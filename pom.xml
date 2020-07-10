@@ -32,15 +32,6 @@
   <build>
     <plugins>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-        <configuration>
-          <compilerArgs>--enable-preview</compilerArgs>
-        </configuration>
-      </plugin>
-
       <!-- code coverage -->
       <plugin>
         <groupId>org.jacoco</groupId>
@@ -119,27 +110,9 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.22.2</version>
         <configuration>
-          <argLine>--enable-preview</argLine>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <environmentVariables>
-            <API_ENABLE_ENDPOINTS>true</API_ENABLE_ENDPOINTS>
-            <API_ENABLE_CONSUMERS>true</API_ENABLE_CONSUMERS>
-            <API_ENABLE_SCHEDULED>true</API_ENABLE_SCHEDULED>
-            <API_ENABLE_MIGRATION>true</API_ENABLE_MIGRATION>
-            <API_QUIT_AFTER_MIGRATION>>false</API_QUIT_AFTER_MIGRATION>
             <API_JWT_SECRET>test</API_JWT_SECRET>
-            <API_REDIS_URL>redis://localhost</API_REDIS_URL>
-            <API_DATABASE_URL>jdbc:postgresql://localhost:54321/postgres</API_DATABASE_URL>
-            <API_DATABASE_USERNAME>postgres</API_DATABASE_USERNAME>
-            <API_DATABASE_PASSWORD>postgres</API_DATABASE_PASSWORD>
-            <API_DATABASE_MAXPOOLSZE>5</API_DATABASE_MAXPOOLSZE>
-            <API_RABBITMQ_USERNAME>guest</API_RABBITMQ_USERNAME>
-            <API_RABBITMQ_PASSWORD>guest</API_RABBITMQ_PASSWORD>
-            <API_RABBITMQ_HOST>localhost</API_RABBITMQ_HOST>
-            <API_RABBITMQ_PORT>5672</API_RABBITMQ_PORT>
-            <JAVALIN_HTTP2_PORT>17367</JAVALIN_HTTP2_PORT>
-            <JAVALIN_HTTPS2_PORT>19272</JAVALIN_HTTPS2_PORT>
-            <JAVALIN_PROMETHEUS_PORT>18392</JAVALIN_PROMETHEUS_PORT>
           </environmentVariables>
           <includes>
             <include>**/*Test.java</include>
