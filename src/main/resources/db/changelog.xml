@@ -1,0 +1,234 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd" logicalFilePath="changeLog">
+
+  <!-- Handle for the pilot -->
+  <changeSet author="raf" id="0000_newtable_user">
+
+    <createTable tableName="user">
+
+      <column name="id" type="uuid"><constraints nullable="false"/></column>
+
+      <column name="name" type="varchar(255)"><constraints nullable="false"/></column>
+
+      <column name="email" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="confirmation_code" type="varchar(255)"/>
+
+      <column name="is_admin" type="boolean" defaultValueComputed="true"/>
+
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP" />
+      <column name="created_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+      <column name="modified_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="modified_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+
+    </createTable>
+
+    <addPrimaryKey tableName="user" columnNames="id"/>
+    <addUniqueConstraint tableName="user" columnNames="name"/>
+    <addUniqueConstraint tableName="user" columnNames="email"/>
+
+  </changeSet>
+
+  <!-- The table holds the names of the DCS instances / servers managed by the app -->
+  <changeSet author="raf" id="0001_newtable_server">
+
+    <createTable tableName="server">
+
+      <column name="name" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="campaign_name" type="varchar(255)"/>
+      <!-- This can be null, means no action to do -->
+      <column name="next_action" type="varchar(255)"/>
+      <column name="current_action" type="varchar(255)"/>
+      <column name="mission_zip" type="bytea"/>
+
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="created_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+      <column name="modified_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="modified_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+
+    </createTable>
+
+    <addPrimaryKey tableName="server" columnNames="name"/>
+
+  </changeSet>
+
+  <!-- This will hold the campaign runtime information -->
+  <changeSet author="raf" id="0002_newtable_campaign_and_mission">
+
+    <createTable tableName="campaign">
+
+      <column name="name" type="varchar(255)"><constraints nullable="false"/></column>
+
+      <!-- Campaign has a manager and decides the objectives, FEBA etc. -->
+      <column name="manager_user" type="uuid"/>
+      <!-- Points to the active/next mission if existing -->
+      <column name="active_mission" type="varchar(255)"/>
+
+      <column name="map" type="varchar(255)" defaultValue="CAUCASUS"><constraints nullable="false"/></column>
+      <column name="state" type="varchar(255)" defaultValue="PREPARING"><constraints nullable="false"/></column>
+      <column name="phase" type="varchar(255)" defaultValue="DECLARING"><constraints nullable="false"/></column>
+
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="created_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+      <column name="modified_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="modified_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+
+    </createTable>
+
+    <addPrimaryKey tableName="campaign" columnNames="name"/>
+
+    <createTable tableName="mission">
+
+      <column name="name" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="campaign" type="varchar(255)"><constraints nullable="false"/></column>
+
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="created_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+      <column name="modified_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="modified_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+
+    </createTable>
+
+    <addPrimaryKey tableName="mission" columnNames="name"/>
+
+  </changeSet>
+
+  <!-- A single faction in the campaign -->
+  <changeSet author="raf" id="0003_newtable_faction">
+
+    <createTable tableName="faction">
+
+      <column name="name" type="varchar(255)"><constraints nullable="false"/></column>
+
+      <column name="commander_user" type="uuid"><constraints nullable="false"/></column>
+
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="created_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+      <column name="modified_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="modified_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+
+    </createTable>
+
+    <addPrimaryKey tableName="faction" columnNames="name"/>
+
+  </changeSet>
+
+  <!-- Holds values for a faction to a specific campaign, basically its status for that campaign -->
+  <changeSet author="raf" id="0003_newtable_campaign_faction">
+
+    <createTable tableName="campaign_faction">
+
+      <column name="id" type="uuid"><constraints nullable="false"/></column>
+      <column name="campaign_name" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="faction_name" type="varchar(255)"><constraints nullable="false"/></column>
+
+      <column name="airbase" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="is_blue" type="boolean" defaultValueBoolean="true"/>
+      <!-- 7000ft is minimum as it is encircling the space of the airfield -->
+      <column name="zone_size_ft" type="int" defaultValue="7000"/>
+      <!-- start credits as 0 and let the app decide defaults during the campaign preparation status -->
+      <column name="credits" type="int" defaultValue="0"/>
+
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="created_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+      <column name="modified_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="modified_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+
+    </createTable>
+
+    <addPrimaryKey tableName="campaign_faction" columnNames="id"/>
+    <addUniqueConstraint tableName="campaign_faction" columnNames="campaign_name, faction_name"/>
+    <addUniqueConstraint tableName="campaign_faction" columnNames="campaign_name, airbase"/>
+    <createIndex indexName="campaign_faction_name" tableName="campaign_faction">
+      <column name="campaign_name"/>
+    </createIndex>
+    <createIndex indexName="campaign_faction_name_faction" tableName="campaign_faction">
+      <column name="campaign_name"/>
+      <column name="faction_name"/>
+    </createIndex>
+
+    <createTable tableName="campaign_faction_units">
+      <column name="id" type="uuid"><constraints nullable="false"/></column>
+      <column name="campaign_faction_id" type="uuid"><constraints nullable="false"/></column>
+      <column name="type" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="x" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="y" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="z" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="angle" type="varchar(255)"><constraints nullable="false"/></column>
+    </createTable>
+    <addPrimaryKey tableName="campaign_faction_units" columnNames="id"/>
+    <createIndex indexName="campaign_faction_units_fk" tableName="campaign_faction_units">
+      <column name="campaign_faction_id"/>
+    </createIndex>
+
+  </changeSet>
+
+  <!-- holds warehouse items and their count -->
+  <changeSet author="raf" id="0004_newtable_campaign_airfield_warehouse">
+    <createTable tableName="campaign_airfield_warehouse">
+      <column name="id" type="uuid"><constraints nullable="false"/></column>
+      <column name="campaign_name" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="airbase" type="varchar(255)"><constraints nullable="false"/></column>
+    </createTable>
+    <addPrimaryKey tableName="campaign_airfield_warehouse" columnNames="id"/>
+    <addUniqueConstraint tableName="campaign_airfield_warehouse" columnNames="campaign_name, airbase"/>
+    <createIndex indexName="campaign_airfield_warehouse_name" tableName="campaign_airfield_warehouse">
+      <column name="campaign_name"/>
+    </createIndex>
+    <createIndex indexName="campaign_airfield_warehouse_base" tableName="campaign_airfield_warehouse">
+      <column name="airbase"/>
+    </createIndex>
+    <createIndex indexName="campaign_airfield_warehouse_name_base" tableName="campaign_airfield_warehouse">
+      <column name="campaign_name"/>
+      <column name="airbase"/>
+    </createIndex>
+
+    <createTable tableName="campaign_airfield_warehouse_item">
+      <column name="id" type="uuid"><constraints nullable="false"/></column>
+      <column name="warehouse_id" type="uuid"><constraints nullable="false"/></column>
+      <column name="item_code" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="item_quantity" type="int" defaultValue="0"/>
+    </createTable>
+    <addPrimaryKey tableName="campaign_airfield_warehouse_item" columnNames="id"/>
+    <addUniqueConstraint tableName="campaign_airfield_warehouse_item" columnNames="warehouse_id,item_code"/>
+    <createIndex indexName="campaign_airfield_warehouse_item_whid" tableName="campaign_airfield_warehouse_item">
+      <column name="warehouse_id"/>
+    </createIndex>
+
+  </changeSet>
+
+  <changeSet author="raf" id="0005_permission_links_server">
+    <createTable tableName="user_server">
+      <column name="user_id" type="uuid"><constraints nullable="false"/></column>
+      <column name="server_name" type="varchar(255)"><constraints nullable="false"/></column>
+    </createTable>
+    <addPrimaryKey tableName="user_server" columnNames="user_id,server_name"/>
+    <createIndex indexName="user_server_byuser" tableName="user_server">
+      <column name="user_id"/>
+    </createIndex>
+  </changeSet>
+
+  <changeSet author="raf" id="0006_server_ip_pw_missiontime">
+    <addColumn tableName="server">
+      <column name="address" type="varchar(255)"/>
+      <column name="port" type="int"/>
+      <column name="password" type="varchar(255)"/>
+      <column name="started_at" type="timestamp"/>
+      <column name="mission_duration_seconds" type="int"/>
+      <column name="running" type="boolean" defaultValueBoolean="true"><constraints nullable="false"/></column>
+    </addColumn>
+  </changeSet>
+
+  <changeSet author="raf" id="0007_flightlog_table">
+    <createTable tableName="campaign_faction_flight_log">
+      <column name="id" type="uuid"><constraints nullable="false"/></column>
+      <column name="campaign_faction_id" type="uuid"><constraints nullable="false"/></column>
+      <column name="description" type="clob"><constraints nullable="false"/></column>
+
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP" />
+      <column name="created_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+      <column name="modified_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="modified_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+    </createTable>
+    <addPrimaryKey tableName="campaign_faction_flight_log" columnNames="id"/>
+  </changeSet>
+
+</databaseChangeLog>
