@@ -115,8 +115,7 @@
             <API_JWT_SECRET>test</API_JWT_SECRET>
           </environmentVariables>
           <includes>
-            <include>**/*Test.java</include>
-            <include>**/*IT.java</include>
+            <include>**</include>
           </includes>
         </configuration>
       </plugin>
@@ -198,6 +197,12 @@
       <version>${version.junit}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>${version.junit}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- testing mockers, matchers and utilities -->
     <dependency>
       <groupId>org.mockito</groupId>
@@ -215,6 +220,12 @@
       <groupId>org.skyscreamer</groupId>
       <artifactId>jsonassert</artifactId>
       <version>${version.jsonassert}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.200</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
