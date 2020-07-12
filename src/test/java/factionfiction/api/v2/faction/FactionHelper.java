@@ -13,11 +13,11 @@ public final class FactionHelper {
       + FactionRepository.TABLE_NAME));
   }
 
-  public static void insertSampleFaction(Jdbi jdbi) {
+  public static void insertSampleFaction(Jdbi jdbi, UUID owner) {
     jdbi.useHandle(h -> h.execute(
       "insert into faction (name, commander_user) values(?, ?)",
       "name",
-      UUID.randomUUID()));
+      owner));
   }
 
   public static Faction makeSampleFaction() {

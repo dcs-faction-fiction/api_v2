@@ -19,7 +19,7 @@ public class FactionSecurity implements FactionService {
     if (!canViewFactions())
       throw cannotViewFactionsError();
 
-    return impl.getFactions();
+    return impl.getFactions(authInfo.getUserUUID());
   }
 
   boolean canCreateFactions() {

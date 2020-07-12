@@ -17,9 +17,11 @@ public class FactionRepositoryIT {
 
   Jdbi jdbi;
   FactionRepository repository;
+  UUID owner;
 
   @BeforeEach
   public void setup() {
+    owner = UUID.randomUUID();
     jdbi = jdbi();
     repository = new FactionRepository(jdbi);
   }
@@ -28,7 +30,7 @@ public class FactionRepositoryIT {
   public void testFactionListZero() {
     cleanFactionTable(jdbi);
 
-    var factions = repository.getFactions();
+    var factions = repository.getFactions(owner);
 
     assertThat(factions, is(emptyList()));
   }
@@ -37,9 +39,9 @@ public class FactionRepositoryIT {
   public void testFactionListOne() {
     cleanFactionTable(jdbi);
 
-    insertSampleFaction(jdbi);
+    insertSampleFaction(jdbi, owner);
 
-    var factions = repository.getFactions();
+    var factions = repository.getFactions(owner);
 
     assertThat(factions, is(List.of(makeSampleFaction())));
   }
@@ -48,8 +50,8 @@ public class FactionRepositoryIT {
   public void testNewFaction() {
     cleanFactionTable(jdbi);
 
-    var faction = repository.newFaction("name", UUID.randomUUID());
-    var factions = repository.getFactions();
+    var faction = repository.newFaction("name", owner);
+    var factions = repository.getFactions(owner);
 
     assertThat(faction.name(), is("name"));
     assertThat(factions, is(List.of(makeSampleFaction())));

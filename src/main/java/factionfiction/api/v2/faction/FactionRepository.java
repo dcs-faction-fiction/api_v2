@@ -20,9 +20,9 @@ public class FactionRepository {
     return find(name);
   }
 
-  public List<Faction> getFactions() {
+  public List<Faction> getFactions(UUID owner) {
     return jdbi.withHandle(h -> h
-      .select("select * from faction")
+      .select("select * from faction where commander_user = ?", owner)
       .mapTo(Faction.class)
       .list());
   }

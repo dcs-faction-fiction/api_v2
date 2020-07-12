@@ -20,6 +20,7 @@ public class FactionEndpoints implements Endpoint {
   public void register(Javalin javalin) {
     javalin.get("/v2/faction-api", this, roles(FACTION_MANAGER));
     javalin.post("/v2/faction-api/factions", this::newFaction, roles(FACTION_MANAGER));
+    javalin.get("/v2/faction-api/factions", this::getFactions, roles(FACTION_MANAGER));
   }
 
   @Override
@@ -33,6 +34,13 @@ public class FactionEndpoints implements Endpoint {
 
     var faction = service.newFaction(name);
     ctx.json(faction);
+  }
+
+  public void getFactions(Context ctx) {
+    var service = service(ctx);
+
+    var factions = service.getFactions();
+    ctx.json(factions);
   }
 
   private FactionService service(Context ctx) {

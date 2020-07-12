@@ -36,5 +36,8 @@ public class CampaignSimulatorIT {
     var name = "New faction"+System.currentTimeMillis();
     var result = http.post("/v2/faction-api/factions", "\""+name+"\"");
     JSONAssert.assertEquals("{\"name\": \""+name+"\"}", result, false);
+
+    result = http.get("/v2/faction-api/factions");
+    JSONAssert.assertEquals("[{\"name\": \""+name+"\"}]", result, false);
   }
 }

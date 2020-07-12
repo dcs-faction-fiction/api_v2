@@ -134,7 +134,7 @@
     <dependency>
 	    <groupId>com.github.dcs-faction-fiction</groupId>
 	    <artifactId>game-interface-library</artifactId>
-      <version>0.0.5</version>
+      <version>0.0.6</version>
     </dependency>
 
     <!-- annotation processing -->

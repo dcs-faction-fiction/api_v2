@@ -58,7 +58,7 @@ public class FactionSecurityTest {
   @Test
   public void testCanViewFactionsWhenFactionManager() {
     var list = List.of(makeSampleFaction());
-    given(impl.getFactions()).willReturn(list);
+    given(impl.getFactions(any())).willReturn(list);
     given(authInfo.isFactionManager()).willReturn(true);
 
     var factions = security.getFactions();
@@ -74,6 +74,6 @@ public class FactionSecurityTest {
     });
 
     assertThat(ex.getMessage(), containsString("Cannot view factions"));
-    verify(impl, times(0)).getFactions();
+    verify(impl, times(0)).getFactions(any());
   }
 }
