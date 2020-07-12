@@ -41,15 +41,10 @@ public class ComponentsModule {
   }
 
   @Provides
-  @Singleton
-  public FactionServiceImpl factionServiceImpl(Jdbi jdbi) {
-    var repository = new FactionRepository(jdbi);
-    return new FactionServiceImpl(repository);
-  }
-
-  @Provides
   @IntoSet
-  public Endpoint factionEndpoints(FactionServiceImpl impl) {
+  public Endpoint factionEndpoints(Jdbi jdbi) {
+    var repository = new FactionRepository(jdbi);
+    var impl = new FactionServiceImpl(repository);
     return new FactionEndpoints(impl);
   }
 }

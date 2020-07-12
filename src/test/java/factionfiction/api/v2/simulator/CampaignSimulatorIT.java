@@ -12,6 +12,9 @@ public class CampaignSimulatorIT {
 
   static HttpCaller http = new HttpCaller();
 
+  static String factionName = "New faction"+System.currentTimeMillis();
+  static String campaignName = "New campaign"+System.currentTimeMillis();
+
   @BeforeAll
   public static void startup() {
     Main.main(new String[]{});
@@ -29,15 +32,5 @@ public class CampaignSimulatorIT {
 
     result = http.get("/v2/faction-api");
     JSONAssert.assertEquals("{\"version\": \"2\"}", result, false);
-  }
-
-  @Test
-  public void testSimulation() throws JSONException {
-    var name = "New faction"+System.currentTimeMillis();
-    var result = http.post("/v2/faction-api/factions", "\""+name+"\"");
-    JSONAssert.assertEquals("{\"name\": \""+name+"\"}", result, false);
-
-    result = http.get("/v2/faction-api/factions");
-    JSONAssert.assertEquals("[{\"name\": \""+name+"\"}]", result, false);
   }
 }
