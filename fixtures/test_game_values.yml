@@ -1,0 +1,189 @@
+game:
+  credits:
+    starting: 1.5
+    gain:
+      mission: 5
+  zones:
+    sizes:
+      min:  50000
+      max: 500000
+    increase:
+      amount: 50000
+      cost: 2
+    decrease:
+      amount: 50000
+      gain: 1
+  units:
+    - code: "AWACS"
+      cost: 3
+    - code: "TANKER"
+      cost: 1
+    - code: "ABRAMS"
+      cost: 0.5
+    - code: "T_80"
+      cost: 0.5
+    - code: "BRADLEY"
+      cost: 0.5
+    - code: "BMP_3"
+      cost: 0.5
+    - code: "SHILKA"
+      cost: 0.5
+    - code: "SA_9"
+      cost: 0.5
+    - code: "SA_13"
+      cost: 0.5
+    - code: "SA_15"
+      cost: 3
+    - code: "SA_19"
+      cost: 2
+    - code: "SA_6"
+      cost: 2
+    - code: "SA_11"
+      cost: 2
+    - code: "SA_HAWK"
+      cost: 2
+    - code: "SA_10"
+      cost: 4
+    - code: "SA_PATRIOT"
+      cost: 4
+  warehouseItems:
+    - code: "JET_FUEL_TONS"
+      cost: 0.04
+    - code: "AVIATION_GASOLINE_TONS"
+      cost: 0.04
+    - code: "MW50_TONS"
+      cost: 0.04
+    - code: "DIESEL_TONS"
+      cost: 0.04
+    - code: "F_14_B"
+      cost: 2
+    - code: "F_15_C"
+      cost: 2
+    - code: "F_16_C"
+      cost: 2
+    - code: "F_A_18_C"
+      cost: 2
+    - code: "AV_8B_NA"
+      cost: 2
+    - code: "SU_27"
+      cost: 2
+    - code: "SU_33"
+      cost: 2
+    - code: "MIG_29_S"
+      cost: 2
+    - code: "M_2000_C"
+      cost: 2
+    - code: "JF_17"
+      cost: 2
+    - code: "UH_1H"
+      cost: 2
+    - code: "KA_50"
+      cost: 2
+    - code: "AIM_120_B"
+      cost: 0.8
+    - code: "AIM_120_C"
+      cost: 0.8
+    - code: "AIM_54_A_MK_47"
+      cost: 1.2
+    - code: "AIM_54_A_MK_60"
+      cost: 1.2
+    - code: "AIM_54_C_MK_47"
+      cost: 1.2
+    - code: "AIM_7_F"
+      cost: 0.2
+    - code: "AIM_7_M"
+      cost: 0.2
+    - code: "AIM_7_MH"
+      cost: 0.2
+    - code: "AIM_9_L"
+      cost: 0.1
+    - code: "AIM_9_M"
+      cost: 0.1
+    - code: "AIM_9_P5"
+      cost: 0.1
+    - code: "AIM_9_X"
+      cost: 0.4
+    - code: "R_27_ER"
+      cost: 0.4
+    - code: "R_27_ET"
+      cost: 0.8
+    - code: "R_27_R"
+      cost: 0.2
+    - code: "R_27_T"
+      cost: 0.2
+    - code: "R_73"
+      cost: 0.4
+    - code: "R_60"
+      cost: 0.1
+    - code: "R_77"
+      cost: 0.8
+    - code: "MATRA_MAGIC_2"
+      cost: 0.1
+    - code: "MATRA_S_530_D"
+      cost: 0.2
+    - code: "AGM_122"
+      cost: 0.8
+    - code: "AGM_154_A"
+      cost: 1.6
+    - code: "AGM_154_C"
+      cost: 1.6
+    - code: "AGM_65_D"
+      cost: 0.8
+    - code: "AGM_65_E"
+      cost: 0.8
+    - code: "AGM_65_F"
+      cost: 0.8
+    - code: "AGM_65_G"
+      cost: 0.8
+    - code: "AGM_65_H"
+      cost: 0.8
+    - code: "AGM_65_K"
+      cost: 0.8
+    - code: "AGM_84_D"
+      cost: 1.6
+    - code: "AGM_84_E"
+      cost: 1.6
+    - code: "AGM_88_C"
+      cost: 1.2
+    - code: "VIKHR"
+      cost: 0.8
+    - code: "KH_58"
+      cost: 1.2
+    - code: "KH_25MPU"
+      cost: 1.2
+    - code: "KH_29L"
+      cost: 0.8
+    - code: "KH_29T"
+      cost: 0.8
+    - code: "GBU_10"
+      cost: 0.8
+    - code: "GBU_12"
+      cost: 0.8
+    - code: "GBU_16"
+      cost: 0.8
+    - code: "GBU_31"
+      cost: 0.8
+    - code: "GBU_31_V3B"
+      cost: 0.8
+    - code: "GBU_38"
+      cost: 0.8
+    - code: "AGM_62"
+      cost: 0.8
+    - code: "MK_81"
+      cost: 0.1
+    - code: "MK_82"
+      cost: 0.1
+    - code: "MK_83"
+      cost: 0.1
+    - code: "MK_84"
+      cost: 0.1
+    - code: "MK_82X"
+      cost: 0.1
+    - code: "MK_82Y"
+      cost: 0.1
+    - code: "ZUNI"
+      cost: 0.1
+    - code: "M151"
+      cost: 0.01
+    - code: "M5_HE"
+      cost: 0.01

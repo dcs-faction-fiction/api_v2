@@ -2,7 +2,6 @@ package factionfiction.api.v2.faction;
 
 import static factionfiction.api.v2.auth.Roles.FACTION_MANAGER;
 import static factionfiction.api.v2.faction.FactionHelper.makeSampleFaction;
-import factionfiction.api.v2.test.AuthProvider;
 import static factionfiction.api.v2.test.AuthProvider.mockUser;
 import io.javalin.Javalin;
 import static io.javalin.core.security.SecurityUtil.roles;
