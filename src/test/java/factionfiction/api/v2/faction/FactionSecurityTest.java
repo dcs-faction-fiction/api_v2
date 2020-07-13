@@ -43,7 +43,7 @@ public class FactionSecurityTest {
   }
 
   @Test
-  public void testCanotnCreateFactionWhenNotFactionManager() {
+  public void testCannotCreateFactionWhenNotFactionManager() {
     String name = "valid name";
     given(authInfo.isFactionManager()).willReturn(false);
 
@@ -58,22 +58,23 @@ public class FactionSecurityTest {
   @Test
   public void testCanViewFactionsWhenFactionManager() {
     var list = List.of(makeSampleFaction());
-    given(impl.getFactions(any())).willReturn(list);
+    given(impl.listFactions(any())).willReturn(list);
     given(authInfo.isFactionManager()).willReturn(true);
 
-    var factions = security.getFactions();
+    var factions = security.listFactions();
 
     assertThat(factions, is(list));
   }
+
   @Test
   public void testCannotViewFactionsWhenNotFactionManager() {
     given(authInfo.isFactionManager()).willReturn(false);
 
     var ex = assertThrows(NotAuthorizedException.class, () -> {
-      security.getFactions();
+      security.listFactions();
     });
 
     assertThat(ex.getMessage(), containsString("Cannot view factions"));
-    verify(impl, times(0)).getFactions(any());
+    verify(impl, times(0)).listFactions(any());
   }
 }

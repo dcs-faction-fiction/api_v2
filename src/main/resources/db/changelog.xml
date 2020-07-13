@@ -231,4 +231,10 @@
     <addPrimaryKey tableName="campaign_faction_flight_log" columnNames="id"/>
   </changeSet>
 
+  <changeSet author="raf" id="0008_campaign_faction_game_options">
+    <addColumn tableName="campaign">
+      <column name="game_options" type="clob"/>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>

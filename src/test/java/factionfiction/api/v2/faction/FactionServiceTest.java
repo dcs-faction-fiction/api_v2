@@ -30,9 +30,9 @@ public class FactionServiceTest {
 
   @Test
   public void testNoFactionsAtStart() {
-    given(repository.getFactions(any())).willReturn(emptyList());
+    given(repository.listFactions(any())).willReturn(emptyList());
 
-    var factions = service.getFactions(UUID.randomUUID());
+    var factions = service.listFactions(UUID.randomUUID());
 
     assertThat(factions, is(emptyList()));
   }
@@ -40,9 +40,9 @@ public class FactionServiceTest {
   @Test
   public void testFactionsReturned() {
     var list = List.of(makeSampleFaction());
-    given(repository.getFactions(any())).willReturn(list);
+    given(repository.listFactions(any())).willReturn(list);
 
-    var factions = service.getFactions(UUID.randomUUID());
+    var factions = service.listFactions(UUID.randomUUID());
 
     assertThat(factions, is(list));
   }

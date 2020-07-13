@@ -39,7 +39,7 @@ public class FactionEndpoints implements Endpoint {
   public void getFactions(Context ctx) {
     var service = service(ctx);
 
-    var factions = service.getFactions();
+    var factions = service.listFactions();
     ctx.json(factions);
   }
 

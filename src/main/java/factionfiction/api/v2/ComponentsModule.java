@@ -5,9 +5,17 @@ import com.github.apilab.rest.Endpoint;
 import com.github.apilab.rest.auth.AuthConfiguration;
 import com.github.apilab.rest.auth.ImmutableAuthConfiguration;
 import com.github.apilab.rest.exceptions.ServerException;
+import com.google.gson.Gson;
 import dagger.Provides;
 import dagger.multibindings.IntoSet;
 import factionfiction.api.v2.auth.Roles;
+import factionfiction.api.v2.campaign.Campaign;
+import factionfiction.api.v2.campaign.CampaignEndpoints;
+import factionfiction.api.v2.campaign.CampaignRepository;
+import factionfiction.api.v2.campaign.CampaignServiceImpl;
+import factionfiction.api.v2.campaignfaction.CampaignFaction;
+import factionfiction.api.v2.campaignfaction.CampaignFactionRepository;
+import factionfiction.api.v2.campaignfaction.CampaignFactionServiceImpl;
 import factionfiction.api.v2.common.CommonEndpoints;
 import factionfiction.api.v2.faction.Faction;
 import factionfiction.api.v2.faction.FactionEndpoints;
@@ -42,15 +50,59 @@ public class ComponentsModule {
   @Singleton
   @Named("jdbiImmutables")
   public Set<Class<?>> jdbiImmutables() {
-    return Set.of(Faction.class);
+    return Set.of(
+      Faction.class,
+      Campaign.class,
+      CampaignFaction.class);
+  }
+
+  @Provides
+  public FactionRepository factionRepository(Jdbi jdbi) {
+    return new FactionRepository(jdbi);
+  }
+
+  @Provides
+  public CampaignRepository campaignRepository(Jdbi jdbi, Gson gson, @Named("defaults") GameOptions defaultOptions) {
+    return new CampaignRepository(jdbi, gson, defaultOptions);
+  }
+
+  @Provides
+  public CampaignFactionRepository campaignFactionRepository(Jdbi jdbi) {
+    return new CampaignFactionRepository(jdbi);
+  }
+
+  @Provides
+  public FactionServiceImpl factionService(FactionRepository facRepo) {
+    return new FactionServiceImpl(facRepo);
+  }
+
+  @Provides
+  public CampaignServiceImpl campaignService(CampaignRepository campRepo) {
+    return new CampaignServiceImpl(campRepo);
+  }
+
+  @Provides
+  public CampaignFactionServiceImpl campaignFactionService(
+    CampaignRepository campRepo,
+    FactionRepository facRepo,
+    CampaignFactionRepository repo) {
+
+    return new CampaignFactionServiceImpl(campRepo, facRepo, repo);
   }
 
   @Provides
   @IntoSet
-  public Endpoint factionEndpoints(Jdbi jdbi) {
-    var repository = new FactionRepository(jdbi);
-    var impl = new FactionServiceImpl(repository);
+  public Endpoint factionEndpoints(FactionServiceImpl impl) {
     return new FactionEndpoints(impl);
+  }
+
+  @Provides
+  @IntoSet
+  public Endpoint campaignEndpoints(
+    CampaignServiceImpl impl,
+    CampaignFactionServiceImpl cfImpl) {
+
+    return new CampaignEndpoints(impl, cfImpl);
   }
 
   @Provides

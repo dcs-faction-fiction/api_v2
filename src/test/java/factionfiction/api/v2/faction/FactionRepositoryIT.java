@@ -30,7 +30,7 @@ public class FactionRepositoryIT {
   public void testFactionListZero() {
     cleanFactionTable(jdbi);
 
-    var factions = repository.getFactions(owner);
+    var factions = repository.listFactions(owner);
 
     assertThat(factions, is(emptyList()));
   }
@@ -41,7 +41,7 @@ public class FactionRepositoryIT {
 
     insertSampleFaction(jdbi, owner);
 
-    var factions = repository.getFactions(owner);
+    var factions = repository.listFactions(owner);
 
     assertThat(factions, is(List.of(makeSampleFaction())));
   }
@@ -51,7 +51,7 @@ public class FactionRepositoryIT {
     cleanFactionTable(jdbi);
 
     var faction = repository.newFaction("name", owner);
-    var factions = repository.getFactions(owner);
+    var factions = repository.listFactions(owner);
 
     assertThat(faction.name(), is("name"));
     assertThat(factions, is(List.of(makeSampleFaction())));

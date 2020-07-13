@@ -17,8 +17,8 @@ public class FactionServiceImpl {
     this.repository = repository;
   }
 
-  public List<Faction> getFactions(UUID owner) {
-    return repository.getFactions(owner);
+  public List<Faction> listFactions(UUID owner) {
+    return repository.listFactions(owner);
   }
 
   public Faction newFaction(String name, UUID owner) {

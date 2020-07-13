@@ -3,6 +3,6 @@ package factionfiction.api.v2.faction;
 import java.util.List;
 
 public interface FactionService {
-  List<Faction> getFactions();
+  List<Faction> listFactions();
   Faction newFaction(String name);
 }

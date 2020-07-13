@@ -68,7 +68,7 @@ public class FactionEndpointsTest {
     var faction = makeSampleFaction();
     var factions = List.of(faction);
     mockUserWIthFactionRole();
-    given(impl.getFactions(user)).willReturn(factions);
+    given(impl.listFactions(user)).willReturn(factions);
 
     endpoints.getFactions(ctx);
 

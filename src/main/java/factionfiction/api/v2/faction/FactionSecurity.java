@@ -15,11 +15,11 @@ public class FactionSecurity implements FactionService {
   }
 
   @Override
-  public List<Faction> getFactions() {
+  public List<Faction> listFactions() {
     if (!canViewFactions())
       throw cannotViewFactionsError();
 
-    return impl.getFactions(authInfo.getUserUUID());
+    return impl.listFactions(authInfo.getUserUUID());
   }
 
   boolean canCreateFactions() {

@@ -1,5 +1,6 @@
 package factionfiction.api.v2.auth;
 
+import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
 import static factionfiction.api.v2.auth.Roles.FACTION_MANAGER;
 import static factionfiction.api.v2.test.AuthProvider.mockUser;
 import io.javalin.http.Context;
@@ -11,8 +12,9 @@ import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 
 public class AuthInfoTest {
+
   @Test
-  public void testFromContext() {
+  public void testFromContextFactionManager() {
     var uuid = UUID.randomUUID();
     Context ctx = mock(Context.class);
     mockUser(ctx, uuid, Set.of(FACTION_MANAGER));
@@ -20,6 +22,18 @@ public class AuthInfoTest {
     var info = AuthInfo.fromContext(ctx);
 
     assertThat(info.isFactionManager(), is(true));
+    assertThat(info.getUserUUID(), is(uuid));
+  }
+
+  @Test
+  public void testFromContextCampaignManager() {
+    var uuid = UUID.randomUUID();
+    Context ctx = mock(Context.class);
+    mockUser(ctx, uuid, Set.of(CAMPAIGN_MANAGER));
+
+    var info = AuthInfo.fromContext(ctx);
+
+    assertThat(info.isCampaignManager(), is(true));
     assertThat(info.getUserUUID(), is(uuid));
   }
 }
