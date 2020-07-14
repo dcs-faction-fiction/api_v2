@@ -8,23 +8,33 @@ import com.github.apilab.rest.exceptions.ServerException;
 import com.google.gson.Gson;
 import dagger.Provides;
 import dagger.multibindings.IntoSet;
+import factionfiction.api.v2.auth.AuthInfo;
 import factionfiction.api.v2.auth.Roles;
 import factionfiction.api.v2.campaign.Campaign;
 import factionfiction.api.v2.campaign.CampaignEndpoints;
 import factionfiction.api.v2.campaign.CampaignRepository;
+import factionfiction.api.v2.campaign.CampaignSecurity;
+import factionfiction.api.v2.campaign.CampaignService;
 import factionfiction.api.v2.campaign.CampaignServiceImpl;
 import factionfiction.api.v2.campaignfaction.CampaignFaction;
+import factionfiction.api.v2.campaignfaction.CampaignFactionEndpoints;
 import factionfiction.api.v2.campaignfaction.CampaignFactionRepository;
+import factionfiction.api.v2.campaignfaction.CampaignFactionSecurity;
+import factionfiction.api.v2.campaignfaction.CampaignFactionService;
 import factionfiction.api.v2.campaignfaction.CampaignFactionServiceImpl;
 import factionfiction.api.v2.common.CommonEndpoints;
 import factionfiction.api.v2.faction.Faction;
 import factionfiction.api.v2.faction.FactionEndpoints;
 import factionfiction.api.v2.faction.FactionRepository;
+import factionfiction.api.v2.faction.FactionSecurity;
+import factionfiction.api.v2.faction.FactionService;
 import factionfiction.api.v2.faction.FactionServiceImpl;
 import factionfiction.api.v2.game.GameOptions;
 import factionfiction.api.v2.game.GameOptionsLoader;
+import io.javalin.http.Context;
 import java.io.IOException;
 import java.util.Set;
+import java.util.function.Function;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.jdbi.v3.core.Jdbi;
@@ -91,18 +101,55 @@ public class ComponentsModule {
   }
 
   @Provides
+  @Named("factionProvider")
+  public Function<Context, FactionService> factionProvider(FactionServiceImpl impl) {
+    return ctx -> new FactionSecurity(impl, AuthInfo.fromContext(ctx));
+  }
+
+  @Provides
+  @Named("campaignProvider")
+  public Function<Context, CampaignService> campaignProvider(CampaignServiceImpl impl) {
+    return ctx -> new CampaignSecurity(impl, AuthInfo.fromContext(ctx));
+  }
+
+  @Provides
+  @Named("campaignFactionProvider")
+  public Function<Context, CampaignFactionService> campaignFactionProvider(
+    CampaignFactionServiceImpl impl,
+    CampaignRepository campaignRepository) {
+
+    return ctx -> new CampaignFactionSecurity(impl, campaignRepository, AuthInfo.fromContext(ctx));
+  }
+
+  @Provides
   @IntoSet
-  public Endpoint factionEndpoints(FactionServiceImpl impl) {
-    return new FactionEndpoints(impl);
+  public Endpoint factionEndpoints(
+    @Named("factionProvider")
+    Function<Context, FactionService> fn) {
+
+    return new FactionEndpoints(fn);
   }
 
   @Provides
   @IntoSet
   public Endpoint campaignEndpoints(
-    CampaignServiceImpl impl,
-    CampaignFactionServiceImpl cfImpl) {
+    @Named("campaignProvider")
+    Function<Context, CampaignService> campProvider,
+    @Named("campaignFactionProvider")
+    Function<Context, CampaignFactionService> cfProvider) {
 
-    return new CampaignEndpoints(impl, cfImpl);
+    return new CampaignEndpoints(campProvider, cfProvider);
+  }
+
+  @Provides
+  @IntoSet
+  public Endpoint campaignFactionEndpoints(
+    @Named("campaignProvider")
+    Function<Context, CampaignService> campProvider,
+    @Named("campaignFactionProvider")
+    Function<Context, CampaignFactionService> cfProvider) {
+
+    return new CampaignFactionEndpoints(campProvider, cfProvider);
   }
 
   @Provides

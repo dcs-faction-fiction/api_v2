@@ -66,4 +66,26 @@ public class CampaignRepositoryIT {
     assertThat(campaign, is(campaignToCreate));
     assertThat(gampaigns, is(List.of(campaignToCreate)));
   }
+
+  @Test
+  public void testIsOwner() throws IOException {
+    cleanCampaignTable(jdbi);
+    insertSampleCampaign(jdbi, owner);
+    var sample = makeSampleCampaign();
+
+    var isOwner = repository.isOwner(sample.name(), owner);
+
+    assertThat(isOwner, is(true));
+  }
+
+  @Test
+  public void testIsNotOwner() throws IOException {
+    cleanCampaignTable(jdbi);
+    insertSampleCampaign(jdbi, owner);
+    var sample = makeSampleCampaign();
+
+    var isOwner = repository.isOwner(sample.name(), UUID.randomUUID());
+
+    assertThat(isOwner, is(false));
+  }
 }

@@ -79,4 +79,37 @@ public class CampaignSecurityTest {
       security.newCampaign(name, gameOptions);
     });
   }
+
+  @Test
+  public void testFindCampaignNotPermission() throws IOException {
+    given(authInfo.isCampaignManager()).willReturn(false);
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.find("");
+    });
+  }
+
+  @Test
+  public void testFindCampaignNotOwned() throws IOException {
+    var uuid = UUID.randomUUID();
+    given(authInfo.getUserUUID()).willReturn(uuid);
+    given(authInfo.isCampaignManager()).willReturn(true);
+    given(impl.isOwner("", uuid)).willReturn(false);
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.find("");
+    });
+  }
+
+  @Test
+  public void testFindCampaignOwned() throws IOException {
+    var uuid = UUID.randomUUID();
+    var campaign = makeSampleCampaign();
+    given(authInfo.getUserUUID()).willReturn(uuid);
+    given(authInfo.isCampaignManager()).willReturn(true);
+    given(impl.isOwner("", uuid)).willReturn(true);
+    given(impl.find("")).willReturn(campaign);
+
+    var result = security.find("");
+
+    assertThat(result, is(campaign));
+  }
 }

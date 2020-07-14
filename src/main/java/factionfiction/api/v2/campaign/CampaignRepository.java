@@ -53,6 +53,16 @@ public class CampaignRepository {
       .orElseThrow(() -> new NotFoundException("not found"));
   }
 
+  public boolean isOwner(String name, UUID owner) {
+    return jdbi.withHandle(h -> h.select(
+      "select name from campaign where name = ? and manager_user = ?",
+      name,
+      owner)
+      .mapTo(String.class)
+      .findFirst())
+      .isPresent();
+  }
+
   private RowMapper<Campaign> mapToCampaign() {
     return (rs, ctx) -> campaignFromResultSet(rs);
   }
@@ -69,4 +79,5 @@ public class CampaignRepository {
       .map(s -> gson.fromJson(s, GameOptions.class))
       .orElse(defaultOptions);
   }
+
 }

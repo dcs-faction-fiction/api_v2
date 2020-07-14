@@ -23,4 +23,11 @@ public class CampaignServiceImpl {
     return repository.newCampaign(name, owner, options);
   }
 
+  public Campaign find(String name) {
+    return repository.find(name);
+  }
+
+  public boolean isOwner(String name, UUID owner) {
+    return repository.isOwner(name, owner);
+  }
 }

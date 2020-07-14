@@ -31,7 +31,26 @@ public class CampaignSecurity implements CampaignService {
     return impl.newCampaign(name, authInfo.getUserUUID(), options);
   }
 
+  @Override
+  public Campaign find(String name) {
+    if (!canViewCampaigns())
+      throw cannotViewCampaignsError();
+
+    if (!ownsCampaign(name))
+      throw cannotOwnCampaign();
+
+    return impl.find(name);
+  }
+
+  boolean ownsCampaign(String name) {
+    return impl.isOwner(name, authInfo.getUserUUID());
+  }
+
   boolean canViewCampaigns() {
+    return authInfo.isCampaignManager();
+  }
+
+  boolean canCreateCampaigns() {
     return authInfo.isCampaignManager();
   }
 
@@ -39,11 +58,12 @@ public class CampaignSecurity implements CampaignService {
     return new NotAuthorizedException("Cannot view campaigns");
   }
 
-  boolean canCreateCampaigns() {
-    return authInfo.isCampaignManager();
+  static NotAuthorizedException cannotOwnCampaign() {
+    return new NotAuthorizedException("Not owning this campaign");
   }
 
   static RuntimeException cannotCreateCampaignsError() {
     return new NotAuthorizedException("Cannot create campaigns");
   }
+
 }

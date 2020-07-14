@@ -2,6 +2,7 @@ package factionfiction.api.v2.campaignfaction;
 
 import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
 import factionfiction.api.v2.campaign.CampaignRepository;
+import static factionfiction.api.v2.campaignfaction.CampaignFaction.fromCampaignAndFactionAndOptions;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
 import static factionfiction.api.v2.faction.FactionHelper.makeSampleFaction;
 import factionfiction.api.v2.faction.FactionRepository;
@@ -47,7 +48,7 @@ public class CampaignFactionServiceTest {
   @Test
   public void testConverter() throws IOException {
     var options = new GameOptionsLoader().loadDefaults();
-    var result = impl.fromCampaignAndFactionAndOptions(
+    var result = fromCampaignAndFactionAndOptions(
       sample.campaignName(),
       sample.factionName(),
       sample.airbase(),

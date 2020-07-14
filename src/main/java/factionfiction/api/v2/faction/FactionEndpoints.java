@@ -1,19 +1,19 @@
 package factionfiction.api.v2.faction;
 
 import com.github.apilab.rest.Endpoint;
-import factionfiction.api.v2.auth.AuthInfo;
 import static factionfiction.api.v2.auth.Roles.FACTION_MANAGER;
 import io.javalin.Javalin;
 import static io.javalin.core.security.SecurityUtil.roles;
 import io.javalin.http.Context;
 import java.util.Map;
+import java.util.function.Function;
 
 public class FactionEndpoints implements Endpoint {
 
-  final FactionServiceImpl impl;
+  final Function<Context, FactionService> serviceProvider;
 
-  public FactionEndpoints(FactionServiceImpl impl) {
-    this.impl = impl;
+  public FactionEndpoints(Function<Context, FactionService> serviceProvider) {
+    this.serviceProvider = serviceProvider;
   }
 
   @Override
@@ -29,7 +29,7 @@ public class FactionEndpoints implements Endpoint {
   }
 
   public void newFaction(Context ctx) {
-    var service = service(ctx);
+    var service = serviceProvider.apply(ctx);
     var name = ctx.bodyAsClass(String.class);
 
     var faction = service.newFaction(name);
@@ -37,15 +37,9 @@ public class FactionEndpoints implements Endpoint {
   }
 
   public void getFactions(Context ctx) {
-    var service = service(ctx);
+    var service = serviceProvider.apply(ctx);
 
     var factions = service.listFactions();
     ctx.json(factions);
   }
-
-  private FactionService service(Context ctx) {
-    var authInfo = AuthInfo.fromContext(ctx);
-    return new FactionSecurity(impl, authInfo);
-  }
-
 }

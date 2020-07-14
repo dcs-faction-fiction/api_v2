@@ -23,7 +23,7 @@ public class FactionEndpointsTest {
   UUID user;
   Context ctx;
   Javalin javalin;
-  FactionServiceImpl impl;
+  FactionService service;
   FactionEndpoints endpoints;
 
   @BeforeEach
@@ -31,8 +31,8 @@ public class FactionEndpointsTest {
     user = UUID.randomUUID();
     ctx = mock(Context.class);
     javalin = mock(Javalin.class);
-    impl = mock(FactionServiceImpl.class);
-    endpoints = new FactionEndpoints(impl);
+    service = mock(FactionService.class);
+    endpoints = new FactionEndpoints(v -> service);
   }
 
   @Test
@@ -56,7 +56,7 @@ public class FactionEndpointsTest {
     var faction = makeSampleFaction();
     mockUserWIthFactionRole();
     given(ctx.bodyAsClass(String.class)).willReturn(faction.name());
-    given(impl.newFaction(faction.name(), user)).willReturn(faction);
+    given(service.newFaction(faction.name())).willReturn(faction);
 
     endpoints.newFaction(ctx);
 
@@ -68,7 +68,7 @@ public class FactionEndpointsTest {
     var faction = makeSampleFaction();
     var factions = List.of(faction);
     mockUserWIthFactionRole();
-    given(impl.listFactions(user)).willReturn(factions);
+    given(service.listFactions()).willReturn(factions);
 
     endpoints.getFactions(ctx);
 

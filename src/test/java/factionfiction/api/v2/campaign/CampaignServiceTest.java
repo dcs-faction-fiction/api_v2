@@ -56,6 +56,25 @@ public class CampaignServiceTest {
   }
 
   @Test
+  public void testFindCampaign() throws IOException {
+    var campaign = makeSampleCampaign();
+    given(repository.find(campaign.name())).willReturn(campaign);
+    var result = service.find(campaign.name());
+
+    assertThat(result, is(campaign));
+  }
+
+  @Test
+  public void testIsOwner() throws IOException {
+    var campaign = makeSampleCampaign();
+    given(repository.isOwner(campaign.name(), owner)).willReturn(true);
+    var isowner = service.isOwner(campaign.name(), owner);
+
+    verify(repository).isOwner(campaign.name(), owner);
+    assertThat(isowner, is(true));
+  }
+
+  @Test
   public void testCreateCampaign() {
     var name = "Campaign";
     GameOptions options = ImmutableGameOptions.copyOf(defaultOptions);

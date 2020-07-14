@@ -4,6 +4,7 @@ import factionfiction.api.v2.game.GameOptions;
 import java.util.List;
 
 public interface CampaignService {
+  public Campaign find(String name);
   public List<Campaign> listCampaigns();
   public Campaign newCampaign(String name, GameOptions options);
 }
