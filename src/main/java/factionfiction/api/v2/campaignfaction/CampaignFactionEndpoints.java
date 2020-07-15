@@ -28,7 +28,7 @@ public class CampaignFactionEndpoints implements Endpoint {
   @Override
   public void register(Javalin javalin) {
     javalin.get("/v2/campaignfaction-api", this, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
-    javalin.post("/v2/campaignfaction-api/campaigns/:campaign/campaignfactions", this, roles(CAMPAIGN_MANAGER));
+    javalin.post("/v2/campaignfaction-api/campaigns/:campaign/factions", this, roles(CAMPAIGN_MANAGER));
   }
 
   @Override

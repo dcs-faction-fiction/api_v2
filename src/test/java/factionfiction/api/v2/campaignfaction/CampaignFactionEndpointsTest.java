@@ -45,6 +45,7 @@ public class CampaignFactionEndpointsTest {
     endpoints.register(javalin);
 
     verify(javalin).get(eq("/v2/campaignfaction-api"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
+    javalin.post(eq("/v2/campaignfaction-api/campaigns/:campaign/factions"), any(), eq(roles(CAMPAIGN_MANAGER)));
   }
 
   @Test
