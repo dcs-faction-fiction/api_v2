@@ -27,6 +27,16 @@ public class FactionRepository {
       .list());
   }
 
+  public boolean isOwner(String name, UUID owner) {
+    return jdbi.withHandle(h -> h.select(
+      "select name from faction where name = ? and commander_user = ?",
+      name,
+      owner)
+      .mapTo(String.class)
+      .findFirst())
+      .isPresent();
+  }
+
   void insert(String name, UUID owner) {
     jdbi.useHandle(h -> h.execute(
       "insert into faction (name, commander_user) values(?, ?)",

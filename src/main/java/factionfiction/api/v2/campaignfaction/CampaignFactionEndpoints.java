@@ -29,6 +29,7 @@ public class CampaignFactionEndpoints implements Endpoint {
   public void register(Javalin javalin) {
     javalin.get("/v2/campaignfaction-api", this, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
     javalin.post("/v2/campaignfaction-api/campaigns/:campaign/factions", this, roles(CAMPAIGN_MANAGER));
+    javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction", this, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
   }
 
   @Override
@@ -50,6 +51,16 @@ public class CampaignFactionEndpoints implements Endpoint {
       campaign.gameOptions());
 
     var result = service.newCampaignFaction(cfFull);
+
+    ctx.json(result);
+  }
+
+  public void getSituation(Context ctx) {
+    var service = cfServiceProvider.apply(ctx);
+    var campaignName = ctx.pathParam("campaign", String.class).get();
+    var factionName = ctx.pathParam("faction", String.class).get();
+
+    var result = service.getSituation(campaignName, factionName);
 
     ctx.json(result);
   }

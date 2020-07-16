@@ -1,7 +1,6 @@
 package factionfiction.api.v2.campaignfaction;
 
 import static base.game.Airbases.KUTAISI;
-import factionfiction.api.v2.campaignfaction.ImmutableCampaignFaction;
 import java.math.BigDecimal;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -16,16 +15,18 @@ public final class CampaignFactionHelper {
       + CampaignFactionRepository.TABLE_NAME));
   }
 
-  public static void insertSampleCampaignFaction(Jdbi jdbi, UUID owner) {
+  public static void insertSampleCampaignFaction(Jdbi jdbi, UUID id, UUID owner) {
     jdbi.useHandle(h -> h.execute(
       "insert into campaign_faction ("
+        + "id, "
         + "campaign_name, "
         + "faction_name, "
         + "airbase, "
         + "is_blue, "
         + "zone_size_ft, "
         + "credits)"
-        + " values(?, ?, ?, ?, ?, ?)",
+        + " values(?, ?, ?, ?, ?, ?, ?)",
+      id,
       "campaign name",
       "faction name",
       KUTAISI,

@@ -1,8 +1,8 @@
 package factionfiction.api.v2.campaignfaction;
 
 import static base.game.Airbases.ANAPA;
-import factionfiction.api.v2.campaignfaction.ImmutableCampaignFaction;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.cleanCampaignFactionTable;
+import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.insertSampleCampaignFaction;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
 import static factionfiction.api.v2.test.InMemoryDB.jdbi;
 import java.io.IOException;
@@ -50,6 +50,28 @@ public class CampaignFactionRepositoryIT {
     var campaignFaction = repository.newCampaignFaction(sampleRed);
 
     assertThat(campaignFaction, is(sampleRed));
+  }
+
+  @Test
+  public void testGetCFID() {
+    var id = UUID.randomUUID();
+    cleanCampaignFactionTable(jdbi);
+    insertSampleCampaignFaction(jdbi, id, owner);
+
+    var result = repository.getCampaignFactionId(sample.campaignName(), sample.factionName());
+
+    assertThat(result, is(id));
+  }
+
+  @Test
+  public void testGtById() {
+    var id = UUID.randomUUID();
+    cleanCampaignFactionTable(jdbi);
+    insertSampleCampaignFaction(jdbi, id, owner);
+
+    var result = repository.getCampaignFaction(id);
+
+    assertThat(result, is(makeSampleCampaignFaction()));
   }
 
 }

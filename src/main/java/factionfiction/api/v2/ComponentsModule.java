@@ -1,5 +1,6 @@
 package factionfiction.api.v2;
 
+import base.game.FactionUnit;
 import com.github.apilab.core.Env;
 import com.github.apilab.rest.Endpoint;
 import com.github.apilab.rest.auth.AuthConfiguration;
@@ -31,6 +32,8 @@ import factionfiction.api.v2.faction.FactionService;
 import factionfiction.api.v2.faction.FactionServiceImpl;
 import factionfiction.api.v2.game.GameOptions;
 import factionfiction.api.v2.game.GameOptionsLoader;
+import factionfiction.api.v2.units.UnitRepository;
+import factionfiction.api.v2.warehouse.WarehouseRepository;
 import io.javalin.http.Context;
 import java.io.IOException;
 import java.util.Set;
@@ -63,12 +66,23 @@ public class ComponentsModule {
     return Set.of(
       Faction.class,
       Campaign.class,
-      CampaignFaction.class);
+      CampaignFaction.class,
+      FactionUnit.class);
   }
 
   @Provides
   public FactionRepository factionRepository(Jdbi jdbi) {
     return new FactionRepository(jdbi);
+  }
+
+  @Provides
+  public WarehouseRepository warehouseRepository(Jdbi jdbi) {
+    return new WarehouseRepository(jdbi);
+  }
+
+  @Provides
+  public UnitRepository unitRepository(Jdbi jdbi) {
+    return new UnitRepository(jdbi);
   }
 
   @Provides
@@ -95,9 +109,13 @@ public class ComponentsModule {
   public CampaignFactionServiceImpl campaignFactionService(
     CampaignRepository campRepo,
     FactionRepository facRepo,
-    CampaignFactionRepository repo) {
+    CampaignFactionRepository repo,
+    WarehouseRepository wareRepo,
+    UnitRepository unitRepo) {
 
-    return new CampaignFactionServiceImpl(campRepo, facRepo, repo);
+    return new CampaignFactionServiceImpl(
+      campRepo, facRepo, repo,
+      wareRepo, unitRepo);
   }
 
   @Provides
@@ -116,9 +134,10 @@ public class ComponentsModule {
   @Named("campaignFactionProvider")
   public Function<Context, CampaignFactionService> campaignFactionProvider(
     CampaignFactionServiceImpl impl,
-    CampaignRepository campaignRepository) {
+    CampaignRepository campaignRepository,
+    FactionRepository factionRepository) {
 
-    return ctx -> new CampaignFactionSecurity(impl, campaignRepository, AuthInfo.fromContext(ctx));
+    return ctx -> new CampaignFactionSecurity(impl, campaignRepository, factionRepository, AuthInfo.fromContext(ctx));
   }
 
   @Provides

@@ -57,4 +57,25 @@ public class FactionRepositoryIT {
     assertThat(factions, is(List.of(makeSampleFaction())));
   }
 
+  @Test
+  public void testIsOwner() {
+    cleanFactionTable(jdbi);
+    insertSampleFaction(jdbi, owner);
+    var sample = makeSampleFaction();
+
+    var isOwner = repository.isOwner(sample.name(), owner);
+
+    assertThat(isOwner, is(true));
+  }
+
+  @Test
+  public void testIsNotOwner() {
+    cleanFactionTable(jdbi);
+    insertSampleFaction(jdbi, owner);
+    var sample = makeSampleFaction();
+
+    var isOwner = repository.isOwner(sample.name(), UUID.randomUUID());
+
+    assertThat(isOwner, is(false));
+  }
 }

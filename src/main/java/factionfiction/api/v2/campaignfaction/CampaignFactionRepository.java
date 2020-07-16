@@ -21,6 +21,20 @@ public class CampaignFactionRepository {
     return find(id);
   }
 
+  public UUID getCampaignFactionId(String campaignName, String factionName) {
+    return jdbi.withHandle(h -> h.select(
+      "select id from campaign_faction where campaign_name = ? and faction_name = ?",
+      campaignName,
+      factionName)
+      .mapTo(UUID.class)
+      .findFirst())
+      .orElseThrow(() -> new NotFoundException("not found"));
+  }
+
+  public CampaignFaction getCampaignFaction(UUID id) {
+    return find(id);
+  }
+
   CampaignFaction find(UUID id) {
     return jdbi.withHandle(h -> h.select(
       "select campaign_name, faction_name, airbase, zone_size_ft, credits from campaign_faction where id = ?", id)
@@ -52,5 +66,6 @@ public class CampaignFactionRepository {
       campaignFaction.credits()
     ));
   }
+
 
 }

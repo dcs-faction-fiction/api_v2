@@ -1,5 +1,6 @@
 package factionfiction.api.v2.campaignfaction;
 
+import base.game.FactionSituation;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
 import static factionfiction.api.v2.auth.Roles.FACTION_MANAGER;
 import factionfiction.api.v2.campaign.CampaignCreatePayloadFactions;
@@ -75,5 +76,21 @@ public class CampaignFactionEndpointsTest {
     endpoints.addNew(ctx);
 
     verify(ctx).json(cf);
+  }
+
+  @Test
+  public void testGetSituation() throws IOException {
+    var cf = makeSampleCampaignFaction();
+    var situation = mock(FactionSituation.class);
+    given(ctx.pathParam("faction", String.class))
+      .willReturn(Validator.create(String.class, cf.factionName()));
+    given(ctx.pathParam("campaign", String.class))
+      .willReturn(Validator.create(String.class, cf.campaignName()));
+    given(campFactionService.getSituation(cf.campaignName(), cf.factionName()))
+      .willReturn(situation);
+
+    endpoints.getSituation(ctx);
+
+    verify(ctx).json(situation);
   }
 }

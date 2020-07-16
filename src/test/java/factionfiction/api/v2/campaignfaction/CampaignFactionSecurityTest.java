@@ -1,9 +1,14 @@
 package factionfiction.api.v2.campaignfaction;
 
+import base.game.FactionSituation;
+import base.game.ImmutableFactionSituation;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import factionfiction.api.v2.auth.AuthInfo;
 import factionfiction.api.v2.campaign.CampaignRepository;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
+import factionfiction.api.v2.faction.FactionRepository;
+import java.math.BigDecimal;
+import static java.util.Collections.emptyList;
 import java.util.UUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -12,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 public class CampaignFactionSecurityTest {
 
@@ -22,6 +26,7 @@ public class CampaignFactionSecurityTest {
   CampaignFactionServiceImpl impl;
   CampaignFactionSecurity security;
   CampaignRepository campaignRepository;
+  FactionRepository factionRepository;
 
   @BeforeEach
   public void setup() {
@@ -30,7 +35,8 @@ public class CampaignFactionSecurityTest {
     authInfo = mock(AuthInfo.class);
     impl = mock(CampaignFactionServiceImpl.class);
     campaignRepository = mock(CampaignRepository.class);
-    security = new CampaignFactionSecurity(impl, campaignRepository, authInfo);
+    factionRepository = mock(FactionRepository.class);
+    security = new CampaignFactionSecurity(impl, campaignRepository, factionRepository, authInfo);
   }
 
   @Test
@@ -77,4 +83,117 @@ public class CampaignFactionSecurityTest {
     });
   }
 
+  @Test
+  public void testCanGetSituationCampaignCasesNone() {
+    var situation = makeSituation();
+    mockNoFactionManager();
+    mockNoCamapignManager();
+    mockOwnerAndResponse(situation);
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.getSituation(sample.campaignName(), sample.factionName());
+    });
+  }
+
+  @Test
+  public void testCanGetSituationCampaignCasesCampaign() {
+    var situation = makeSituation();
+    mockNoFactionManager();
+    mockCampaignManagerAndCampaignOwner();
+    mockOwnerAndResponse(situation);
+
+    var result = security.getSituation(sample.campaignName(), sample.factionName());
+
+    assertThat(result, is(situation));
+  }
+
+  @Test
+  public void testCanGetSituationCampaignCasesFaction() {
+    var situation = makeSituation();
+    mockFactionManagerAndFactionOwner();
+    mockNoCamapignManager();
+    mockOwnerAndResponse(situation);
+
+    var result = security.getSituation(sample.campaignName(), sample.factionName());
+
+    assertThat(result, is(situation));
+  }
+
+  @Test
+  public void testCanGetSituationCampaignCasesCampaignNoOwner() {
+    var situation = makeSituation();
+    mockNoFactionManager();
+    mockCampaignManagerAndNoCampaignOwner();
+    mockOwnerAndResponse(situation);
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.getSituation(sample.campaignName(), sample.factionName());
+    });
+  }
+
+  @Test
+  public void testCanGetSituationCampaignCasesFactionNoOwner() {
+    var situation = makeSituation();
+    mockFactionManagerAndNoFactionOwner();
+    mockNoCamapignManager();
+    mockOwnerAndResponse(situation);
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.getSituation(sample.campaignName(), sample.factionName());
+    });
+  }
+
+  void mockOwnerAndResponse(FactionSituation situation) {
+    given(authInfo.getUserUUID()).willReturn(owner);
+    given(impl.getSituation(sample.campaignName(), sample.factionName()))
+      .willReturn(situation);
+  }
+
+  void mockNoFactionManager() {
+    given(authInfo.isFactionManager()).willReturn(false);
+    given(factionRepository.isOwner(sample.factionName(), owner))
+      .willReturn(false);
+  }
+
+  void mockNoCamapignManager() {
+    given(authInfo.isCampaignManager()).willReturn(false);
+    given(campaignRepository.isOwner(sample.factionName(), owner))
+      .willReturn(false);
+  }
+
+  void mockFactionManagerAndFactionOwner() {
+    given(authInfo.isFactionManager()).willReturn(true);
+    given(factionRepository.isOwner(sample.factionName(), owner))
+      .willReturn(true);
+  }
+
+  void mockCampaignManagerAndCampaignOwner() {
+    given(authInfo.isCampaignManager()).willReturn(true);
+    given(campaignRepository.isOwner(sample.campaignName(), owner))
+      .willReturn(true);
+  }
+
+  void mockFactionManagerAndNoFactionOwner() {
+    given(authInfo.isFactionManager()).willReturn(true);
+    given(factionRepository.isOwner(sample.factionName(), owner))
+      .willReturn(false);
+  }
+
+  void mockCampaignManagerAndNoCampaignOwner() {
+    given(authInfo.isCampaignManager()).willReturn(true);
+    given(campaignRepository.isOwner(sample.campaignName(), owner))
+      .willReturn(false);
+  }
+
+  FactionSituation makeSituation() {
+    return ImmutableFactionSituation.builder()
+      .id(UUID.randomUUID())
+      .campaign(sample.campaignName())
+      .faction(sample.factionName())
+      .credits(new BigDecimal(30))
+      .zoneSizeFt(50_000)
+      .airbases(emptyList())
+      .units(emptyList())
+      .build();
+  }
 }
