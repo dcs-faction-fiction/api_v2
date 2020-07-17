@@ -1,10 +1,12 @@
 package factionfiction.api.v2.units.purchase;
 
 import base.game.ImmutableFactionUnit;
+import static base.game.warehouse.WarehouseItemCode.JF_17;
 import factionfiction.api.v2.campaignfaction.CampaignFaction;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.cleanCampaignFactionTable;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.insertSampleCampaignFaction;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
+import factionfiction.api.v2.campaignfaction.CampaignFactionRepository;
 import factionfiction.api.v2.test.InMemoryDB;
 import static factionfiction.api.v2.units.UnitHelper.makeSampleFactionUnit;
 import factionfiction.api.v2.units.UnitRepository;
@@ -15,9 +17,6 @@ import static org.hamcrest.Matchers.is;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 
 public class PurchaseRepositoryIT {
 
@@ -26,6 +25,7 @@ public class PurchaseRepositoryIT {
   CampaignFaction sample;
   PurchaseRepository repository;
   UnitRepository unitRepository;
+  CampaignFactionRepository campaignFactionRepository;
 
   @BeforeEach
   public void setup() {
@@ -33,7 +33,8 @@ public class PurchaseRepositoryIT {
     jdbi = InMemoryDB.jdbi();
     sample = makeSampleCampaignFaction();
     unitRepository = new UnitRepository(jdbi);
-    repository = new PurchaseRepository(unitRepository, jdbi);
+    campaignFactionRepository = new CampaignFactionRepository(jdbi);
+    repository = new PurchaseRepository(unitRepository, campaignFactionRepository, jdbi);
   }
 
   @Test
@@ -86,5 +87,22 @@ public class PurchaseRepositoryIT {
     assertThat(credits.compareTo(sample.credits()), is(-1));
   }
 
+  @Test
+  public void testBuyItem() {
+    cleanCampaignFactionTable(jdbi);
+    insertSampleCampaignFaction(jdbi, UUID.randomUUID(), owner);
+
+    repository.buyItem(
+      sample.campaignName(),
+      sample.factionName(),
+      ONE,
+      JF_17);
+
+    var credits = repository.getCredits(
+      sample.campaignName(),
+      sample.factionName());
+
+    assertThat(credits.compareTo(sample.credits()), is(-1));
+  }
 
 }

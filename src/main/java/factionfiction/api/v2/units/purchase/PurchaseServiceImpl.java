@@ -2,9 +2,11 @@ package factionfiction.api.v2.units.purchase;
 
 import base.game.FactionUnit;
 import base.game.ImmutableFactionUnit;
+import base.game.warehouse.WarehouseItemCode;
 import factionfiction.api.v2.campaign.CampaignRepository;
 import factionfiction.api.v2.campaignfaction.CampaignFactionRepository;
 import factionfiction.api.v2.game.GameOptionsUnit;
+import factionfiction.api.v2.game.GameOptionsWarehouseItem;
 import factionfiction.api.v2.math.MathService;
 import java.math.BigDecimal;
 import static java.math.BigDecimal.ZERO;
@@ -52,12 +54,11 @@ public class PurchaseServiceImpl {
 
   GameOptionsUnit findUnitOptionsFromCampaign(String campaignName, FactionUnit unit) {
     var campaign = campaignRepository.find(campaignName);
-    var campaignUnit = campaign.gameOptions().units().stream()
+    return campaign.gameOptions().units().stream()
       .filter(unitWithCostGreaterThanZero())
       .filter(unitMatchingType(unit))
       .findFirst()
-      .orElseThrow(() -> new UnitNotAllowedInCampaignException());
-    return campaignUnit;
+      .orElseThrow(UnitNotAllowedInCampaignException::new);
   }
 
   Predicate<GameOptionsUnit> unitWithCostGreaterThanZero() {
@@ -73,8 +74,6 @@ public class PurchaseServiceImpl {
     if (!enoughCreditsToBuyUnit(campaUnit, credits))
       throw new NotEnoughCreditsException();
 
-    // Reusing the handle in order to stay in the same
-    // transaction with all the operations.
     return purchaseRepository.buyUnit(
       campaignName, factionName,
       campaUnit.cost(),
@@ -85,5 +84,41 @@ public class PurchaseServiceImpl {
     return credits.compareTo(unit.cost()) >= 0;
   }
 
+  public void buyWarehouseItem(String campaignName, String factionName, WarehouseItemCode item) {
+    buyItemTransactionally(
+      findWarehouseOptionsFromCampaign(campaignName, item),
+      campaignName, factionName);
+  }
 
+  GameOptionsWarehouseItem findWarehouseOptionsFromCampaign(String campaignName, WarehouseItemCode item) {
+    var campaign = campaignRepository.find(campaignName);
+    return campaign.gameOptions().warehouseItems().stream()
+      .filter(filterWarehouseItemGreaterThanZero())
+      .filter(filterWarehouseItemMatchByCode(item))
+      .findFirst()
+      .orElseThrow(WarehouseItemNotAllowedInCampaignException::new);
+  }
+
+  Predicate<GameOptionsWarehouseItem> filterWarehouseItemMatchByCode( WarehouseItemCode item) {
+    return i -> i.code() == item;
+  }
+
+  Predicate<GameOptionsWarehouseItem> filterWarehouseItemGreaterThanZero() {
+    return i -> i.cost().compareTo(ZERO) > 0;
+  }
+
+  void buyItemTransactionally(GameOptionsWarehouseItem campaignWarehouseItem, String campaignName, String factionName) {
+    var credits = purchaseRepository.getCredits(campaignName, factionName);
+    if (!enoughCreditsToBuyItem(campaignWarehouseItem, credits))
+      throw new NotEnoughCreditsException();
+
+    purchaseRepository.buyItem(
+      campaignName, factionName,
+      campaignWarehouseItem.cost(),
+      campaignWarehouseItem.code());
+  }
+
+  boolean enoughCreditsToBuyItem(GameOptionsWarehouseItem item, BigDecimal credits) {
+    return credits.compareTo(item.cost()) >= 0;
+  }
 }

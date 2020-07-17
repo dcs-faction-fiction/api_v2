@@ -7,7 +7,6 @@ import base.game.units.Unit;
 import com.github.apilab.rest.exceptions.NotFoundException;
 import java.util.List;
 import java.util.UUID;
-import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.RowMapper;
 

@@ -4,6 +4,9 @@ import base.game.ImmutableFactionUnit;
 import base.game.ImmutableLocation;
 import static base.game.units.Unit.ABRAMS;
 import static base.game.units.Unit.T_80;
+import static base.game.warehouse.WarehouseItemCode.AV_8B_NA;
+import static base.game.warehouse.WarehouseItemCode.JF_17;
+import static base.game.warehouse.WarehouseItemCode.UH_1H;
 import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
 import factionfiction.api.v2.campaign.CampaignRepository;
 import factionfiction.api.v2.campaign.ImmutableCampaign;
@@ -11,6 +14,7 @@ import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSa
 import factionfiction.api.v2.campaignfaction.CampaignFactionRepository;
 import factionfiction.api.v2.game.ImmutableGameOptions;
 import factionfiction.api.v2.game.ImmutableGameOptionsUnit;
+import factionfiction.api.v2.game.ImmutableGameOptionsWarehouseItem;
 import java.io.IOException;
 import java.math.BigDecimal;
 import static java.math.BigDecimal.ONE;
@@ -24,6 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class PurchaseServiceTest {
 
@@ -97,6 +102,34 @@ public class PurchaseServiceTest {
 
     assertThrows(UnitNotAllowedInCampaignException.class, () -> {
       service.buyUnit(campaignName, factionName, unit);
+    });
+  }
+
+  @Test
+  public void testBuyWarehouseItem() throws IOException {
+    mockBuyItemSituation(new BigDecimal(30));
+
+    service.buyWarehouseItem(campaignName, factionName, JF_17);
+
+    verify(purchaseRepository)
+      .buyItem(campaignName, factionName, new BigDecimal(2), JF_17);
+  }
+
+  @Test
+  public void testBuyWarehouseItemNoCredits() throws IOException {
+    mockBuyItemSituation(new BigDecimal(0));
+
+    assertThrows(NotEnoughCreditsException.class, () -> {
+      service.buyWarehouseItem(campaignName, factionName, JF_17);
+    });
+  }
+
+  @Test
+  public void testBuyWarehouseItemNotAllowedItem() throws IOException {
+    mockBuyItemSituation(new BigDecimal(30));
+
+    assertThrows(WarehouseItemNotAllowedInCampaignException.class, () -> {
+      service.buyWarehouseItem(campaignName, factionName, UH_1H);
     });
   }
 
@@ -196,5 +229,30 @@ public class PurchaseServiceTest {
     given(campaignFactionRepository.getCampaignFaction(cfId)).willReturn(cf);
     given(purchaseRepository.getCredits(campaignName, factionName)).willReturn(creditsAvailable);
     return unit;
+  }
+
+  void mockBuyItemSituation(BigDecimal creditsAvailable) throws IOException {
+    var cfId = UUID.randomUUID();
+    var campaign = makeSampleCampaign();
+    campaign = ImmutableCampaign.builder()
+      .from(campaign)
+      .gameOptions(ImmutableGameOptions.builder()
+        .from(campaign.gameOptions())
+        .warehouseItems(List.of(ImmutableGameOptionsWarehouseItem.builder()
+          .code(AV_8B_NA)
+          .cost(ZERO)
+        .build(), ImmutableGameOptionsWarehouseItem.builder()
+          .code(JF_17)
+          .cost(new BigDecimal(2))
+          .build()))
+        .build())
+      .build();
+    var cf = makeSampleCampaignFaction();
+    campaignName = cf.campaignName();
+    factionName = cf.factionName();
+    given(campaignRepository.find(cf.campaignName())).willReturn(campaign);
+    given(campaignFactionRepository.getCampaignFactionId(cf.campaignName(), cf.factionName())).willReturn(cfId);
+    given(campaignFactionRepository.getCampaignFaction(cfId)).willReturn(cf);
+    given(purchaseRepository.getCredits(campaignName, factionName)).willReturn(creditsAvailable);
   }
 }
