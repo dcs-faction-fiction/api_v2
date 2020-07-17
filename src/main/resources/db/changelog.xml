@@ -237,4 +237,8 @@
     </addColumn>
   </changeSet>
 
+  <changeSet author="raf" id="0009_campaign_faction_game_decimal_credits">
+    <modifyDataType tableName="campaign_faction" columnName="credits" newDataType="decimal"/>
+  </changeSet>
+
 </databaseChangeLog>

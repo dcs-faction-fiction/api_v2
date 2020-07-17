@@ -45,4 +45,16 @@ public final class UnitHelper {
         .build())
       .build();
   }
+
+  public static FactionUnit makeSampleFactionUnit() {
+    return ImmutableFactionUnit.builder()
+      .type(Unit.T_80)
+      .location(ImmutableLocation.builder()
+        .latitude(new BigDecimal(1))
+        .longitude(new BigDecimal(2))
+        .altitude(new BigDecimal(3))
+        .angle(new BigDecimal(4))
+        .build())
+      .build();
+  }
 }
