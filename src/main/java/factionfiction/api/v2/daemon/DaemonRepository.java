@@ -3,9 +3,14 @@ package factionfiction.api.v2.daemon;
 import base.game.Airbases;
 import base.game.warehouse.WarehouseItemCode;
 import com.github.apilab.rest.exceptions.NotFoundException;
+import static factionfiction.api.v2.daemon.ServerAction.MISSION_STARTED;
+import static factionfiction.api.v2.daemon.ServerAction.STOP_MISSION;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 
@@ -61,6 +66,46 @@ public class DaemonRepository {
           u.id())
       )
     );
+  }
+
+  public void downloadMission(String serverid, Consumer<InputStream> consumer) {
+    jdbi.useHandle(h -> {
+      ensureServerExists(h, serverid);
+      h.select("select mission_zip from server where name = ?", serverid)
+        .mapTo(byte[].class)
+        .findFirst()
+        .ifPresent(b ->
+          consumer.accept(new ByteArrayInputStream(b))
+        );
+    });
+  }
+
+  public Optional<ServerAction> pullNextAction(String serverId) {
+    return jdbi.withHandle(h -> {
+      ensureServerExists(h, serverId);
+      var action = h.select("select next_action from server where name = ?", serverId)
+        .mapTo(ServerAction.class)
+        .findOne();
+      action.ifPresent(a -> h.execute("update server set next_action = null, current_action = ? where name = ?", a, serverId));
+      return action;
+    });
+  }
+
+  public void setNextAction(String serverid, ServerAction action, Optional<ServerInfo> info) {
+    jdbi.useHandle(h -> {
+      ensureServerExists(h, serverid);
+      h.execute("update server set next_action = ? where name = ?", action, serverid);
+      info.ifPresent(i -> h.execute("update server set address = ?, port = ?, password = ? where name = ?", i.address(), i.port(), i.password(), serverid));
+      if (action == MISSION_STARTED) {
+        h.execute("update server set running = true, started_at = CURRENT_TIMESTAMP where name = ?", serverid);
+      }
+      if (action == STOP_MISSION) {
+        h.execute("update server set running = false, started_at = null where name = ?", serverid);
+        // At mission stop, need to change campaign status
+        // Need to clear out the mission data
+        h.execute("update server set mission_zip = null, campaign_name = null where name = ?", serverid);
+      }
+    });
   }
 
   private String getCampaignNameFromServerId(String serverId) {

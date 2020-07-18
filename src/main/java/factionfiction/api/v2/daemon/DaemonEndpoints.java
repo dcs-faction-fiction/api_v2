@@ -12,7 +12,6 @@ import io.javalin.plugin.openapi.annotations.OpenApiRequestBody;
 import io.javalin.plugin.openapi.annotations.OpenApiResponse;
 import java.util.Arrays;
 import java.util.Map;
-import static java.util.Optional.empty;
 import java.util.UUID;
 import static java.util.stream.Collectors.toList;
 
@@ -30,6 +29,7 @@ public class DaemonEndpoints implements Endpoint {
     javalin.post("/v2/daemon-api/servers/:server/warehouse-changed", this::warehouseChanged, roles(DAEMON));
     javalin.post("/v2/daemon-api/servers/:server/units-moved", this::movedUnits, roles(DAEMON));
     javalin.post("/v2/daemon-api/servers/:server/units-destroyed", this::destroyedUnits, roles(DAEMON));
+    javalin.post("/v2/daemon-api/servers/:server/download-mission", this::downloadMission, roles(DAEMON));
   }
 
   @OpenApi(ignore = true)
@@ -85,5 +85,20 @@ public class DaemonEndpoints implements Endpoint {
 
     ctx.result("{}");
     ctx.status(201);
+  }
+
+  @OpenApi(
+    description = "Daemon reserved: download next mission file for campaign",
+    pathParams = {
+      @OpenApiParam(name = "serverid", type = String.class)
+    },
+    responses = {
+      @OpenApiResponse(status = "200", content = @OpenApiContent(type = "application/zip", from = byte[].class))
+    })
+  public void downloadMission(Context ctx) {
+    var serverId = ctx.pathParam("server", String.class).get();
+    ctx.status(200);
+    ctx.contentType("application/zip");
+    repository.downloadMission(serverId, ctx::result);
   }
 }

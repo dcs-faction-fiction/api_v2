@@ -89,6 +89,16 @@ public class DaemonEndpointTest {
     verify(repository).reportMovedUnits(List.of(item));
   }
 
+  @Test
+  public void testDownloadMission() {
+    given(ctx.pathParam("server", String.class))
+      .willReturn(Validator.create(String.class, "server1"));
+
+    endpoints.downloadMission(ctx);
+
+    verify(repository).downloadMission(eq("server1"), any());
+  }
+
   static ImmutableFactionUnitPosition sampleMovedUnit() {
     return ImmutableFactionUnitPosition.builder()
       .id(UUID.randomUUID())

@@ -9,10 +9,16 @@ import static base.game.units.Unit.T_80;
 import base.game.warehouse.WarehouseItemCode;
 import static base.game.warehouse.WarehouseItemCode.JET_FUEL_TONS;
 import com.github.apilab.rest.exceptions.NotFoundException;
+import static factionfiction.api.v2.daemon.ServerAction.MISSION_STARTED;
+import static factionfiction.api.v2.daemon.ServerAction.START_NEW_MISSION;
+import static factionfiction.api.v2.daemon.ServerAction.STOP_MISSION;
 import static factionfiction.api.v2.test.InMemoryDB.jdbi;
+import java.io.IOException;
 import static java.math.BigDecimal.ONE;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import org.h2.util.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import org.jdbi.v3.core.Jdbi;
@@ -21,6 +27,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class DaemonRepositoryIT {
+
+  static final byte[] MISSION_BYTES = new byte[]{1,2,3};
 
   UUID unit1;
   UUID unit2;
@@ -99,6 +107,39 @@ public class DaemonRepositoryIT {
     assertThat(changedLocation, is(location));
   }
 
+  @Test
+  public void testDownloadMission() {
+    cleanTables();
+    addData();
+    var result = new byte[3];
+    repository.downloadMission("server1", b -> {
+      try {
+        IOUtils.readFully(b, result, 3);
+      } catch (IOException ex) {
+        throw new RuntimeException(ex.getMessage(), ex);
+      }
+    });
+
+    assertThat(result, is(MISSION_BYTES));
+  }
+
+  @Test
+  public void testActions() {
+    var info = Optional.of((ServerInfo) ImmutableServerInfo.builder()
+      .address("localhost")
+      .port(1)
+      .password("pw")
+      .build());
+
+    repository.setNextAction("server1", STOP_MISSION, info);
+    repository.setNextAction("server1", MISSION_STARTED, info);
+    repository.setNextAction("server1", START_NEW_MISSION, info);
+
+    var action = repository.pullNextAction("server1");
+
+    assertThat(action, is(Optional.of(START_NEW_MISSION)));
+  }
+
   ImmutableWarehousesSpent makeWarehouseRequest() {
     var request = ImmutableWarehousesSpent.builder()
       .data(List.of(ImmutableWarehousesSpentItem.builder()
@@ -123,7 +164,7 @@ public class DaemonRepositoryIT {
     UUID cfId = UUID.randomUUID();
     UUID whid = UUID.randomUUID();
     jdbi.useHandle(h -> {
-      h.execute("insert into server(name, campaign_name) values('server1', 'campaign1')");
+      h.execute("insert into server(name, campaign_name, mission_zip) values('server1', 'campaign1', ?)", MISSION_BYTES);
       h.execute("insert into server(name, campaign_name) values('server2', 'campaign2')");
       h.execute("insert into campaign_airfield_warehouse(id, campaign_name, airbase) values(?, ?, ?)",
         whid, "campaign1", "KRYMSK");
