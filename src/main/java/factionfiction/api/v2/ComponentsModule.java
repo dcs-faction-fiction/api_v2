@@ -33,6 +33,11 @@ import factionfiction.api.v2.faction.FactionServiceImpl;
 import factionfiction.api.v2.game.GameOptions;
 import factionfiction.api.v2.game.GameOptionsLoader;
 import factionfiction.api.v2.units.UnitRepository;
+import factionfiction.api.v2.units.purchase.PurchaseEndpoints;
+import factionfiction.api.v2.units.purchase.PurchaseRepository;
+import factionfiction.api.v2.units.purchase.PurchaseSecurity;
+import factionfiction.api.v2.units.purchase.PurchaseService;
+import factionfiction.api.v2.units.purchase.PurchaseServiceImpl;
 import factionfiction.api.v2.warehouse.WarehouseRepository;
 import io.javalin.http.Context;
 import java.io.IOException;
@@ -91,6 +96,14 @@ public class ComponentsModule {
   }
 
   @Provides
+  public PurchaseRepository purchaseRepository(
+    Jdbi jdbi,
+    UnitRepository unitRepository,
+    CampaignFactionRepository campaignFactionRepository) {
+    return new PurchaseRepository(unitRepository, campaignFactionRepository, jdbi);
+  }
+
+  @Provides
   public CampaignFactionRepository campaignFactionRepository(Jdbi jdbi) {
     return new CampaignFactionRepository(jdbi);
   }
@@ -119,6 +132,18 @@ public class ComponentsModule {
   }
 
   @Provides
+  public PurchaseServiceImpl purchaseService(
+    PurchaseRepository purchaseRepository,
+    CampaignRepository campaignRepository,
+    CampaignFactionRepository campaignFactionRepository) {
+
+    return new PurchaseServiceImpl(
+      purchaseRepository,
+      campaignRepository,
+      campaignFactionRepository);
+  }
+
+  @Provides
   @Named("factionProvider")
   public Function<Context, FactionService> factionProvider(FactionServiceImpl impl) {
     return ctx -> new FactionSecurity(impl, AuthInfo.fromContext(ctx));
@@ -138,6 +163,16 @@ public class ComponentsModule {
     FactionRepository factionRepository) {
 
     return ctx -> new CampaignFactionSecurity(impl, campaignRepository, factionRepository, AuthInfo.fromContext(ctx));
+  }
+
+  @Provides
+  @Named("purchaseProvider")
+  public Function<Context, PurchaseService> purchaseProvider(
+    PurchaseServiceImpl impl,
+    CampaignRepository campaignRepository,
+    FactionRepository factionRepository) {
+
+    return ctx -> new PurchaseSecurity(impl, campaignRepository, factionRepository, AuthInfo.fromContext(ctx));
   }
 
   @Provides
@@ -169,6 +204,15 @@ public class ComponentsModule {
     Function<Context, CampaignFactionService> cfProvider) {
 
     return new CampaignFactionEndpoints(campProvider, cfProvider);
+  }
+
+  @Provides
+  @IntoSet
+  public Endpoint purchaseEndpoints(
+    @Named("purchaseProvider")
+    Function<Context, PurchaseService> provider) {
+
+    return new PurchaseEndpoints(provider);
   }
 
   @Provides

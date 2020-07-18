@@ -39,6 +39,12 @@ public class PurchaseServiceImpl {
       confineUnitWithinFactionZone(campaignName, factionName, unit));
   }
 
+  public void buyWarehouseItem(String campaignName, String factionName, WarehouseItemCode item) {
+    buyItemTransactionally(
+      findWarehouseOptionsFromCampaign(campaignName, item),
+      campaignName, factionName);
+  }
+
   FactionUnit confineUnitWithinFactionZone(String campaignName, String factionName, FactionUnit unit) {
     var cfId = campaignFactionRepository.getCampaignFactionId(campaignName, factionName);
     var cf = campaignFactionRepository.getCampaignFaction(cfId);
@@ -82,12 +88,6 @@ public class PurchaseServiceImpl {
 
   static boolean enoughCreditsToBuyUnit(GameOptionsUnit unit, BigDecimal credits) {
     return credits.compareTo(unit.cost()) >= 0;
-  }
-
-  public void buyWarehouseItem(String campaignName, String factionName, WarehouseItemCode item) {
-    buyItemTransactionally(
-      findWarehouseOptionsFromCampaign(campaignName, item),
-      campaignName, factionName);
   }
 
   GameOptionsWarehouseItem findWarehouseOptionsFromCampaign(String campaignName, WarehouseItemCode item) {
