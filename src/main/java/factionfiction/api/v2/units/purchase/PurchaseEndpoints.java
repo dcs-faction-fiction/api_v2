@@ -8,6 +8,7 @@ import static factionfiction.api.v2.auth.Roles.FACTION_MANAGER;
 import io.javalin.Javalin;
 import static io.javalin.core.security.SecurityUtil.roles;
 import io.javalin.http.Context;
+import io.javalin.plugin.openapi.annotations.OpenApi;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.function.Function;
@@ -31,6 +32,7 @@ public class PurchaseEndpoints implements Endpoint {
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-warehouse-item", this::buyWarehouseItem, roles(FACTION_MANAGER));
   }
 
+  @OpenApi(ignore = true)
   @Override
   public void handle(Context ctx) throws Exception {
     ctx.json(Map.of("version", "2"));

@@ -5,6 +5,10 @@ import static factionfiction.api.v2.auth.Roles.FACTION_MANAGER;
 import io.javalin.Javalin;
 import static io.javalin.core.security.SecurityUtil.roles;
 import io.javalin.http.Context;
+import io.javalin.plugin.openapi.annotations.OpenApi;
+import io.javalin.plugin.openapi.annotations.OpenApiContent;
+import io.javalin.plugin.openapi.annotations.OpenApiRequestBody;
+import io.javalin.plugin.openapi.annotations.OpenApiResponse;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -23,11 +27,13 @@ public class FactionEndpoints implements Endpoint {
     javalin.get("/v2/faction-api/factions", this::getFactions, roles(FACTION_MANAGER));
   }
 
+  @OpenApi(ignore = true)
   @Override
   public void handle(Context ctx) throws Exception {
     ctx.json(Map.of("version", "2"));
   }
 
+  @OpenApi(requestBody = @OpenApiRequestBody(content = @OpenApiContent(from = String.class)))
   public void newFaction(Context ctx) {
     var service = serviceProvider.apply(ctx);
     var name = ctx.bodyAsClass(String.class);
@@ -36,6 +42,7 @@ public class FactionEndpoints implements Endpoint {
     ctx.json(faction);
   }
 
+  @OpenApi(responses = {@OpenApiResponse(status = "200", content = @OpenApiContent(from = Faction.class, isArray = true))})
   public void getFactions(Context ctx) {
     var service = serviceProvider.apply(ctx);
 

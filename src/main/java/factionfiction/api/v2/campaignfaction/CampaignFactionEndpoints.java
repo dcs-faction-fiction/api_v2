@@ -1,5 +1,6 @@
 package factionfiction.api.v2.campaignfaction;
 
+import base.game.FactionSituation;
 import com.github.apilab.rest.Endpoint;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
 import static factionfiction.api.v2.auth.Roles.FACTION_MANAGER;
@@ -9,6 +10,10 @@ import static factionfiction.api.v2.campaignfaction.CampaignFaction.fromCampaign
 import io.javalin.Javalin;
 import static io.javalin.core.security.SecurityUtil.roles;
 import io.javalin.http.Context;
+import io.javalin.plugin.openapi.annotations.OpenApi;
+import io.javalin.plugin.openapi.annotations.OpenApiContent;
+import io.javalin.plugin.openapi.annotations.OpenApiRequestBody;
+import io.javalin.plugin.openapi.annotations.OpenApiResponse;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -32,11 +37,13 @@ public class CampaignFactionEndpoints implements Endpoint {
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction", this, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
   }
 
+  @OpenApi(ignore = true)
   @Override
   public void handle(Context ctx) throws Exception {
     ctx.json(Map.of("version", "2"));
   }
 
+  @OpenApi(requestBody = @OpenApiRequestBody(content = @OpenApiContent(from = CampaignCreatePayloadFactions.class)))
   public void addNew(Context ctx) {
     var service = cfServiceProvider.apply(ctx);
     var campService = campServiceProvider.apply(ctx);
@@ -55,6 +62,7 @@ public class CampaignFactionEndpoints implements Endpoint {
     ctx.json(result);
   }
 
+  @OpenApi(responses = {@OpenApiResponse(status = "200", content = @OpenApiContent(from = FactionSituation.class, isArray = false))})
   public void getSituation(Context ctx) {
     var service = cfServiceProvider.apply(ctx);
     var campaignName = ctx.pathParam("campaign", String.class).get();

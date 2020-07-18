@@ -7,6 +7,10 @@ import factionfiction.api.v2.campaignfaction.CampaignFactionService;
 import io.javalin.Javalin;
 import static io.javalin.core.security.SecurityUtil.roles;
 import io.javalin.http.Context;
+import io.javalin.plugin.openapi.annotations.OpenApi;
+import io.javalin.plugin.openapi.annotations.OpenApiContent;
+import io.javalin.plugin.openapi.annotations.OpenApiRequestBody;
+import io.javalin.plugin.openapi.annotations.OpenApiResponse;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -30,11 +34,13 @@ public class CampaignEndpoints implements Endpoint {
     javalin.get("/v2/campaign-api/campaigns", this::getCampaigns, roles(CAMPAIGN_MANAGER));
   }
 
+  @OpenApi(ignore = true)
   @Override
   public void handle(Context ctx) throws Exception {
     ctx.json(Map.of("version", "2"));
   }
 
+  @OpenApi(requestBody = @OpenApiRequestBody(content = @OpenApiContent(from = CampaignCreatePayload.class)))
   public void newCampaign(Context ctx) {
     var cfService = cfServiceProvider.apply(ctx);
     var campService = campServiceProvider.apply(ctx);
@@ -47,6 +53,7 @@ public class CampaignEndpoints implements Endpoint {
     ctx.json(campaign);
   }
 
+  @OpenApi(responses = {@OpenApiResponse(status = "200", content = @OpenApiContent(from = Campaign.class, isArray = true))})
   public void getCampaigns(Context ctx) {
     var campService = campServiceProvider.apply(ctx);
 

@@ -1,6 +1,7 @@
 package factionfiction.api.v2;
 
 import base.game.FactionUnit;
+import com.github.apilab.core.ApplicationLifecycleItem;
 import com.github.apilab.core.Env;
 import com.github.apilab.rest.Endpoint;
 import com.github.apilab.rest.auth.AuthConfiguration;
@@ -39,6 +40,7 @@ import factionfiction.api.v2.units.purchase.PurchaseSecurity;
 import factionfiction.api.v2.units.purchase.PurchaseService;
 import factionfiction.api.v2.units.purchase.PurchaseServiceImpl;
 import factionfiction.api.v2.warehouse.WarehouseRepository;
+import io.javalin.Javalin;
 import io.javalin.http.Context;
 import java.io.IOException;
 import java.util.Set;
@@ -73,6 +75,12 @@ public class ComponentsModule {
       Campaign.class,
       CampaignFaction.class,
       FactionUnit.class);
+  }
+
+  @Provides
+  @IntoSet
+  public ApplicationLifecycleItem staticFiles(Javalin javalin) {
+    return new StaticFiles(javalin);
   }
 
   @Provides
