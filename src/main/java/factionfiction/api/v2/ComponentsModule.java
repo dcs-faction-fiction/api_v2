@@ -25,6 +25,8 @@ import factionfiction.api.v2.campaignfaction.CampaignFactionSecurity;
 import factionfiction.api.v2.campaignfaction.CampaignFactionService;
 import factionfiction.api.v2.campaignfaction.CampaignFactionServiceImpl;
 import factionfiction.api.v2.common.CommonEndpoints;
+import factionfiction.api.v2.daemon.DaemonEndpoints;
+import factionfiction.api.v2.daemon.DaemonRepository;
 import factionfiction.api.v2.faction.Faction;
 import factionfiction.api.v2.faction.FactionEndpoints;
 import factionfiction.api.v2.faction.FactionRepository;
@@ -91,6 +93,11 @@ public class ComponentsModule {
   @Provides
   public WarehouseRepository warehouseRepository(Jdbi jdbi) {
     return new WarehouseRepository(jdbi);
+  }
+
+  @Provides
+  public DaemonRepository daemonRepository(Jdbi jdbi) {
+    return new DaemonRepository(jdbi);
   }
 
   @Provides
@@ -221,6 +228,12 @@ public class ComponentsModule {
     Function<Context, PurchaseService> provider) {
 
     return new PurchaseEndpoints(provider);
+  }
+
+  @Provides
+  @IntoSet
+  public Endpoint daemonEndpoints(DaemonRepository repository) {
+    return new DaemonEndpoints(repository);
   }
 
   @Provides

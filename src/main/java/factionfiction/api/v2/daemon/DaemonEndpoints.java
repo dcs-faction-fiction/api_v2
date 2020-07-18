@@ -12,10 +12,13 @@ import io.javalin.plugin.openapi.annotations.OpenApiRequestBody;
 import io.javalin.plugin.openapi.annotations.OpenApiResponse;
 import java.util.Arrays;
 import java.util.Map;
+import static java.util.Optional.of;
 import java.util.UUID;
 import static java.util.stream.Collectors.toList;
 
 public class DaemonEndpoints implements Endpoint {
+
+  static final String SERVER_PATHPARAM = "server";
 
   final DaemonRepository repository;
 
@@ -30,6 +33,8 @@ public class DaemonEndpoints implements Endpoint {
     javalin.post("/v2/daemon-api/servers/:server/units-moved", this::movedUnits, roles(DAEMON));
     javalin.post("/v2/daemon-api/servers/:server/units-destroyed", this::destroyedUnits, roles(DAEMON));
     javalin.post("/v2/daemon-api/servers/:server/download-mission", this::downloadMission, roles(DAEMON));
+    javalin.get("/v2/daemon-api/servers/:server/next-action", this::pullNextAction, roles(DAEMON));
+    javalin.post("/v2/daemon-api/servers/:server/actions/:action", this::setAction, roles(DAEMON));
   }
 
   @OpenApi(ignore = true)
@@ -47,7 +52,7 @@ public class DaemonEndpoints implements Endpoint {
       content = @OpenApiContent(from = WarehousesSpent.class)),
     responses = {@OpenApiResponse(status = "201")})
   public void warehouseChanged(Context ctx) {
-    var serverId = ctx.pathParam("server", String.class).get();
+    var serverId = ctx.pathParam(SERVER_PATHPARAM, String.class).get();
     var spent = ctx.bodyAsClass(ImmutableWarehousesSpent.class);
 
     repository.reportWarehouses(serverId, spent);
@@ -96,9 +101,40 @@ public class DaemonEndpoints implements Endpoint {
       @OpenApiResponse(status = "200", content = @OpenApiContent(type = "application/zip", from = byte[].class))
     })
   public void downloadMission(Context ctx) {
-    var serverId = ctx.pathParam("server", String.class).get();
+    var serverId = ctx.pathParam(SERVER_PATHPARAM, String.class).get();
     ctx.status(200);
     ctx.contentType("application/zip");
     repository.downloadMission(serverId, ctx::result);
+  }
+
+  @OpenApi(
+    description = "Daemon reserved: checks next action for server",
+    pathParams = {
+      @OpenApiParam(name = "serverid", type = String.class)
+    },
+    responses = {
+      @OpenApiResponse(
+        content = @OpenApiContent(from = ServerAction.class),
+        status = "200")
+    })
+  public void pullNextAction(Context ctx) {
+    var serverId = ctx.pathParam(SERVER_PATHPARAM, String.class).get();
+    ctx.json(repository.pullNextAction(serverId));
+    ctx.status(200);
+  }
+
+  @OpenApi(
+    description = "Sets the next action/state",
+    pathParams = {@OpenApiParam(name = "action", type = ServerAction.class)},
+    requestBody = @OpenApiRequestBody(content = @OpenApiContent(from = ServerInfo.class)),
+    responses = {@OpenApiResponse(status = "200")}
+  )
+  public void setAction(Context ctx) {
+    var server = ctx.pathParam(SERVER_PATHPARAM, String.class).get();
+    var action = ServerAction.valueOf(ctx.pathParam("action", String.class).get());
+    var info = ctx.bodyAsClass(ServerInfo.class);
+
+    repository.setNextAction(server, action, of(info));
+    ctx.status(200);
   }
 }
