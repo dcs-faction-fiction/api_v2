@@ -8,6 +8,7 @@ import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
 import factionfiction.api.v2.campaign.CampaignService;
 import factionfiction.api.v2.campaign.ImmutableCampaignCreatePayloadFactions;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
+import factionfiction.api.v2.game.GameOptionsLoader;
 import io.javalin.Javalin;
 import static io.javalin.core.security.SecurityUtil.roles;
 import io.javalin.core.validation.Validator;
@@ -92,5 +93,21 @@ public class CampaignFactionEndpointsTest {
     endpoints.getSituation(ctx);
 
     verify(ctx).json(situation);
+  }
+
+  @Test
+  public void testGetOptions() throws IOException {
+    var cf = makeSampleCampaignFaction();
+    var options = new GameOptionsLoader().loadDefaults();
+    given(ctx.pathParam("faction", String.class))
+      .willReturn(Validator.create(String.class, cf.factionName()));
+    given(ctx.pathParam("campaign", String.class))
+      .willReturn(Validator.create(String.class, cf.campaignName()));
+    given(campFactionService.getGameOptions(cf.campaignName(), cf.factionName()))
+      .willReturn(options);
+
+    endpoints.getGameOptions(ctx);
+
+    verify(ctx).json(options);
   }
 }

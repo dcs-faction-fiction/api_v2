@@ -19,6 +19,9 @@ import java.util.function.Function;
 
 public class CampaignFactionEndpoints implements Endpoint {
 
+  static final String CAMPAIGN_PATHPARAM = "campaign";
+  static final String FACTION_PATHPARAM = "faction";
+
   final Function<Context, CampaignService> campServiceProvider;
   final Function<Context, CampaignFactionService> cfServiceProvider;
 
@@ -33,8 +36,9 @@ public class CampaignFactionEndpoints implements Endpoint {
   @Override
   public void register(Javalin javalin) {
     javalin.get("/v2/campaignfaction-api", this, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
-    javalin.post("/v2/campaignfaction-api/campaigns/:campaign/factions", this, roles(CAMPAIGN_MANAGER));
-    javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction", this, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
+    javalin.post("/v2/campaignfaction-api/campaigns/:campaign/factions", this::addNew, roles(CAMPAIGN_MANAGER));
+    javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction", this::getSituation, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
+    javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/game-options", this::getGameOptions, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
   }
 
   @OpenApi(ignore = true)
@@ -49,7 +53,7 @@ public class CampaignFactionEndpoints implements Endpoint {
     var campService = campServiceProvider.apply(ctx);
     var cf = ctx.bodyAsClass(CampaignCreatePayloadFactions.class);
 
-    var campaignName = ctx.pathParam("campaign", String.class).get();
+    var campaignName = ctx.pathParam(CAMPAIGN_PATHPARAM, String.class).get();
     var campaign = campService.find(campaignName);
     var cfFull = fromCampaignAndFactionAndOptions(
       campaignName,
@@ -65,10 +69,20 @@ public class CampaignFactionEndpoints implements Endpoint {
   @OpenApi(responses = {@OpenApiResponse(status = "200", content = @OpenApiContent(from = FactionSituation.class, isArray = false))})
   public void getSituation(Context ctx) {
     var service = cfServiceProvider.apply(ctx);
-    var campaignName = ctx.pathParam("campaign", String.class).get();
-    var factionName = ctx.pathParam("faction", String.class).get();
+    var campaignName = ctx.pathParam(CAMPAIGN_PATHPARAM, String.class).get();
+    var factionName = ctx.pathParam(FACTION_PATHPARAM, String.class).get();
 
     var result = service.getSituation(campaignName, factionName);
+
+    ctx.json(result);
+  }
+
+  public void getGameOptions(Context ctx) {
+    var service = cfServiceProvider.apply(ctx);
+    var campaignName = ctx.pathParam(CAMPAIGN_PATHPARAM, String.class).get();
+    var factionName = ctx.pathParam(FACTION_PATHPARAM, String.class).get();
+
+    var result = service.getGameOptions(campaignName, factionName);
 
     ctx.json(result);
   }

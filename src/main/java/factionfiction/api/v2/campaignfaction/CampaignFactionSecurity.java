@@ -5,6 +5,7 @@ import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import factionfiction.api.v2.auth.AuthInfo;
 import factionfiction.api.v2.campaign.CampaignRepository;
 import factionfiction.api.v2.faction.FactionRepository;
+import factionfiction.api.v2.game.GameOptions;
 
 public class CampaignFactionSecurity implements CampaignFactionService {
 
@@ -44,6 +45,14 @@ public class CampaignFactionSecurity implements CampaignFactionService {
     return impl.getSituation(campaignName, factionName);
   }
 
+  @Override
+  public GameOptions getGameOptions(String campaignName, String factionName) {
+    if (!canGetSituation(campaignName, factionName))
+      throw cannotGetOptions();
+
+    return campaignRepository.find(campaignName).gameOptions();
+  }
+
   boolean isCampaignOwner(CampaignFaction campaignFaction) {
     return campaignRepository.isOwner(campaignFaction.campaignName(), authInfo.getUserUUID());
   }
@@ -68,5 +77,9 @@ public class CampaignFactionSecurity implements CampaignFactionService {
 
   private RuntimeException cannotGetSituation() {
     return new NotAuthorizedException("Cannot get situation for this faction.");
+  }
+
+  private RuntimeException cannotGetOptions() {
+    return new NotAuthorizedException("Cannot get campaign options.");
   }
 }

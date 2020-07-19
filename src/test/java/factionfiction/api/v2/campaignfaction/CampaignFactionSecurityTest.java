@@ -5,8 +5,12 @@ import base.game.ImmutableFactionSituation;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import factionfiction.api.v2.auth.AuthInfo;
 import factionfiction.api.v2.campaign.CampaignRepository;
+import factionfiction.api.v2.campaign.ImmutableCampaign;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
 import factionfiction.api.v2.faction.FactionRepository;
+import factionfiction.api.v2.game.GameOptions;
+import factionfiction.api.v2.game.GameOptionsLoader;
+import java.io.IOException;
 import java.math.BigDecimal;
 import static java.util.Collections.emptyList;
 import java.util.UUID;
@@ -143,43 +147,84 @@ public class CampaignFactionSecurityTest {
     });
   }
 
+  @Test
+  public void testCanGetGameOptions() throws IOException {
+    var options = makeSampleOptions();
+    mockGameOptions(options);
+    mockFactionManagerAndFactionOwner();
+    mockNoCamapignManager();
+
+    var result = security.getGameOptions(sample.campaignName(), sample.factionName());
+
+    assertThat(result, is(options));
+  }
+
+  @Test
+  public void testCannotGetGameOptions() throws IOException {
+    var options = makeSampleOptions();
+    mockGameOptions(options);
+    mockNoFactionManager();
+    mockNoCamapignManager();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.getGameOptions(sample.campaignName(), sample.factionName());
+    });
+  }
+
+  void mockGameOptions(GameOptions options) {
+    given(campaignRepository.find(sample.campaignName()))
+      .willReturn(ImmutableCampaign.builder()
+        .name(sample.campaignName())
+        .gameOptions(options)
+        .build());
+  }
+
+  static GameOptions makeSampleOptions() throws IOException {
+    return new GameOptionsLoader().loadDefaults();
+  }
+
   void mockOwnerAndResponse(FactionSituation situation) {
-    given(authInfo.getUserUUID()).willReturn(owner);
     given(impl.getSituation(sample.campaignName(), sample.factionName()))
       .willReturn(situation);
   }
 
   void mockNoFactionManager() {
+    given(authInfo.getUserUUID()).willReturn(owner);
     given(authInfo.isFactionManager()).willReturn(false);
     given(factionRepository.isOwner(sample.factionName(), owner))
       .willReturn(false);
   }
 
   void mockNoCamapignManager() {
+    given(authInfo.getUserUUID()).willReturn(owner);
     given(authInfo.isCampaignManager()).willReturn(false);
     given(campaignRepository.isOwner(sample.factionName(), owner))
       .willReturn(false);
   }
 
   void mockFactionManagerAndFactionOwner() {
+    given(authInfo.getUserUUID()).willReturn(owner);
     given(authInfo.isFactionManager()).willReturn(true);
     given(factionRepository.isOwner(sample.factionName(), owner))
       .willReturn(true);
   }
 
   void mockCampaignManagerAndCampaignOwner() {
+    given(authInfo.getUserUUID()).willReturn(owner);
     given(authInfo.isCampaignManager()).willReturn(true);
     given(campaignRepository.isOwner(sample.campaignName(), owner))
       .willReturn(true);
   }
 
   void mockFactionManagerAndNoFactionOwner() {
+    given(authInfo.getUserUUID()).willReturn(owner);
     given(authInfo.isFactionManager()).willReturn(true);
     given(factionRepository.isOwner(sample.factionName(), owner))
       .willReturn(false);
   }
 
   void mockCampaignManagerAndNoCampaignOwner() {
+    given(authInfo.getUserUUID()).willReturn(owner);
     given(authInfo.isCampaignManager()).willReturn(true);
     given(campaignRepository.isOwner(sample.campaignName(), owner))
       .willReturn(false);
