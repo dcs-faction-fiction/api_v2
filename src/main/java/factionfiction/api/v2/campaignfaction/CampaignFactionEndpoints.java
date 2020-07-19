@@ -39,6 +39,7 @@ public class CampaignFactionEndpoints implements Endpoint {
     javalin.post("/v2/campaignfaction-api/campaigns/:campaign/factions", this::addNew, roles(CAMPAIGN_MANAGER));
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction", this::getSituation, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/game-options", this::getGameOptions, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
+    javalin.get("/v2/campaignfaction-api/factions/:faction/campaigns", this::getAvailableCampaigns, roles(FACTION_MANAGER));
   }
 
   @OpenApi(ignore = true)
@@ -83,6 +84,15 @@ public class CampaignFactionEndpoints implements Endpoint {
     var factionName = ctx.pathParam(FACTION_PATHPARAM, String.class).get();
 
     var result = service.getGameOptions(campaignName, factionName);
+
+    ctx.json(result);
+  }
+
+  public void getAvailableCampaigns(Context ctx) {
+    var service = cfServiceProvider.apply(ctx);
+    var factionName = ctx.pathParam(FACTION_PATHPARAM, String.class).get();
+
+    var result = service.getAvailableCampaigns(factionName);
 
     ctx.json(result);
   }

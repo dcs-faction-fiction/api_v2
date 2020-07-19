@@ -80,4 +80,12 @@ public class CampaignRepository {
       .orElse(defaultOptions);
   }
 
+  public List<String> getAvailableCampaignsForFaction(String factionName) {
+    return jdbi.withHandle(h -> h.select(
+      "select campaign_name from campaign_faction where faction_name = ?",
+      factionName)
+      .mapTo(String.class)
+      .list());
+  }
+
 }

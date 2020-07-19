@@ -5,6 +5,8 @@ import com.google.gson.Gson;
 import static factionfiction.api.v2.campaign.CampaignHelper.cleanCampaignTable;
 import static factionfiction.api.v2.campaign.CampaignHelper.insertSampleCampaign;
 import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
+import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.cleanCampaignFactionTable;
+import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.insertSampleCampaignFaction;
 import factionfiction.api.v2.game.GameOptions;
 import factionfiction.api.v2.game.GameOptionsLoader;
 import factionfiction.api.v2.test.InMemoryDB;
@@ -87,5 +89,15 @@ public class CampaignRepositoryIT {
     var isOwner = repository.isOwner(sample.name(), UUID.randomUUID());
 
     assertThat(isOwner, is(false));
+  }
+
+  @Test
+  public void testGetAvailableCampaignsForFaction() throws IOException {
+    cleanCampaignFactionTable(jdbi);
+    insertSampleCampaignFaction(jdbi, UUID.randomUUID(), owner);
+
+    var result = repository.getAvailableCampaignsForFaction("faction name");
+
+    assertThat(result, is(List.of("campaign name")));
   }
 }

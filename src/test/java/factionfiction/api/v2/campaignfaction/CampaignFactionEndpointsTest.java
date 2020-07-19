@@ -14,6 +14,7 @@ import static io.javalin.core.security.SecurityUtil.roles;
 import io.javalin.core.validation.Validator;
 import io.javalin.http.Context;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,10 @@ public class CampaignFactionEndpointsTest {
     endpoints.register(javalin);
 
     verify(javalin).get(eq("/v2/campaignfaction-api"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
-    javalin.post(eq("/v2/campaignfaction-api/campaigns/:campaign/factions"), any(), eq(roles(CAMPAIGN_MANAGER)));
+    verify(javalin).post(eq("/v2/campaignfaction-api/campaigns/:campaign/factions"), any(), eq(roles(CAMPAIGN_MANAGER)));
+    verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
+    verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/game-options"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
+    verify(javalin).get(eq("/v2/campaignfaction-api/factions/:faction/campaigns"), any(), eq(roles(FACTION_MANAGER)));
   }
 
   @Test
@@ -109,5 +113,16 @@ public class CampaignFactionEndpointsTest {
     endpoints.getGameOptions(ctx);
 
     verify(ctx).json(options);
+  }
+
+  @Test
+  public void testGetAvailableCampaigns() {
+    given(ctx.pathParam("faction", String.class))
+      .willReturn(Validator.create(String.class, "faction"));
+    given(campFactionService.getAvailableCampaigns("faction"))
+      .willReturn(List.of("campaign"));
+    endpoints.getAvailableCampaigns(ctx);
+
+    verify(ctx).json(List.of("campaign"));
   }
 }

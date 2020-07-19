@@ -13,6 +13,7 @@ import factionfiction.api.v2.game.GameOptionsLoader;
 import java.io.IOException;
 import java.math.BigDecimal;
 import static java.util.Collections.emptyList;
+import java.util.List;
 import java.util.UUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -169,6 +170,16 @@ public class CampaignFactionSecurityTest {
     assertThrows(NotAuthorizedException.class, () -> {
       security.getGameOptions(sample.campaignName(), sample.factionName());
     });
+  }
+
+  @Test
+  public void testGetAvailableCampaigns() {
+    given(campaignRepository.getAvailableCampaignsForFaction("faction"))
+      .willReturn(List.of("campaign"));
+
+    var result = security.getAvailableCampaigns("faction");
+
+    assertThat(result, is(List.of("campaign")));
   }
 
   void mockGameOptions(GameOptions options) {

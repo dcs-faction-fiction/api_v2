@@ -6,6 +6,7 @@ import factionfiction.api.v2.auth.AuthInfo;
 import factionfiction.api.v2.campaign.CampaignRepository;
 import factionfiction.api.v2.faction.FactionRepository;
 import factionfiction.api.v2.game.GameOptions;
+import java.util.List;
 
 public class CampaignFactionSecurity implements CampaignFactionService {
 
@@ -51,6 +52,11 @@ public class CampaignFactionSecurity implements CampaignFactionService {
       throw cannotGetOptions();
 
     return campaignRepository.find(campaignName).gameOptions();
+  }
+
+  @Override
+  public List<String> getAvailableCampaigns(String factionName) {
+    return campaignRepository.getAvailableCampaignsForFaction(factionName);
   }
 
   boolean isCampaignOwner(CampaignFaction campaignFaction) {
