@@ -44,6 +44,7 @@ public class PurchaseEndpoints implements Endpoint {
     var credits = ctx.bodyAsClass(BigDecimal.class);
 
     serviceProvider.apply(ctx).giveCredits(campaign, faction, credits);
+    ctx.json("{}");
   }
 
   public void buyUnit(Context ctx) {
@@ -61,5 +62,6 @@ public class PurchaseEndpoints implements Endpoint {
     var code = ctx.bodyAsClass(WarehouseItemCode.class);
 
     serviceProvider.apply(ctx).buyWarehouseItem(campaign, faction, code);
+    ctx.json("{}");
   }
 }
