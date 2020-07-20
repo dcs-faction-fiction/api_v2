@@ -3,6 +3,7 @@ package factionfiction.api.v2.auth;
 import static com.github.apilab.rest.auth.JavalinJWTFilter.REQ_ATTR_ROLES;
 import static com.github.apilab.rest.auth.JavalinJWTFilter.REQ_ATTR_SUBJECT;
 import com.github.apilab.rest.exceptions.NotAuthenticatedException;
+import static factionfiction.api.v2.auth.Roles.ADMIN;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
 import static factionfiction.api.v2.auth.Roles.FACTION_MANAGER;
 import io.javalin.core.security.Role;
@@ -31,6 +32,10 @@ public class AuthInfo {
 
   public boolean isCampaignManager() {
     return roles.contains(CAMPAIGN_MANAGER);
+  }
+
+  public boolean isAdmin() {
+    return roles.contains(ADMIN);
   }
 
   public static AuthInfo fromContext(Context ctx) {

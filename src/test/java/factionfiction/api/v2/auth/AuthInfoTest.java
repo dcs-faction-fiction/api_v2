@@ -1,5 +1,6 @@
 package factionfiction.api.v2.auth;
 
+import static factionfiction.api.v2.auth.Roles.ADMIN;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
 import static factionfiction.api.v2.auth.Roles.FACTION_MANAGER;
 import static factionfiction.api.v2.test.AuthProvider.mockUser;
@@ -35,5 +36,16 @@ public class AuthInfoTest {
 
     assertThat(info.isCampaignManager(), is(true));
     assertThat(info.getUserUUID(), is(uuid));
+  }
+
+  @Test
+  public void testFromContextAdmin() {
+    var uuid = UUID.randomUUID();
+    Context ctx = mock(Context.class);
+    mockUser(ctx, uuid, Set.of(ADMIN));
+
+    var info = AuthInfo.fromContext(ctx);
+
+    assertThat(info.isAdmin(), is(true));
   }
 }

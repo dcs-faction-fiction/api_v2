@@ -46,6 +46,11 @@ public class CampaignSecurity implements CampaignService {
 
   @Override
   public void startMission(String campaignName, String serverName) {
+    if (authInfo.isAdmin()) {
+      impl.startMission(campaignName, serverName);
+      return;
+    }
+
     if (!canViewCampaigns())
       throw cannotViewCampaignsError();
 

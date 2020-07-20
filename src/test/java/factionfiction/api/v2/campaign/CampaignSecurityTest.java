@@ -152,6 +152,15 @@ public class CampaignSecurityTest {
   }
 
   @Test
+  public void teststartMissionAsAdmin() throws IOException {
+    given(authInfo.isAdmin()).willReturn(true);
+
+    security.startMission("camp", "serv");
+
+    verify(impl).startMission("camp", "serv");
+  }
+
+  @Test
   public void teststartMission() throws IOException {
     var uuid = UUID.randomUUID();
     given(authInfo.getUserUUID()).willReturn(uuid);
