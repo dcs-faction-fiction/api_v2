@@ -1,4 +1,4 @@
-package factionfiction.api.v2.units.purchase;
+package factionfiction.api.v2.purchase;
 
 import base.game.FactionUnit;
 import base.game.warehouse.WarehouseItemCode;
@@ -97,5 +97,27 @@ public class PurchaseEndpointTest {
     endpoint.buyWarehouseItem(ctx);
 
     verify(service).buyWarehouseItem(CAMPAIGN_NAME, FACTION_NAME, code);
+  }
+
+  @Test
+  public void testZoneIncrease() throws Exception {
+    given(ctx.pathParam(CAMPAIGN_PATHPARAM, String.class))
+      .willReturn(Validator.create(String.class, CAMPAIGN_NAME));
+    given(ctx.pathParam(FACTION_PATHPARAM, String.class))
+      .willReturn(Validator.create(String.class, FACTION_NAME));
+    endpoint.zoneIncrease(ctx);
+
+    verify(service).zoneIncrease(CAMPAIGN_NAME, FACTION_NAME);
+  }
+
+  @Test
+  public void testZoneDecrease() throws Exception {
+    given(ctx.pathParam(CAMPAIGN_PATHPARAM, String.class))
+      .willReturn(Validator.create(String.class, CAMPAIGN_NAME));
+    given(ctx.pathParam(FACTION_PATHPARAM, String.class))
+      .willReturn(Validator.create(String.class, FACTION_NAME));
+    endpoint.zoneDecrease(ctx);
+
+    verify(service).zoneDecrease(CAMPAIGN_NAME, FACTION_NAME);
   }
 }

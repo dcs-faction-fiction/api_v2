@@ -1,4 +1,4 @@
-package factionfiction.api.v2.units.purchase;
+package factionfiction.api.v2.purchase;
 
 import com.github.apilab.rest.exceptions.UnprocessableEntityException;
 

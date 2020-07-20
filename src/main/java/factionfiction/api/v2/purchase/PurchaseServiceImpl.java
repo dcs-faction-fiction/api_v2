@@ -1,4 +1,4 @@
-package factionfiction.api.v2.units.purchase;
+package factionfiction.api.v2.purchase;
 
 import base.game.FactionUnit;
 import base.game.ImmutableFactionUnit;
@@ -43,6 +43,16 @@ public class PurchaseServiceImpl {
     buyItemTransactionally(
       findWarehouseOptionsFromCampaign(campaignName, item),
       campaignName, factionName);
+  }
+
+  void zoneIncrease(String campaign, String faction) {
+    var c = campaignRepository.find(campaign);
+    purchaseRepository.zoneIncrease(campaign, faction, c.gameOptions());
+  }
+
+  void zoneDecrease(String campaign, String faction) {
+    var c = campaignRepository.find(campaign);
+    purchaseRepository.zoneDecrease(campaign, faction, c.gameOptions());
   }
 
   FactionUnit confineUnitWithinFactionZone(String campaignName, String factionName, FactionUnit unit) {

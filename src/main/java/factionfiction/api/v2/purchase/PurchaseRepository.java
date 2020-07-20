@@ -1,9 +1,10 @@
-package factionfiction.api.v2.units.purchase;
+package factionfiction.api.v2.purchase;
 
 import base.game.FactionUnit;
 import base.game.warehouse.WarehouseItemCode;
 import factionfiction.api.v2.campaignfaction.CampaignFaction;
 import factionfiction.api.v2.campaignfaction.CampaignFactionRepository;
+import factionfiction.api.v2.game.GameOptions;
 import factionfiction.api.v2.units.UnitRepository;
 import java.math.BigDecimal;
 import static java.math.BigDecimal.ZERO;
@@ -60,6 +61,54 @@ public class PurchaseRepository {
     });
 
     return unitRepository.getUnit(id);
+  }
+
+  public void zoneIncrease(String campaignName, String factionName, GameOptions options) {
+    jdbi.useHandle(h -> {
+      UUID cfid = h.select("select id from campaign_faction "
+        + "where campaign_name = ? and faction_name = ? "
+        + "for update",
+        campaignName, factionName)
+        .mapTo(UUID.class)
+        .first();
+
+      var creditsAvailable = h.select(
+        "select credits from campaign_faction where id = ?", cfid)
+        .mapTo(BigDecimal.class).findFirst().orElse(ZERO);
+      if (options.zones().increase().cost().compareTo(creditsAvailable) > 0) {
+        throw new NotEnoughCreditsException();
+      }
+
+      h.execute("update campaign_faction set "
+        + "zone_size_ft = zone_size_ft + ?, "
+        + "credits = greatest(0, credits - ?) "
+        + "where id = ?",
+        options.zones().increase().amount(), options.zones().increase().cost(), cfid);
+    });
+  }
+
+  public void zoneDecrease(String campaignName, String factionName, GameOptions options) {
+    jdbi.useHandle(h -> {
+      UUID cfid = h.select("select id from campaign_faction "
+        + "where campaign_name = ? and faction_name = ? "
+        + "for update",
+        campaignName, factionName)
+        .mapTo(UUID.class)
+        .first();
+
+      var sizeAvailable = h.select(
+        "select zone_size_ft from campaign_faction where id = ?", cfid)
+        .mapTo(Integer.class).findFirst().orElse(0);
+      if (sizeAvailable <= options.zones().sizes().min()) {
+        throw new ZoneAtMinumum();
+      }
+
+      h.execute("update campaign_faction set "
+        + "zone_size_ft = zone_size_ft - ?, "
+        + "credits = greatest(0, credits + ?) "
+        + "where id = ?",
+        options.zones().decrease().amount(), options.zones().decrease().cost(), cfid);
+    });
   }
 
   void buyItem(String campaignName, String factionName, BigDecimal cost, WarehouseItemCode code) {

@@ -1,4 +1,4 @@
-package factionfiction.api.v2.units.purchase;
+package factionfiction.api.v2.purchase;
 
 import base.game.ImmutableFactionUnit;
 import static base.game.warehouse.WarehouseItemCode.JF_17;
@@ -7,14 +7,18 @@ import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.cleanC
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.insertSampleCampaignFaction;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
 import factionfiction.api.v2.campaignfaction.CampaignFactionRepository;
+import factionfiction.api.v2.game.GameOptionsLoader;
 import factionfiction.api.v2.test.InMemoryDB;
 import static factionfiction.api.v2.units.UnitHelper.makeSampleFactionUnit;
 import factionfiction.api.v2.units.UnitRepository;
+import java.io.IOException;
+import java.math.BigDecimal;
 import static java.math.BigDecimal.ONE;
 import java.util.UUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import org.jdbi.v3.core.Jdbi;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -103,6 +107,50 @@ public class PurchaseRepositoryIT {
       sample.factionName());
 
     assertThat(credits.compareTo(sample.credits()), is(-1));
+  }
+
+  @Test
+  public void testIncreaseDecreaseZone() throws IOException {
+    cleanCampaignFactionTable(jdbi);
+    insertSampleCampaignFaction(jdbi, UUID.randomUUID(), owner);
+
+    assertThrows(ZoneAtMinumum.class, () -> {
+      repository.zoneDecrease(
+        sample.campaignName(),
+        sample.factionName(),
+        new GameOptionsLoader().loadDefaults());
+    });
+
+    repository.zoneIncrease(
+      sample.campaignName(),
+      sample.factionName(),
+      new GameOptionsLoader().loadDefaults());
+
+    var credits = repository.getCredits(
+      sample.campaignName(),
+      sample.factionName());
+
+    assertThat(credits.compareTo(sample.credits()), is(-1));
+
+    repository.zoneDecrease(
+      sample.campaignName(),
+      sample.factionName(),
+      new GameOptionsLoader().loadDefaults());
+
+    credits = repository.getCredits(
+      sample.campaignName(),
+      sample.factionName());
+
+    assertThat(credits.compareTo(sample.credits()), is(-1));
+
+    repository.giveCredits(sample.campaignName(), sample.factionName(), new BigDecimal(-1000));
+
+    assertThrows(NotEnoughCreditsException.class, () -> {
+      repository.zoneIncrease(
+      sample.campaignName(),
+      sample.factionName(),
+         new GameOptionsLoader().loadDefaults());
+    });
   }
 
 }

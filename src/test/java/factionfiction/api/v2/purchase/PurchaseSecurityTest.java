@@ -1,4 +1,4 @@
-package factionfiction.api.v2.units.purchase;
+package factionfiction.api.v2.purchase;
 
 import base.game.FactionUnit;
 import static base.game.warehouse.WarehouseItemCode.JF_17;
@@ -82,6 +82,24 @@ public class PurchaseSecurityTest {
   }
 
   @Test
+  public void testIncreaseZone() {
+    mockCorrectFactionSecurity();
+
+    security.zoneIncrease(campaignName, factionName);
+
+    verify(impl).zoneIncrease(campaignName, factionName);
+  }
+
+  @Test
+  public void testDecreaseZone() {
+    mockCorrectFactionSecurity();
+
+    security.zoneDecrease(campaignName, factionName);
+
+    verify(impl).zoneDecrease(campaignName, factionName);
+  }
+
+  @Test
   public void testGiveCreditsNoManager() {
     mockNoCampaignManager();
 
@@ -109,6 +127,24 @@ public class PurchaseSecurityTest {
   }
 
   @Test
+  public void testIncreaseZoneItemNoManager() {
+    mockNoFactionManager();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.zoneIncrease(campaignName, factionName);
+    });
+  }
+
+  @Test
+  public void testDecreaseZoneItemNoManager() {
+    mockNoFactionManager();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.zoneDecrease(campaignName, factionName);
+    });
+  }
+
+  @Test
   public void testGiveCreditsNoOwner() {
     mockNoCampaignOwner();
 
@@ -132,6 +168,24 @@ public class PurchaseSecurityTest {
 
     assertThrows(NotAuthorizedException.class, () -> {
       security.buyWarehouseItem(campaignName, factionName, JF_17);
+    });
+  }
+
+  @Test
+  public void testIncreaseZoneNoOwner() {
+    mockNoFactionOwner();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.zoneIncrease(campaignName, factionName);
+    });
+  }
+
+  @Test
+  public void testDecreaseZoneItemNoOwner() {
+    mockNoFactionOwner();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.zoneDecrease(campaignName, factionName);
     });
   }
 

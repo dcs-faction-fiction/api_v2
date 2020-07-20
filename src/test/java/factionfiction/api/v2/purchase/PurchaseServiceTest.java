@@ -1,4 +1,4 @@
-package factionfiction.api.v2.units.purchase;
+package factionfiction.api.v2.purchase;
 
 import base.game.ImmutableFactionUnit;
 import base.game.ImmutableLocation;
@@ -131,6 +131,28 @@ public class PurchaseServiceTest {
     assertThrows(WarehouseItemNotAllowedInCampaignException.class, () -> {
       service.buyWarehouseItem(campaignName, factionName, UH_1H);
     });
+  }
+
+  @Test
+  public void testPassIncrease() throws IOException {
+    var c = makeSampleCampaign();
+    given(campaignRepository.find("c"))
+      .willReturn(c);
+
+    service.zoneIncrease("c", "f");
+
+    verify(purchaseRepository).zoneIncrease("c", "f", c.gameOptions());
+  }
+
+  @Test
+  public void testPassDecrease() throws IOException {
+    var c = makeSampleCampaign();
+    given(campaignRepository.find("c"))
+      .willReturn(c);
+
+    service.zoneDecrease("c", "f");
+
+    verify(purchaseRepository).zoneDecrease("c", "f", c.gameOptions());
   }
 
   ImmutableFactionUnit mockBuyUnitSituation(BigDecimal creditsAvailable) throws IOException {

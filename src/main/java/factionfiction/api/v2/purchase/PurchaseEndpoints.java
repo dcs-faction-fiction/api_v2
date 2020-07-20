@@ -1,4 +1,4 @@
-package factionfiction.api.v2.units.purchase;
+package factionfiction.api.v2.purchase;
 
 import base.game.FactionUnit;
 import base.game.warehouse.WarehouseItemCode;
@@ -30,6 +30,8 @@ public class PurchaseEndpoints implements Endpoint {
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/give-credits", this::giveCredits, roles(CAMPAIGN_MANAGER));
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-unit", this::buyUnit, roles(FACTION_MANAGER));
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-warehouse-item", this::buyWarehouseItem, roles(FACTION_MANAGER));
+    javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/zone-increase", this::zoneIncrease, roles(FACTION_MANAGER));
+    javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/zone-decrease", this::zoneDecrease, roles(FACTION_MANAGER));
   }
 
   @OpenApi(ignore = true)
@@ -62,6 +64,22 @@ public class PurchaseEndpoints implements Endpoint {
     var code = ctx.bodyAsClass(WarehouseItemCode.class);
 
     serviceProvider.apply(ctx).buyWarehouseItem(campaign, faction, code);
+    ctx.json("{}");
+  }
+
+  public void zoneIncrease(Context ctx) {
+    var campaign = ctx.pathParam(CAMPAIGN_PATHPARAM, String.class).get();
+    var faction = ctx.pathParam(FACTION_PATHPARAM, String.class).get();
+
+    serviceProvider.apply(ctx).zoneIncrease(campaign, faction);
+    ctx.json("{}");
+  }
+
+  public void zoneDecrease(Context ctx) {
+    var campaign = ctx.pathParam(CAMPAIGN_PATHPARAM, String.class).get();
+    var faction = ctx.pathParam(FACTION_PATHPARAM, String.class).get();
+
+    serviceProvider.apply(ctx).zoneDecrease(campaign, faction);
     ctx.json("{}");
   }
 }

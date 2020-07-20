@@ -1,4 +1,4 @@
-package factionfiction.api.v2.units.purchase;
+package factionfiction.api.v2.purchase;
 
 import base.game.FactionUnit;
 import base.game.warehouse.WarehouseItemCode;
@@ -50,6 +50,20 @@ public class PurchaseSecurity implements PurchaseService {
     impl.buyWarehouseItem(campaignName, factionName, item);
   }
 
+  @Override
+  public void zoneIncrease(String campaign, String faction) {
+    if (!managerAndOwnsFaction(faction))
+      throw errorNotFactionManager();
+    impl.zoneIncrease(campaign, faction);
+  }
+
+  @Override
+  public void zoneDecrease(String campaign, String faction) {
+    if (!managerAndOwnsFaction(faction))
+      throw errorNotFactionManager();
+    impl.zoneDecrease(campaign, faction);
+  }
+
   boolean managerAndOwnsCampaign(String campaignName) {
     return authInfo.isCampaignManager() && isCampaignOwner(campaignName);
   }
@@ -61,7 +75,6 @@ public class PurchaseSecurity implements PurchaseService {
   static NotAuthorizedException errorNotCampaignManager() {
     return new NotAuthorizedException("Not a campaign manager");
   }
-
 
   boolean managerAndOwnsFaction(String factionName) {
     return authInfo.isFactionManager() && isFactionOwner(factionName);

@@ -1,4 +1,4 @@
-package factionfiction.api.v2.units.purchase;
+package factionfiction.api.v2.purchase;
 
 import base.game.FactionUnit;
 import base.game.warehouse.WarehouseItemCode;
@@ -8,4 +8,6 @@ public interface PurchaseService {
   BigDecimal giveCredits(String campaignName, String factionName, BigDecimal credits);
   FactionUnit buyUnit(String campaignName, String factionName, FactionUnit unit);
   void buyWarehouseItem(String campaignName, String factionName, WarehouseItemCode item);
+  void zoneIncrease(String campaign, String faction);
+  void zoneDecrease(String campaign, String faction);
 }
