@@ -27,6 +27,7 @@ import factionfiction.api.v2.campaignfaction.CampaignFactionServiceImpl;
 import factionfiction.api.v2.common.CommonEndpoints;
 import factionfiction.api.v2.daemon.DaemonEndpoints;
 import factionfiction.api.v2.daemon.DaemonRepository;
+import factionfiction.api.v2.daemon.ServerInfo;
 import factionfiction.api.v2.faction.Faction;
 import factionfiction.api.v2.faction.FactionEndpoints;
 import factionfiction.api.v2.faction.FactionRepository;
@@ -76,7 +77,8 @@ public class ComponentsModule {
       Faction.class,
       Campaign.class,
       CampaignFaction.class,
-      FactionUnit.class);
+      FactionUnit.class,
+      ServerInfo.class);
   }
 
   @Provides

@@ -1,13 +1,15 @@
 package factionfiction.api.v2.campaign;
 
+import factionfiction.api.v2.daemon.ServerInfo;
 import factionfiction.api.v2.game.GameOptions;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 public class CampaignServiceImpl {
 
-  CampaignRepository repository;
+  final CampaignRepository repository;
 
   public CampaignServiceImpl(CampaignRepository repository) {
     this.repository = repository;
@@ -29,5 +31,17 @@ public class CampaignServiceImpl {
 
   public boolean isOwner(String name, UUID owner) {
     return repository.isOwner(name, owner);
+  }
+
+  public void startMission(String campaignName, String serverName) {
+    repository.startMission(campaignName, serverName);
+  }
+
+  public Optional<ServerInfo> getServerInfo(String campaignName) {
+    return repository.getInfoFromCampaign(campaignName);
+  }
+
+  public boolean userCanManageServer(UUID user, String server) {
+    return repository.userCanManageServer(user, server);
   }
 }

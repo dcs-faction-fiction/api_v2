@@ -4,12 +4,15 @@ import static base.game.Airbases.ANAPA;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
 import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
 import factionfiction.api.v2.campaignfaction.CampaignFactionService;
+import factionfiction.api.v2.daemon.ServerInfo;
 import io.javalin.Javalin;
 import static io.javalin.core.security.SecurityUtil.roles;
+import io.javalin.core.validation.Validator;
 import io.javalin.http.Context;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
@@ -82,6 +85,31 @@ public class CampaignEndpointsTest {
     endpoint.getCampaigns(ctx);
 
     verify(ctx).json(campaigns);
+  }
+
+  @Test
+  public void testGetServerInfo() {
+    var response = mock(ServerInfo.class);
+    given(ctx.pathParam("campaign", String.class))
+      .willReturn(Validator.create(String.class, "camp"));
+    given(campaignService.getServerInfo("camp"))
+      .willReturn(Optional.of(response));
+
+    endpoint.getServerInfo(ctx);
+
+    verify(ctx).json(response);
+  }
+
+  @Test
+  public void testStartServer() {
+    given(ctx.pathParam("campaign", String.class))
+      .willReturn(Validator.create(String.class, "camp"));
+    given(ctx.bodyAsClass(String.class))
+      .willReturn("serv");
+
+    endpoint.startServer(ctx);
+
+    verify(campaignService).startMission("camp", "serv");
   }
 
 }

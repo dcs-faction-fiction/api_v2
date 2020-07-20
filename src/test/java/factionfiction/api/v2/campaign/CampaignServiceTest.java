@@ -90,4 +90,23 @@ public class CampaignServiceTest {
     assertThat(campaign.name(), is("Campaign"));
     assertThat(campaign.gameOptions(), is(options));
   }
+
+  @Test
+  public void testPassServerInfo() {
+    service.getServerInfo("camp");
+    verify(repository).getInfoFromCampaign("camp");
+  }
+
+  @Test
+  public void testPassStartMission() {
+    service.startMission("camp", "serv");
+    verify(repository).startMission("camp", "serv");
+  }
+
+  @Test
+  public void testPassUserCanManageServer() {
+    var user = UUID.randomUUID();
+    service.userCanManageServer(user, "serv");
+    verify(repository).userCanManageServer(user, "serv");
+  }
 }

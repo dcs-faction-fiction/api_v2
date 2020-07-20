@@ -2,8 +2,10 @@ package factionfiction.api.v2.campaign;
 
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import factionfiction.api.v2.auth.AuthInfo;
+import factionfiction.api.v2.daemon.ServerInfo;
 import factionfiction.api.v2.game.GameOptions;
 import java.util.List;
+import java.util.Optional;
 
 public class CampaignSecurity implements CampaignService {
 
@@ -42,6 +44,31 @@ public class CampaignSecurity implements CampaignService {
     return impl.find(name);
   }
 
+  @Override
+  public void startMission(String campaignName, String serverName) {
+    if (!canViewCampaigns())
+      throw cannotViewCampaignsError();
+
+    if (!ownsCampaign(campaignName))
+      throw cannotOwnCampaign();
+
+    if (!canManageServer(serverName))
+      throw cannotManageServerError();
+
+    impl.startMission(campaignName, serverName);
+  }
+
+  @Override
+  public Optional<ServerInfo> getServerInfo(String campaignName) {
+    if (!canViewCampaigns())
+      throw cannotViewCampaignsError();
+
+    if (!ownsCampaign(campaignName))
+      throw cannotOwnCampaign();
+
+    return impl.getServerInfo(campaignName);
+  }
+
   boolean ownsCampaign(String name) {
     return impl.isOwner(name, authInfo.getUserUUID());
   }
@@ -54,11 +81,15 @@ public class CampaignSecurity implements CampaignService {
     return authInfo.isCampaignManager();
   }
 
+  boolean canManageServer(String serverName) {
+    return impl.userCanManageServer(authInfo.getUserUUID(), serverName);
+  }
+
   static RuntimeException cannotViewCampaignsError() {
     return new NotAuthorizedException("Cannot view campaigns");
   }
 
-  static NotAuthorizedException cannotOwnCampaign() {
+  static RuntimeException cannotOwnCampaign() {
     return new NotAuthorizedException("Not owning this campaign");
   }
 
@@ -66,4 +97,7 @@ public class CampaignSecurity implements CampaignService {
     return new NotAuthorizedException("Cannot create campaigns");
   }
 
+  static RuntimeException cannotManageServerError() {
+    return new NotAuthorizedException("User does not manage this server");
+  }
 }

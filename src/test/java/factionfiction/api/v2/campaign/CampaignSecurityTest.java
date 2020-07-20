@@ -3,10 +3,12 @@ package factionfiction.api.v2.campaign;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import factionfiction.api.v2.auth.AuthInfo;
 import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
+import factionfiction.api.v2.daemon.ServerInfo;
 import factionfiction.api.v2.game.GameOptions;
 import factionfiction.api.v2.game.GameOptionsLoader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -111,5 +113,88 @@ public class CampaignSecurityTest {
     var result = security.find("");
 
     assertThat(result, is(campaign));
+  }
+
+  @Test
+  public void testGetServerInfo() throws IOException {
+    var uuid = UUID.randomUUID();
+    var campaign = makeSampleCampaign();
+    var info = mock(ServerInfo.class);
+    given(authInfo.getUserUUID()).willReturn(uuid);
+    given(authInfo.isCampaignManager()).willReturn(true);
+    given(impl.isOwner(campaign.name(), uuid)).willReturn(true);
+    given(impl.getServerInfo(campaign.name())).willReturn(Optional.of(info));
+
+    var result = security.getServerInfo(campaign.name());
+
+    assertThat(result, is(Optional.of(info)));
+  }
+
+  @Test
+  public void testGetServerInfoNoManager() throws IOException {
+    given(authInfo.isCampaignManager()).willReturn(false);
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.getServerInfo("");
+    });
+  }
+
+  @Test
+  public void testGetServerInfoNoOwner() throws IOException {
+    var uuid = UUID.randomUUID();
+    given(authInfo.getUserUUID()).willReturn(uuid);
+    given(authInfo.isCampaignManager()).willReturn(true);
+    given(impl.isOwner("", uuid)).willReturn(false);
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.getServerInfo("");
+    });
+  }
+
+  @Test
+  public void teststartMission() throws IOException {
+    var uuid = UUID.randomUUID();
+    given(authInfo.getUserUUID()).willReturn(uuid);
+    given(authInfo.isCampaignManager()).willReturn(true);
+    given(impl.isOwner("camp", uuid)).willReturn(true);
+    given(impl.userCanManageServer(uuid, "serv")).willReturn(true);
+
+    security.startMission("camp", "serv");
+
+    verify(impl).startMission("camp", "serv");
+  }
+
+  @Test
+  public void teststartMissionNoManager() throws IOException {
+    given(authInfo.isCampaignManager()).willReturn(false);
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.startMission("camp", "serv");
+    });
+  }
+
+  @Test
+  public void teststartMissionNoOwner() throws IOException {
+    var uuid = UUID.randomUUID();
+    given(authInfo.getUserUUID()).willReturn(uuid);
+    given(authInfo.isCampaignManager()).willReturn(true);
+    given(impl.isOwner("camp", uuid)).willReturn(false);
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.startMission("camp", "serv");
+    });
+  }
+
+  @Test
+  public void teststartMissionNoServerOwner() throws IOException {
+    var uuid = UUID.randomUUID();
+    given(authInfo.getUserUUID()).willReturn(uuid);
+    given(authInfo.isCampaignManager()).willReturn(true);
+    given(impl.isOwner("camp", uuid)).willReturn(true);
+    given(impl.userCanManageServer(uuid, "serv")).willReturn(false);
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.startMission("camp", "serv");
+    });
   }
 }

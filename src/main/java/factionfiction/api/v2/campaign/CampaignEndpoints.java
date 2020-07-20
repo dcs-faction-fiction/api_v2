@@ -32,6 +32,8 @@ public class CampaignEndpoints implements Endpoint {
     javalin.get("/v2/campaign-api", this, roles(CAMPAIGN_MANAGER));
     javalin.post("/v2/campaign-api/campaigns", this::newCampaign, roles(CAMPAIGN_MANAGER));
     javalin.get("/v2/campaign-api/campaigns", this::getCampaigns, roles(CAMPAIGN_MANAGER));
+    javalin.post("/v2/campaign-api/campaigns/:campaign/start-server", this::startServer, roles(CAMPAIGN_MANAGER));
+    javalin.get("/v2/campaign-api/campaigns/:campaign/server-info", this::getServerInfo, roles(CAMPAIGN_MANAGER));
   }
 
   @OpenApi(ignore = true)
@@ -59,6 +61,24 @@ public class CampaignEndpoints implements Endpoint {
 
     var factions = campService.listCampaigns();
     ctx.json(factions);
+  }
+
+  public void startServer(Context ctx) {
+    var campService = campServiceProvider.apply(ctx);
+    var campaign = ctx.pathParam("campaign", String.class).get();
+    var server = ctx.bodyAsClass(String.class);
+
+    campService.startMission(campaign, server);
+
+    ctx.json("{}");
+  }
+
+  public void getServerInfo(Context ctx) {
+    var campService = campServiceProvider.apply(ctx);
+    var campaign = ctx.pathParam("campaign", String.class).get();
+
+    var result = campService.getServerInfo(campaign);
+    result.ifPresentOrElse(ctx::json, () -> ctx.json("{}"));
   }
 
   void addFactionToCampaign(CampaignFactionService cfService, Campaign campaign, CampaignCreatePayloadFactions cf, CampaignCreatePayload request) {
