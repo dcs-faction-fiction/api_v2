@@ -45,7 +45,7 @@ public class DaemonEndpointTest {
     verify(javalin).post(eq("/v2/daemon-api/servers/:server/warehouse-changed"), any(), eq(roles(DAEMON)));
     verify(javalin).post(eq("/v2/daemon-api/servers/:server/units-moved"), any(), eq(roles(DAEMON)));
     verify(javalin).post(eq("/v2/daemon-api/servers/:server/units-destroyed"), any(), eq(roles(DAEMON)));
-    verify(javalin).post(eq("/v2/daemon-api/servers/:server/download-mission"), any(), eq(roles(DAEMON)));
+    verify(javalin).get(eq("/v2/daemon-api/servers/:server/download-mission"), any(), eq(roles(DAEMON)));
     verify(javalin).get(eq("/v2/daemon-api/servers/:server/next-action"), any(), eq(roles(DAEMON)));
     verify(javalin).post(eq("/v2/daemon-api/servers/:server/actions/:action"), any(), eq(roles(DAEMON)));
   }

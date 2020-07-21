@@ -32,7 +32,7 @@ public class DaemonEndpoints implements Endpoint {
     javalin.post("/v2/daemon-api/servers/:server/warehouse-changed", this::warehouseChanged, roles(DAEMON));
     javalin.post("/v2/daemon-api/servers/:server/units-moved", this::movedUnits, roles(DAEMON));
     javalin.post("/v2/daemon-api/servers/:server/units-destroyed", this::destroyedUnits, roles(DAEMON));
-    javalin.post("/v2/daemon-api/servers/:server/download-mission", this::downloadMission, roles(DAEMON));
+    javalin.get("/v2/daemon-api/servers/:server/download-mission", this::downloadMission, roles(DAEMON));
     javalin.get("/v2/daemon-api/servers/:server/next-action", this::pullNextAction, roles(DAEMON));
     javalin.post("/v2/daemon-api/servers/:server/actions/:action", this::setAction, roles(DAEMON));
   }
