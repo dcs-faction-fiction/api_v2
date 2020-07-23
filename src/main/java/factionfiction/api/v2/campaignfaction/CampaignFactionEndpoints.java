@@ -1,6 +1,7 @@
 package factionfiction.api.v2.campaignfaction;
 
 import base.game.FactionSituation;
+import base.game.Location;
 import com.github.apilab.rest.Endpoint;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
 import static factionfiction.api.v2.auth.Roles.FACTION_MANAGER;
@@ -15,6 +16,7 @@ import io.javalin.plugin.openapi.annotations.OpenApiContent;
 import io.javalin.plugin.openapi.annotations.OpenApiRequestBody;
 import io.javalin.plugin.openapi.annotations.OpenApiResponse;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 public class CampaignFactionEndpoints implements Endpoint {
@@ -42,6 +44,7 @@ public class CampaignFactionEndpoints implements Endpoint {
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction", this::getSituation, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/game-options", this::getGameOptions, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
     javalin.get("/v2/campaignfaction-api/factions/:faction/campaigns", this::getAvailableCampaigns, roles(FACTION_MANAGER));
+    javalin.post("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/units/:unitid/new-location", this::moveUnit, roles(FACTION_MANAGER));
   }
 
   @OpenApi(ignore = true)
@@ -115,5 +118,17 @@ public class CampaignFactionEndpoints implements Endpoint {
     var result = service.getAlliedFactions(campaignName);
 
     ctx.json(result);
+  }
+
+  public void moveUnit(Context ctx) {
+    var service = cfServiceProvider.apply(ctx);
+    var campaignName = ctx.pathParam(CAMPAIGN_PATHPARAM, String.class).get();
+    var factionName = ctx.pathParam(FACTION_PATHPARAM, String.class).get();
+    var unitId = UUID.fromString(ctx.pathParam("unitid", String.class).get());
+    var location = ctx.bodyAsClass(Location.class);
+
+    service.moveUnit(campaignName, factionName, unitId, location);
+
+    ctx.json("{}");
   }
 }

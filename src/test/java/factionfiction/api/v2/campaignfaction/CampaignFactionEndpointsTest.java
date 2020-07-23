@@ -4,6 +4,7 @@ import static base.game.Airbases.ANAPA;
 import base.game.FactionSituation;
 import base.game.ImmutableFactionAirbase;
 import base.game.ImmutableFactionSituation;
+import base.game.Location;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
 import static factionfiction.api.v2.auth.Roles.FACTION_MANAGER;
 import factionfiction.api.v2.campaign.CampaignCreatePayloadFactions;
@@ -61,6 +62,7 @@ public class CampaignFactionEndpointsTest {
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/game-options"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/factions/:faction/campaigns"), any(), eq(roles(FACTION_MANAGER)));
+    verify(javalin).post(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/units/:unitid/new-location"), any(), eq(roles(FACTION_MANAGER)));
   }
 
   @Test
@@ -161,6 +163,24 @@ public class CampaignFactionEndpointsTest {
     endpoints.getAlliedFactions(ctx);
 
     verify(ctx).json(List.of(situation));
+  }
+
+  @Test
+  public void testMoveUnit() {
+    var uuid = UUID.randomUUID();
+    var location = mock(Location.class);
+    given(ctx.pathParam("campaign", String.class))
+      .willReturn(Validator.create(String.class, "campaign1"));
+    given(ctx.pathParam("faction", String.class))
+      .willReturn(Validator.create(String.class, "faction1"));
+    given(ctx.pathParam("unitid", String.class))
+      .willReturn(Validator.create(String.class, uuid.toString()));
+    given(ctx.bodyAsClass(Location.class))
+      .willReturn(location);
+
+    endpoints.moveUnit(ctx);
+
+    verify(campFactionService).moveUnit("campaign1", "faction1", uuid, location);
   }
 
   FactionSituation sampleSituation() {
