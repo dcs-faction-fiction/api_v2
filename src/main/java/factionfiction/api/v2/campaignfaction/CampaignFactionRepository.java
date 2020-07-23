@@ -1,10 +1,13 @@
 package factionfiction.api.v2.campaignfaction;
 
+import base.game.Airbases;
 import static base.game.CampaignCoalition.BLUE;
+import static base.game.CampaignCoalition.RED;
 import base.game.Location;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import com.github.apilab.rest.exceptions.NotFoundException;
 import factionfiction.api.v2.math.MathService;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -104,8 +107,17 @@ public class CampaignFactionRepository {
 
   CampaignFaction find(UUID id) {
     return jdbi.withHandle(h -> h.select(
-      "select campaign_name, faction_name, airbase, zone_size_ft, credits from campaign_faction where id = ?", id)
-      .mapTo(CampaignFaction.class)
+      "select campaign_name, faction_name, airbase, zone_size_ft, credits, is_blue"
+        + " from campaign_faction where id = ?", id)
+      .map((rs, st) -> ImmutableCampaignFaction.builder()
+        .campaignName(rs.getString("campaign_name"))
+        .factionName(rs.getString("faction_name"))
+        .airbase(Airbases.valueOf(rs.getString("airbase")))
+        .zoneSizeFt(rs.getInt("zone_size_ft"))
+        .credits(new BigDecimal(rs.getString("credits")))
+        .coalition(rs.getBoolean("is_blue") ? BLUE : RED)
+        .build()
+      )
       .findFirst())
       .orElseThrow(() -> new NotFoundException("not found"));
   }
@@ -128,7 +140,7 @@ public class CampaignFactionRepository {
       campaignFaction.campaignName(),
       campaignFaction.factionName(),
       campaignFaction.airbase(),
-      campaignFaction.airbase().coalition() == BLUE,
+      campaignFaction.coalition() == BLUE,
       campaignFaction.zoneSizeFt(),
       campaignFaction.credits()
     ));

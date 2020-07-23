@@ -61,6 +61,7 @@ public class CampaignFactionServiceImpl {
     var airbase = ImmutableFactionAirbase.builder()
       .name(cf.airbase().name())
       .code(cf.airbase())
+      .coalition(cf.coalition())
       .waypoints(List.of())
       .warehouse(warehouse)
       .build();

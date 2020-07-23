@@ -187,6 +187,7 @@ public class CampaignRepositoryIT {
 
   void cleanAndInsertMissionData(Jdbi jdbi) {
     UUID cfid = UUID.randomUUID();
+    UUID cfid2 = UUID.randomUUID();
 
     jdbi.useHandle(h -> h.execute("truncate table campaign_faction"));
     jdbi.useHandle(h -> h.execute("truncate table campaign_airfield_warehouse"));
@@ -194,8 +195,8 @@ public class CampaignRepositoryIT {
     jdbi.useHandle(h -> h.execute("truncate table campaign_faction_units"));
 
     jdbi.useHandle(h -> h.execute(
-      "insert into campaign_faction(id, campaign_name, faction_name, airbase)"
-      + " values(?, ?, ?, ?)",
+      "insert into campaign_faction(id, campaign_name, faction_name, airbase, is_blue)"
+      + " values(?, ?, ?, ?, false)",
       cfid, "campaign", "faction", "ANAPA"));
     jdbi.useHandle(h -> h.execute(
       "insert into campaign_airfield_warehouse(id, campaign_name, airbase)"
@@ -209,5 +210,22 @@ public class CampaignRepositoryIT {
       "insert into campaign_faction_units(id, campaign_faction_id, type, x, y, z, angle)"
       + " values(?, ?, ?, ?, ?, ?, ?)",
       cfid, cfid, "T_80", 1, 1, 1, 1));
+
+    jdbi.useHandle(h -> h.execute(
+      "insert into campaign_faction(id, campaign_name, faction_name, airbase, is_blue)"
+      + " values(?, ?, ?, ?, true)",
+      cfid2, "campaign", "faction2", "KUTAISI"));
+    jdbi.useHandle(h -> h.execute(
+      "insert into campaign_airfield_warehouse(id, campaign_name, airbase)"
+      + " values(?, ?, ?)",
+      cfid2, "campaign", "KUTAISI"));
+    jdbi.useHandle(h -> h.execute(
+      "insert into campaign_airfield_warehouse_item(id, warehouse_id, item_code, item_quantity)"
+      + " values(?, ?, ?, ?)",
+      cfid2, cfid2, "JF_17", 1));
+    jdbi.useHandle(h -> h.execute(
+      "insert into campaign_faction_units(id, campaign_faction_id, type, x, y, z, angle)"
+      + " values(?, ?, ?, ?, ?, ?, ?)",
+      cfid2, cfid2, "T_80", 1, 1, 1, 1));
   }
 }

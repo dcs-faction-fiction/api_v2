@@ -65,6 +65,7 @@ public class CampaignFactionEndpoints implements Endpoint {
       campaignName,
       cf.faction(),
       cf.airbase(),
+      cf.coalition(),
       campaign.gameOptions());
 
     var result = service.newCampaignFaction(cfFull);

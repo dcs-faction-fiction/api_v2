@@ -2,6 +2,7 @@ package factionfiction.api.v2.campaignfaction;
 
 import static base.game.Airbases.ANAPA;
 import static base.game.Airbases.KUTAISI;
+import static base.game.CampaignCoalition.RED;
 import base.game.Location;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import static factionfiction.api.v2.campaign.CampaignHelper.cleanCampaignTable;
@@ -54,6 +55,7 @@ public class CampaignFactionRepositoryIT {
     var sampleRed = ImmutableCampaignFaction.builder()
       .from(sample)
       .airbase(ANAPA)
+      .coalition(RED)
       .build();
     cleanCampaignFactionTable(jdbi);
 

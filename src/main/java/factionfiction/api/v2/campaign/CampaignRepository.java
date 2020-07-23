@@ -18,6 +18,7 @@ import static factionfiction.api.v2.daemon.ServerAction.START_NEW_MISSION;
 import factionfiction.api.v2.daemon.ServerInfo;
 import factionfiction.api.v2.game.GameOptions;
 import java.io.ByteArrayOutputStream;
+import static java.lang.Boolean.TRUE;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -158,15 +159,17 @@ public class CampaignRepository {
     );
   }
 
-  private Map<Airbases, Map<WarehouseItemCode, BigDecimal>> getWarehouses(String campaignName) {
-    Map<Airbases, Map<WarehouseItemCode, BigDecimal>> result = new EnumMap<>(Airbases.class);
+  private Map<CampaignCoalition, Map<Airbases, Map<WarehouseItemCode, BigDecimal>>> getWarehouses(String campaignName) {
+    Map<CampaignCoalition, Map<Airbases, Map<WarehouseItemCode, BigDecimal>>> result = new EnumMap<>(CampaignCoalition.class);
     jdbi.useHandle(h ->
       h.select("select"
         + " w.airbase airbase,"
         + " i.item_code code,"
-        + " i.item_quantity qty"
+        + " i.item_quantity qty,"
+        + " cf.is_blue is_blue"
         + " from campaign_airfield_warehouse_item i"
         + " left join campaign_airfield_warehouse w on i.warehouse_id = w.id"
+        + " left join campaign_faction cf on cf.campaign_name = w.campaign_name and cf.airbase = w.airbase"
         + " where w.campaign_name = ?",
         campaignName)
         .mapToMap()
@@ -174,7 +177,10 @@ public class CampaignRepository {
           var airbase = Airbases.valueOf((String) m.get("airbase"));
           var code = WarehouseItemCode.valueOf((String) m.get("code"));
           var qty = new BigDecimal(m.get("qty").toString());
-          result.computeIfAbsent(airbase, a -> new EnumMap<>(WarehouseItemCode.class))
+          var coalition = TRUE.equals(Boolean.valueOf(m.get("is_blue").toString())) ? BLUE : RED;
+          result
+            .computeIfAbsent(coalition, coa -> new EnumMap<>(Airbases.class))
+            .computeIfAbsent(airbase, a -> new EnumMap<>(WarehouseItemCode.class))
             .put(code, qty);
         })
     );

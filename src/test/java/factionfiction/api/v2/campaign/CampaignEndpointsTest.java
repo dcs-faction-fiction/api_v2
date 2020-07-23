@@ -1,6 +1,7 @@
 package factionfiction.api.v2.campaign;
 
 import static base.game.Airbases.ANAPA;
+import static base.game.CampaignCoalition.RED;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
 import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
 import factionfiction.api.v2.campaignfaction.CampaignFactionService;
@@ -62,6 +63,7 @@ public class CampaignEndpointsTest {
     var factionPayload = ImmutableCampaignCreatePayloadFactions.builder()
         .faction("Faction")
         .airbase(ANAPA)
+        .coalition(RED)
         .build();
     var payload = ImmutableCampaignCreatePayload.builder()
       .name(campaign.name())

@@ -87,6 +87,7 @@ public class CampaignEndpoints implements Endpoint {
         campaign.name(),
         cf.faction(),
         cf.airbase(),
+        cf.coalition(),
         request.gameOptions()));
   }
 }

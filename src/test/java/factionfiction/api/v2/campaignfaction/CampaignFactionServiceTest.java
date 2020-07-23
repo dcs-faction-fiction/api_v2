@@ -74,6 +74,7 @@ public class CampaignFactionServiceTest {
       sample.campaignName(),
       sample.factionName(),
       sample.airbase(),
+      sample.coalition(),
       options);
 
     assertThat(result, is(sample));
@@ -143,6 +144,7 @@ public class CampaignFactionServiceTest {
       .airbases(List.of(ImmutableFactionAirbase.builder()
         .name(sample.airbase().name())
         .code(sample.airbase())
+        .coalition(sample.coalition())
         .waypoints(List.of())
         .warehouse(makeSampleWarehouseMap())
         .build()))

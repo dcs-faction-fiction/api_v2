@@ -1,6 +1,7 @@
 package factionfiction.api.v2.campaignfaction;
 
 import static base.game.Airbases.ANAPA;
+import static base.game.CampaignCoalition.RED;
 import base.game.FactionSituation;
 import base.game.ImmutableFactionAirbase;
 import base.game.ImmutableFactionSituation;
@@ -79,6 +80,7 @@ public class CampaignFactionEndpointsTest {
     var payload = ImmutableCampaignCreatePayloadFactions.builder()
       .faction(cf.factionName())
       .airbase(cf.airbase())
+      .coalition(cf.coalition())
       .build();
     given(ctx.bodyAsClass(CampaignCreatePayloadFactions.class))
       .willReturn(payload);
@@ -191,6 +193,7 @@ public class CampaignFactionEndpointsTest {
       .airbases(List.of(ImmutableFactionAirbase.builder()
         .name(ANAPA.name())
         .code(ANAPA)
+        .coalition(RED)
         .waypoints(List.of())
         .warehouse(makeSampleWarehouseMap())
         .build()))

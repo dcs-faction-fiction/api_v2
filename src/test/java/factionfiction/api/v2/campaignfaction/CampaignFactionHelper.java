@@ -1,6 +1,7 @@
 package factionfiction.api.v2.campaignfaction;
 
 import static base.game.Airbases.KUTAISI;
+import static base.game.CampaignCoalition.BLUE;
 import java.math.BigDecimal;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -43,6 +44,7 @@ public final class CampaignFactionHelper {
       .campaignName("campaign name")
       .factionName("faction name")
       .airbase(KUTAISI)
+      .coalition(BLUE)
       .zoneSizeFt(50_000)
       .credits(new BigDecimal(30))
       .build();
