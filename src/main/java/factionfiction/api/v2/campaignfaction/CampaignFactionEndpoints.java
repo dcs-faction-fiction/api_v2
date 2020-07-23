@@ -37,6 +37,8 @@ public class CampaignFactionEndpoints implements Endpoint {
   public void register(Javalin javalin) {
     javalin.get("/v2/campaignfaction-api", this, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
     javalin.post("/v2/campaignfaction-api/campaigns/:campaign/factions", this::addNew, roles(CAMPAIGN_MANAGER));
+    javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions", this::getAllFactions, roles(CAMPAIGN_MANAGER));
+    javalin.get("/v2/campaignfaction-api/campaigns/:campaign/allied-factions", this::getAlliedFactions, roles(FACTION_MANAGER));
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction", this::getSituation, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/game-options", this::getGameOptions, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
     javalin.get("/v2/campaignfaction-api/factions/:faction/campaigns", this::getAvailableCampaigns, roles(FACTION_MANAGER));
@@ -93,6 +95,24 @@ public class CampaignFactionEndpoints implements Endpoint {
     var factionName = ctx.pathParam(FACTION_PATHPARAM, String.class).get();
 
     var result = service.getAvailableCampaigns(factionName);
+
+    ctx.json(result);
+  }
+
+  public void getAllFactions(Context ctx) {
+    var service = cfServiceProvider.apply(ctx);
+    var campaignName = ctx.pathParam(CAMPAIGN_PATHPARAM, String.class).get();
+
+    var result = service.getAllFactions(campaignName);
+
+    ctx.json(result);
+  }
+
+  public void getAlliedFactions(Context ctx) {
+    var service = cfServiceProvider.apply(ctx);
+    var campaignName = ctx.pathParam(CAMPAIGN_PATHPARAM, String.class).get();
+
+    var result = service.getAlliedFactions(campaignName);
 
     ctx.json(result);
   }

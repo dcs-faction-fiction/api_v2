@@ -1,5 +1,6 @@
 package factionfiction.api.v2.daemon;
 
+import java.math.BigDecimal;
 import org.immutables.gson.Gson;
 import org.immutables.value.Value;
 
@@ -8,5 +9,5 @@ import org.immutables.value.Value;
 public interface WarehousesSpentItem {
   String airbase();
   String type();
-  int amount();
+  BigDecimal amount();
 }

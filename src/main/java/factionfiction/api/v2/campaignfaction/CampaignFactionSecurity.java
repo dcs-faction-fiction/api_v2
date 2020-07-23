@@ -59,6 +59,22 @@ public class CampaignFactionSecurity implements CampaignFactionService {
     return campaignRepository.getAvailableCampaignsForFaction(factionName);
   }
 
+  @Override
+  public List<FactionSituation> getAllFactions(String campaignName) {
+    if (!authInfo.isCampaignManager())
+      throw new NotAuthorizedException("Only campaign manager can view all factions of a campaign.");
+
+    return impl.getAllFactions(campaignName, authInfo.getUserUUID());
+  }
+
+  @Override
+  public List<FactionSituation> getAlliedFactions(String campaignName) {
+    if (!authInfo.isFactionManager())
+      throw new NotAuthorizedException("Only faction manager can view allied factions.");
+
+    return impl.getAlliedFactions(campaignName, authInfo.getUserUUID());
+  }
+
   boolean isCampaignOwner(CampaignFaction campaignFaction) {
     return campaignRepository.isOwner(campaignFaction.campaignName(), authInfo.getUserUUID());
   }

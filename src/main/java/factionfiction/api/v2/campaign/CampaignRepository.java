@@ -158,8 +158,8 @@ public class CampaignRepository {
     );
   }
 
-  private Map<Airbases, Map<WarehouseItemCode, Integer>> getWarehouses(String campaignName) {
-    Map<Airbases, Map<WarehouseItemCode, Integer>> result = new EnumMap<>(Airbases.class);
+  private Map<Airbases, Map<WarehouseItemCode, BigDecimal>> getWarehouses(String campaignName) {
+    Map<Airbases, Map<WarehouseItemCode, BigDecimal>> result = new EnumMap<>(Airbases.class);
     jdbi.useHandle(h ->
       h.select("select"
         + " w.airbase airbase,"
@@ -173,7 +173,7 @@ public class CampaignRepository {
         .forEach(m -> {
           var airbase = Airbases.valueOf((String) m.get("airbase"));
           var code = WarehouseItemCode.valueOf((String) m.get("code"));
-          var qty = (Integer) m.get("qty");
+          var qty = new BigDecimal(m.get("qty").toString());
           result.computeIfAbsent(airbase, a -> new EnumMap<>(WarehouseItemCode.class))
             .put(code, qty);
         })

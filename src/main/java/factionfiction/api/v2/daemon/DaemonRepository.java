@@ -7,6 +7,7 @@ import static factionfiction.api.v2.daemon.ServerAction.MISSION_STARTED;
 import static factionfiction.api.v2.daemon.ServerAction.STOP_MISSION;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import static java.math.BigDecimal.ZERO;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,7 +31,7 @@ public class DaemonRepository {
         var warehouseUUID = ensureWarehouseExists(h, getCampaignNameFromServerId(serverName), airbase);
         baseInventory.entrySet().forEach(inventoryItem -> {
           var itemCode = inventoryItem.getKey();
-          var amount = Optional.ofNullable(inventoryItem.getValue()).orElse(0);
+          var amount = Optional.ofNullable(inventoryItem.getValue()).orElse(ZERO);
           var itemUUID = ensureWarehouseItemExists(h, warehouseUUID, itemCode);
           h.execute(
             "update campaign_airfield_warehouse_item"

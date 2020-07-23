@@ -1,6 +1,9 @@
 package factionfiction.api.v2.campaignfaction;
 
+import static base.game.Airbases.ANAPA;
 import base.game.FactionSituation;
+import base.game.ImmutableFactionAirbase;
+import base.game.ImmutableFactionSituation;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
 import static factionfiction.api.v2.auth.Roles.FACTION_MANAGER;
 import factionfiction.api.v2.campaign.CampaignCreatePayloadFactions;
@@ -9,13 +12,17 @@ import factionfiction.api.v2.campaign.CampaignService;
 import factionfiction.api.v2.campaign.ImmutableCampaignCreatePayloadFactions;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
 import factionfiction.api.v2.game.GameOptionsLoader;
+import static factionfiction.api.v2.units.UnitHelper.makeSampleFactionUnit;
+import static factionfiction.api.v2.warehouse.WarehouseHelper.makeSampleWarehouseMap;
 import io.javalin.Javalin;
 import static io.javalin.core.security.SecurityUtil.roles;
 import io.javalin.core.validation.Validator;
 import io.javalin.http.Context;
 import java.io.IOException;
+import static java.math.BigDecimal.ZERO;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,6 +56,8 @@ public class CampaignFactionEndpointsTest {
 
     verify(javalin).get(eq("/v2/campaignfaction-api"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
     verify(javalin).post(eq("/v2/campaignfaction-api/campaigns/:campaign/factions"), any(), eq(roles(CAMPAIGN_MANAGER)));
+    verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions"), any(), eq(roles(CAMPAIGN_MANAGER)));
+    verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/allied-factions"), any(), eq(roles(FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/game-options"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/factions/:faction/campaigns"), any(), eq(roles(FACTION_MANAGER)));
@@ -124,5 +133,50 @@ public class CampaignFactionEndpointsTest {
     endpoints.getAvailableCampaigns(ctx);
 
     verify(ctx).json(List.of("campaign"));
+  }
+
+  @Test
+  public void testGetAllFactions() {
+    var situation = sampleSituation();
+    given(ctx.pathParam("campaign", String.class))
+      .willReturn(Validator.create(String.class, "campaign1"));
+    given(campFactionService.getAllFactions("campaign1"))
+      .willReturn(List.of(situation));
+
+    endpoints.getAllFactions(ctx);
+
+    verify(ctx).json(List.of(situation));
+  }
+
+  @Test
+  public void testGetAlliedFactions() {
+    var situation = sampleSituation();
+    given(ctx.pathParam("campaign", String.class))
+      .willReturn(Validator.create(String.class, "campaign1"));
+    given(ctx.pathParam("faction", String.class))
+      .willReturn(Validator.create(String.class, "faction1"));
+    given(campFactionService.getAlliedFactions("campaign1"))
+      .willReturn(List.of(situation));
+
+    endpoints.getAlliedFactions(ctx);
+
+    verify(ctx).json(List.of(situation));
+  }
+
+  FactionSituation sampleSituation() {
+    return ImmutableFactionSituation.builder()
+      .id(UUID.randomUUID())
+      .campaign("campaign1")
+      .faction("faction1")
+      .airbases(List.of(ImmutableFactionAirbase.builder()
+        .name(ANAPA.name())
+        .code(ANAPA)
+        .waypoints(List.of())
+        .warehouse(makeSampleWarehouseMap())
+        .build()))
+      .units(List.of(makeSampleFactionUnit()))
+      .credits(ZERO)
+      .zoneSizeFt(50_000)
+      .build();
   }
 }

@@ -9,4 +9,6 @@ public interface CampaignFactionService {
   FactionSituation getSituation(String campaignName, String factionName);
   GameOptions getGameOptions(String campaignName, String factionName);
   List<String> getAvailableCampaigns(String factionName);
+  List<FactionSituation> getAllFactions(String campaignName);
+  List<FactionSituation> getAlliedFactions(String campaignName);
 }

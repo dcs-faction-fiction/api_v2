@@ -182,6 +182,48 @@ public class CampaignFactionSecurityTest {
     assertThat(result, is(List.of("campaign")));
   }
 
+  @Test
+  public void testGetAllFactions() {
+    var expected = List.of(mock(FactionSituation.class));
+    mockCampaignManagerAndCampaignOwner();
+    given(impl.getAllFactions("campaign", owner))
+      .willReturn(expected);
+
+    var result = security.getAllFactions("campaign");
+
+    assertThat(result, is(expected));
+  }
+
+  @Test
+  public void testGetAllFactionsNoCampaignManager() {
+    mockNoCamapignManager();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.getAllFactions("campaign");
+    });
+  }
+
+  @Test
+  public void testGetAlliedFactions() {
+    var expected = List.of(mock(FactionSituation.class));
+    mockFactionManagerAndFactionOwner();
+    given(impl.getAlliedFactions("campaign", owner))
+      .willReturn(expected);
+
+    var result = security.getAlliedFactions("campaign");
+
+    assertThat(result, is(expected));
+  }
+
+  @Test
+  public void testGetAlliedFactionsNoFactionManager() {
+    mockNoFactionManager();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.getAlliedFactions("campaign");
+    });;
+  }
+
   void mockGameOptions(GameOptions options) {
     given(campaignRepository.find(sample.campaignName()))
       .willReturn(ImmutableCampaign.builder()

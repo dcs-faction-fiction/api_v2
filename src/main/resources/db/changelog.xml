@@ -241,4 +241,8 @@
     <modifyDataType tableName="campaign_faction" columnName="credits" newDataType="decimal"/>
   </changeSet>
 
+  <changeSet author="raf" id="0010_warehouse_quantity_in_decimals">
+    <modifyDataType tableName="campaign_airfield_warehouse_item" columnName="item_quantity" newDataType="decimal"/>
+  </changeSet>
+
 </databaseChangeLog>

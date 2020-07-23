@@ -90,6 +90,30 @@ public class CampaignFactionServiceTest {
     assertThat(situation, is(sampleSituation()));
   }
 
+  @Test
+  public void testPassOnAllFactions() {
+    mockFactionSituation();
+    var uuid = UUID.randomUUID();
+    given(repository.getAllFactionNamesOfCampaign(sample.campaignName(), uuid))
+      .willReturn(List.of(sample.factionName()));
+
+    var result = impl.getAllFactions(sample.campaignName(), uuid);
+
+    assertThat(result, is(List.of(sampleSituation())));
+  }
+
+  @Test
+  public void testPassOnAlliedFactions() {
+    mockFactionSituation();
+    var uuid = UUID.randomUUID();
+    given(repository.getAlliedFactionNamesOfCampaign(sample.campaignName(), uuid))
+      .willReturn(List.of(sample.factionName()));
+
+    var result = impl.getAlliedFactions(sample.campaignName(), uuid);
+
+    assertThat(result, is(List.of(sampleSituation())));
+  }
+
   void mockFactionSituation() {
     given(repository.getCampaignFactionId(sample.campaignName(), sample.factionName()))
       .willReturn(cfId);

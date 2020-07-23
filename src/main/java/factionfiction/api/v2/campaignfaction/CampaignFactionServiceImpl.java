@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import static java.util.stream.Collectors.toList;
 
 public class CampaignFactionServiceImpl {
 
@@ -72,6 +73,20 @@ public class CampaignFactionServiceImpl {
       .airbases(List.of(airbase))
       .units(units)
       .build();
+  }
+
+  public List<FactionSituation> getAllFactions(String campaignName, UUID userId) {
+    List<String> factionNames = repository.getAllFactionNamesOfCampaign(campaignName, userId);
+    return factionNames.stream()
+      .map(name -> getSituation(campaignName, name))
+      .collect(toList());
+  }
+
+  public List<FactionSituation> getAlliedFactions(String campaignName, UUID userId) {
+    List<String> factionNames = repository.getAlliedFactionNamesOfCampaign(campaignName, userId);
+    return factionNames.stream()
+      .map(name -> getSituation(campaignName, name))
+      .collect(toList());
   }
 
 }

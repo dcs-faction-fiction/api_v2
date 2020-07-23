@@ -14,6 +14,7 @@ import static factionfiction.api.v2.daemon.ServerAction.START_NEW_MISSION;
 import static factionfiction.api.v2.daemon.ServerAction.STOP_MISSION;
 import static factionfiction.api.v2.test.InMemoryDB.jdbi;
 import java.io.IOException;
+import java.math.BigDecimal;
 import static java.math.BigDecimal.ONE;
 import java.util.List;
 import java.util.Optional;
@@ -145,7 +146,7 @@ public class DaemonRepositoryIT {
       .data(List.of(ImmutableWarehousesSpentItem.builder()
         .airbase("Krymsk")
         .type("jet_fuel")
-        .amount(-2)
+        .amount(new BigDecimal(-2))
         .build()))
       .build();
     return request;
