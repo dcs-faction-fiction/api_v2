@@ -14,6 +14,9 @@ public final class CampaignFactionHelper {
     jdbi.useHandle(h -> h.execute("truncate table "
       + CampaignFactionRepository.TABLE_NAME));
   }
+  public static void cleanCampaignFactionUnitsTable(Jdbi jdbi) {
+    jdbi.useHandle(h -> h.execute("truncate table campaign_faction_units"));
+  }
 
   public static void insertSampleCampaignFaction(Jdbi jdbi, UUID id, UUID owner) {
     jdbi.useHandle(h -> h.execute(

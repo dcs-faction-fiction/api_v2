@@ -1,6 +1,7 @@
 package factionfiction.api.v2;
 
 import base.game.FactionUnit;
+import base.game.Location;
 import com.github.apilab.core.ApplicationLifecycleItem;
 import com.github.apilab.core.Env;
 import com.github.apilab.rest.Endpoint;
@@ -78,7 +79,8 @@ public class ComponentsModule {
       Campaign.class,
       CampaignFaction.class,
       FactionUnit.class,
-      ServerInfo.class);
+      ServerInfo.class,
+      Location.class);
   }
 
   @Provides

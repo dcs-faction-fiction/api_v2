@@ -2,9 +2,11 @@ package factionfiction.api.v2.campaignfaction;
 
 import static base.game.Airbases.ANAPA;
 import static base.game.Airbases.KUTAISI;
+import base.game.Location;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import static factionfiction.api.v2.campaign.CampaignHelper.cleanCampaignTable;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.cleanCampaignFactionTable;
+import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.cleanCampaignFactionUnitsTable;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.insertSampleCampaignFaction;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
 import static factionfiction.api.v2.faction.FactionHelper.cleanFactionTable;
@@ -16,6 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import org.jdbi.v3.core.Jdbi;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -145,6 +148,57 @@ public class CampaignFactionRepositoryIT {
       "insert into campaign_faction(id, campaign_name, faction_name, airbase, is_blue)"
         + " values(?, ?, ?, ?, ?)",
       UUID.randomUUID(), "campaign", "faction2", KUTAISI, true));
+  }
+
+  @Test
+  public void testMoveUnit() {
+    var newLocation = KUTAISI.location();
+    UUID unitId = UUID.randomUUID();
+    cleanCampaignFactionTable(jdbi);
+    cleanCampaignFactionUnitsTable(jdbi);
+    insertDataForMoveUnit(jdbi, unitId);
+
+    repository.moveUnit("campaign name", "faction name", unitId, newLocation);
+
+    Location location = getLocationOfUnitById(unitId);
+    assertThat(location, is(newLocation));
+  }
+
+  @Test
+  public void testMoveUnitOutsideBase() {
+    var newLocation = ANAPA.location();
+    UUID unitId = UUID.randomUUID();
+    cleanCampaignFactionTable(jdbi);
+    cleanCampaignFactionUnitsTable(jdbi);
+    insertDataForMoveUnit(jdbi, unitId);
+
+    repository.moveUnit("campaign name", "faction name", unitId, newLocation);
+
+    Location location = getLocationOfUnitById(unitId);
+    assertThat(location, is(not(newLocation)));
+  }
+
+  Location getLocationOfUnitById(UUID unitId) {
+    var location = jdbi.withHandle(h -> h.select("select"
+      + " x as longitude,"
+      + " y as latitude,"
+      + " z as altitude,"
+      + " angle"
+      + " from campaign_faction_units"
+      + " where id = ?",
+      unitId)
+      .mapTo(Location.class)
+      .findFirst().get());
+    return location;
+  }
+
+  private void insertDataForMoveUnit(Jdbi jdbi, UUID unitId) {
+    UUID cfid = UUID.randomUUID();
+    insertSampleCampaignFaction(jdbi, cfid, UUID.randomUUID());
+    jdbi.useHandle(h -> h.execute(
+      "insert into campaign_faction_units(id, campaign_faction_id, x, y, z, angle, type)"
+        + " values(?, ?, ?, ?, ?, ?, 'AMBRAMS')",
+      unitId, cfid, 0, 0, 0, 0));
   }
 
 }
