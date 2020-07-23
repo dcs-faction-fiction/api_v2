@@ -3,6 +3,7 @@ package factionfiction.api.v2.campaignfaction;
 import base.game.FactionSituation;
 import base.game.ImmutableFactionAirbase;
 import base.game.ImmutableFactionSituation;
+import base.game.Location;
 import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
 import factionfiction.api.v2.campaign.CampaignRepository;
 import static factionfiction.api.v2.campaignfaction.CampaignFaction.fromCampaignAndFactionAndOptions;
@@ -112,6 +113,15 @@ public class CampaignFactionServiceTest {
     var result = impl.getAlliedFactions(sample.campaignName(), uuid);
 
     assertThat(result, is(List.of(sampleSituation())));
+  }
+
+  @Test
+  public void testPassMoveUnit() {
+    var cfid = UUID.randomUUID();
+    var location = mock(Location.class);
+    impl.moveUnit("campaign", "faction", cfid, location);
+
+    verify(repository).moveUnit("campaign", "faction", cfid, location);
   }
 
   void mockFactionSituation() {

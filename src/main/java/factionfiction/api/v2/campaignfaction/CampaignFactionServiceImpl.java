@@ -4,6 +4,7 @@ import base.game.FactionSituation;
 import base.game.FactionUnit;
 import base.game.ImmutableFactionAirbase;
 import base.game.ImmutableFactionSituation;
+import base.game.Location;
 import base.game.warehouse.WarehouseItemCode;
 import factionfiction.api.v2.campaign.CampaignRepository;
 import factionfiction.api.v2.faction.FactionRepository;
@@ -89,4 +90,7 @@ public class CampaignFactionServiceImpl {
       .collect(toList());
   }
 
+  public void moveUnit(String campaignName, String factionName, UUID uid, Location location) {
+    repository.moveUnit(campaignName, factionName, uid, location);
+  }
 }

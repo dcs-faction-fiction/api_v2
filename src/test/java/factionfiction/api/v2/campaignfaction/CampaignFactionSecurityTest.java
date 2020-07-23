@@ -1,7 +1,9 @@
 package factionfiction.api.v2.campaignfaction;
 
+import static base.game.Airbases.ANAPA;
 import base.game.FactionSituation;
 import base.game.ImmutableFactionSituation;
+import base.game.Location;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import factionfiction.api.v2.auth.AuthInfo;
 import factionfiction.api.v2.campaign.CampaignRepository;
@@ -22,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class CampaignFactionSecurityTest {
 
@@ -221,6 +224,35 @@ public class CampaignFactionSecurityTest {
 
     assertThrows(NotAuthorizedException.class, () -> {
       security.getAlliedFactions("campaign");
+    });;
+  }
+
+  @Test
+  public void testMoveUnit() {
+    var unitId = UUID.randomUUID();
+    var newLocation = mock(Location.class);
+    mockFactionManagerAndFactionOwner();
+
+    security.moveUnit(sample.campaignName(), sample.factionName(), unitId, newLocation);
+
+    verify(impl).moveUnit(sample.campaignName(), sample.factionName(), unitId, newLocation);
+  }
+
+  @Test
+  public void testMoveUnitNoFactionManager() {
+    mockNoFactionManager();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.moveUnit(sample.campaignName(), sample.factionName(), UUID.randomUUID(), ANAPA.location());
+    });
+  }
+
+  @Test
+  public void testMoveUnitNoFactionOwner() {
+    mockFactionManagerAndNoFactionOwner();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.moveUnit(sample.campaignName(), sample.factionName(), UUID.randomUUID(), ANAPA.location());
     });;
   }
 

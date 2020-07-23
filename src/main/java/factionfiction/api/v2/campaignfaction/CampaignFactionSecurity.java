@@ -1,12 +1,14 @@
 package factionfiction.api.v2.campaignfaction;
 
 import base.game.FactionSituation;
+import base.game.Location;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import factionfiction.api.v2.auth.AuthInfo;
 import factionfiction.api.v2.campaign.CampaignRepository;
 import factionfiction.api.v2.faction.FactionRepository;
 import factionfiction.api.v2.game.GameOptions;
 import java.util.List;
+import java.util.UUID;
 
 public class CampaignFactionSecurity implements CampaignFactionService {
 
@@ -32,7 +34,7 @@ public class CampaignFactionSecurity implements CampaignFactionService {
     if (!canCreateCampaignFactions())
       throw cannotCreateCampaignFactionsError();
 
-    if (!isCampaignOwner(campaignFaction))
+    if (!isCampaignOwner(campaignFaction.campaignName()))
       throw cannotCreateWithoutOwner();
 
     return impl.newCampaignFaction(campaignFaction);
@@ -75,8 +77,22 @@ public class CampaignFactionSecurity implements CampaignFactionService {
     return impl.getAlliedFactions(campaignName, authInfo.getUserUUID());
   }
 
-  boolean isCampaignOwner(CampaignFaction campaignFaction) {
-    return campaignRepository.isOwner(campaignFaction.campaignName(), authInfo.getUserUUID());
+  @Override
+  public void moveUnit(String campaignName, String factionName, UUID uid, Location location) {
+    if (!authInfo.isFactionManager())
+      throw new NotAuthorizedException("Only faction manager can move own units.");
+    if (!isFactionOwner(factionName))
+      throw new NotAuthorizedException("Not owning this faction.");
+
+    impl.moveUnit(campaignName, factionName, uid, location);
+  }
+
+  boolean isFactionOwner(String factionName) {
+    return factionRepository.isOwner(factionName, authInfo.getUserUUID());
+  }
+
+  boolean isCampaignOwner(String campaignName) {
+    return campaignRepository.isOwner(campaignName, authInfo.getUserUUID());
   }
 
   private boolean canCreateCampaignFactions() {
@@ -84,8 +100,8 @@ public class CampaignFactionSecurity implements CampaignFactionService {
   }
 
   private boolean canGetSituation(String campaignName, String factionName) {
-    var ownsCampaign = authInfo.isCampaignManager() && campaignRepository.isOwner(campaignName, authInfo.getUserUUID());
-    var ownsFaction = authInfo.isFactionManager() && factionRepository.isOwner(factionName, authInfo.getUserUUID());
+    var ownsCampaign = authInfo.isCampaignManager() && isCampaignOwner(campaignName);
+    var ownsFaction = authInfo.isFactionManager() && isFactionOwner(factionName);
     return ownsCampaign || ownsFaction;
   }
 
