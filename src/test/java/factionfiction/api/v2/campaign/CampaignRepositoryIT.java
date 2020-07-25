@@ -1,5 +1,8 @@
 package factionfiction.api.v2.campaign;
 
+import base.game.units.ImmutableMissionConfiguration;
+import base.game.units.ImmutableMissionTime;
+import base.game.units.ImmutableMissionWeather;
 import com.github.apilab.core.GSONModule;
 import com.google.gson.Gson;
 import static factionfiction.api.v2.campaign.CampaignHelper.cleanCampaignTable;
@@ -134,10 +137,12 @@ public class CampaignRepositoryIT {
 
   @Test
   public void testStartMissionNoServerExisting() {
+    var conf = makeMissionConfiguration();
+
     cleanServerTable(jdbi);
     cleanAndInsertMissionData(jdbi);
 
-    repository.startMission("campaign", "server1");
+    repository.startMission("campaign", "server1", conf);
 
     var result = jdbi.withHandle(h -> h.select(
       "select running from server where name = ?",
@@ -151,11 +156,12 @@ public class CampaignRepositoryIT {
 
   @Test
   public void testStartMissionServerExisting() {
+    var conf = makeMissionConfiguration();
     cleanServerTable(jdbi);
     cleanAndInsertMissionData(jdbi);
     insertSampleServer(jdbi, "campaign");
 
-    repository.startMission("campaign", "server1");
+    repository.startMission("campaign", "server1", conf);
 
     var result = jdbi.withHandle(h -> h.select(
       "select running from server where name = ?",
@@ -165,6 +171,26 @@ public class CampaignRepositoryIT {
       .get());
 
     assertThat(result, is(true));
+  }
+
+  ImmutableMissionConfiguration makeMissionConfiguration() {
+    var conf = ImmutableMissionConfiguration.builder()
+      .time(ImmutableMissionTime.builder()
+        .year(2020)
+        .month(6)
+        .day(1)
+        .hours(8)
+        .minutes(0)
+        .seconds(0)
+        .build())
+      .missionDurationSeconds(3600 * 2)
+      .gameMasterEnabled(true)
+      .tacticalCommanderSlots(8)
+      .weather(ImmutableMissionWeather.builder()
+        .random(true)
+        .build())
+      .build();
+    return conf;
   }
 
   void cleanUserServerTable(Jdbi jdbi) {

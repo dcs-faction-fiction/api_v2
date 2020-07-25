@@ -1,5 +1,6 @@
 package factionfiction.api.v2.campaign;
 
+import base.game.units.MissionConfiguration;
 import factionfiction.api.v2.daemon.ServerInfo;
 import factionfiction.api.v2.game.GameOptions;
 import java.util.List;
@@ -33,8 +34,8 @@ public class CampaignServiceImpl {
     return repository.isOwner(name, owner);
   }
 
-  public void startMission(String campaignName, String serverName) {
-    repository.startMission(campaignName, serverName);
+  public void startMission(String campaignName, String serverName, MissionConfiguration configuration) {
+    repository.startMission(campaignName, serverName, configuration);
   }
 
   public Optional<ServerInfo> getServerInfo(String campaignName) {

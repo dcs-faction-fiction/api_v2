@@ -1,5 +1,6 @@
 package factionfiction.api.v2.campaign;
 
+import base.game.units.MissionConfiguration;
 import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
 import factionfiction.api.v2.game.GameOptions;
 import factionfiction.api.v2.game.GameOptionsLoader;
@@ -99,8 +100,9 @@ public class CampaignServiceTest {
 
   @Test
   public void testPassStartMission() {
-    service.startMission("camp", "serv");
-    verify(repository).startMission("camp", "serv");
+    var conf = mock(MissionConfiguration.class);
+    service.startMission("camp", "serv", conf);
+    verify(repository).startMission("camp", "serv", conf);
   }
 
   @Test

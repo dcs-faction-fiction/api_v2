@@ -1,5 +1,6 @@
 package factionfiction.api.v2.campaign;
 
+import base.game.units.MissionConfiguration;
 import com.github.apilab.rest.Endpoint;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
 import static factionfiction.api.v2.campaignfaction.CampaignFaction.fromCampaignAndFactionAndOptions;
@@ -32,7 +33,7 @@ public class CampaignEndpoints implements Endpoint {
     javalin.get("/v2/campaign-api", this, roles(CAMPAIGN_MANAGER));
     javalin.post("/v2/campaign-api/campaigns", this::newCampaign, roles(CAMPAIGN_MANAGER));
     javalin.get("/v2/campaign-api/campaigns", this::getCampaigns, roles(CAMPAIGN_MANAGER));
-    javalin.post("/v2/campaign-api/campaigns/:campaign/start-server", this::startServer, roles(CAMPAIGN_MANAGER));
+    javalin.post("/v2/campaign-api/campaigns/:campaign/servers/:server/start-server", this::startServer, roles(CAMPAIGN_MANAGER));
     javalin.get("/v2/campaign-api/campaigns/:campaign/server-info", this::getServerInfo, roles(CAMPAIGN_MANAGER));
   }
 
@@ -66,9 +67,10 @@ public class CampaignEndpoints implements Endpoint {
   public void startServer(Context ctx) {
     var campService = campServiceProvider.apply(ctx);
     var campaign = ctx.pathParam("campaign", String.class).get();
-    var server = ctx.bodyAsClass(String.class);
+    var server = ctx.pathParam("server", String.class).get();
+    var configuration = ctx.bodyAsClass(MissionConfiguration.class);
 
-    campService.startMission(campaign, server);
+    campService.startMission(campaign, server, configuration);
 
     ctx.json("{}");
   }

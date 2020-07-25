@@ -2,6 +2,7 @@ package factionfiction.api.v2.campaign;
 
 import static base.game.Airbases.ANAPA;
 import static base.game.CampaignCoalition.RED;
+import base.game.units.MissionConfiguration;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
 import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
 import factionfiction.api.v2.campaignfaction.CampaignFactionService;
@@ -104,14 +105,17 @@ public class CampaignEndpointsTest {
 
   @Test
   public void testStartServer() {
+    var conf = mock(MissionConfiguration.class);
     given(ctx.pathParam("campaign", String.class))
       .willReturn(Validator.create(String.class, "camp"));
-    given(ctx.bodyAsClass(String.class))
-      .willReturn("serv");
+    given(ctx.pathParam("server", String.class))
+      .willReturn(Validator.create(String.class, "serv"));
+    given(ctx.bodyAsClass(MissionConfiguration.class))
+      .willReturn(conf);
 
     endpoint.startServer(ctx);
 
-    verify(campaignService).startMission("camp", "serv");
+    verify(campaignService).startMission("camp", "serv", conf);
   }
 
 }

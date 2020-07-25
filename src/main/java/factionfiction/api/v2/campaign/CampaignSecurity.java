@@ -1,5 +1,6 @@
 package factionfiction.api.v2.campaign;
 
+import base.game.units.MissionConfiguration;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import factionfiction.api.v2.auth.AuthInfo;
 import factionfiction.api.v2.daemon.ServerInfo;
@@ -45,9 +46,9 @@ public class CampaignSecurity implements CampaignService {
   }
 
   @Override
-  public void startMission(String campaignName, String serverName) {
+  public void startMission(String campaignName, String serverName, MissionConfiguration configuration) {
     if (authInfo.isAdmin()) {
-      impl.startMission(campaignName, serverName);
+      impl.startMission(campaignName, serverName, configuration);
       return;
     }
 
@@ -60,7 +61,7 @@ public class CampaignSecurity implements CampaignService {
     if (!canManageServer(serverName))
       throw cannotManageServerError();
 
-    impl.startMission(campaignName, serverName);
+    impl.startMission(campaignName, serverName, configuration);
   }
 
   @Override

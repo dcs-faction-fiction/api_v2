@@ -10,6 +10,7 @@ import base.game.FactionUnit;
 import base.game.FullMissionBuilder;
 import base.game.ImmutableFactionUnit;
 import base.game.ImmutableLocation;
+import base.game.units.MissionConfiguration;
 import base.game.units.Unit;
 import base.game.warehouse.WarehouseItemCode;
 import com.github.apilab.rest.exceptions.NotFoundException;
@@ -127,7 +128,7 @@ public class CampaignRepository {
     );
   }
 
-  public void startMission(String campaignName, String serverName) {
+  public void startMission(String campaignName, String serverName, MissionConfiguration configuration) {
     jdbi.useHandle(h -> {
       ensureServerExists(h, serverName);
 
@@ -138,7 +139,7 @@ public class CampaignRepository {
 
       FullMissionBuilder mb = new FullMissionBuilder();
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      mb.build(map, warehousesMap, blueUnits, redUnits, bos);
+      mb.build(map, configuration, warehousesMap, blueUnits, redUnits, bos);
 
       h.execute("update server"
         + " set next_action = ?, mission_zip = ?, campaign_name = ?"

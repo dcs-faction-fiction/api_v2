@@ -1,5 +1,6 @@
 package factionfiction.api.v2.campaign;
 
+import base.game.units.MissionConfiguration;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import factionfiction.api.v2.auth.AuthInfo;
 import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
@@ -153,49 +154,54 @@ public class CampaignSecurityTest {
 
   @Test
   public void teststartMissionAsAdmin() throws IOException {
+    var conf = mock(MissionConfiguration.class);
     given(authInfo.isAdmin()).willReturn(true);
 
-    security.startMission("camp", "serv");
+    security.startMission("camp", "serv", conf);
 
-    verify(impl).startMission("camp", "serv");
+    verify(impl).startMission("camp", "serv", conf);
   }
 
   @Test
   public void teststartMission() throws IOException {
+    var conf = mock(MissionConfiguration.class);
     var uuid = UUID.randomUUID();
     given(authInfo.getUserUUID()).willReturn(uuid);
     given(authInfo.isCampaignManager()).willReturn(true);
     given(impl.isOwner("camp", uuid)).willReturn(true);
     given(impl.userCanManageServer(uuid, "serv")).willReturn(true);
 
-    security.startMission("camp", "serv");
+    security.startMission("camp", "serv", conf);
 
-    verify(impl).startMission("camp", "serv");
+    verify(impl).startMission("camp", "serv", conf);
   }
 
   @Test
   public void teststartMissionNoManager() throws IOException {
+    var conf = mock(MissionConfiguration.class);
     given(authInfo.isCampaignManager()).willReturn(false);
 
     assertThrows(NotAuthorizedException.class, () -> {
-      security.startMission("camp", "serv");
+      security.startMission("camp", "serv", conf);
     });
   }
 
   @Test
   public void teststartMissionNoOwner() throws IOException {
+    var conf = mock(MissionConfiguration.class);
     var uuid = UUID.randomUUID();
     given(authInfo.getUserUUID()).willReturn(uuid);
     given(authInfo.isCampaignManager()).willReturn(true);
     given(impl.isOwner("camp", uuid)).willReturn(false);
 
     assertThrows(NotAuthorizedException.class, () -> {
-      security.startMission("camp", "serv");
+      security.startMission("camp", "serv", conf);
     });
   }
 
   @Test
   public void teststartMissionNoServerOwner() throws IOException {
+    var conf = mock(MissionConfiguration.class);
     var uuid = UUID.randomUUID();
     given(authInfo.getUserUUID()).willReturn(uuid);
     given(authInfo.isCampaignManager()).willReturn(true);
@@ -203,7 +209,7 @@ public class CampaignSecurityTest {
     given(impl.userCanManageServer(uuid, "serv")).willReturn(false);
 
     assertThrows(NotAuthorizedException.class, () -> {
-      security.startMission("camp", "serv");
+      security.startMission("camp", "serv", conf);
     });
   }
 }
