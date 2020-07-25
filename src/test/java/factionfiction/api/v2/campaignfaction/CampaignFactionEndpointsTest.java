@@ -60,6 +60,7 @@ public class CampaignFactionEndpointsTest {
     verify(javalin).post(eq("/v2/campaignfaction-api/campaigns/:campaign/factions"), any(), eq(roles(CAMPAIGN_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions"), any(), eq(roles(CAMPAIGN_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/allied-factions"), any(), eq(roles(FACTION_MANAGER)));
+    verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/enemy-faction-locations"), any(), eq(roles(FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/game-options"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/factions/:faction/campaigns"), any(), eq(roles(FACTION_MANAGER)));
@@ -165,6 +166,19 @@ public class CampaignFactionEndpointsTest {
     endpoints.getAlliedFactions(ctx);
 
     verify(ctx).json(List.of(situation));
+  }
+
+  @Test
+  public void testEnemyLocations() {
+    var location = mock(Location.class);
+    given(ctx.pathParam("campaign", String.class))
+      .willReturn(Validator.create(String.class, "campaign1"));
+    given(campFactionService.getEnemyFactionLocations("campaign1"))
+      .willReturn(List.of(location));
+
+    endpoints.getEnemyFactionLocations(ctx);
+
+    verify(ctx).json(List.of(location));
   }
 
   @Test

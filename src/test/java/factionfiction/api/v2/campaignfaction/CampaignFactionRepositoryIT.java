@@ -90,10 +90,11 @@ public class CampaignFactionRepositoryIT {
   public void testGetAllFactionNamesOfCampaign() {
     var campaignOwner = UUID.randomUUID();
     var factionOwner = UUID.randomUUID();
+    var faction2Owner = UUID.randomUUID();
     cleanFactionTable(jdbi);
     cleanCampaignTable(jdbi);
     cleanCampaignFactionTable(jdbi);
-    insertDataForFactionNames(jdbi, campaignOwner, factionOwner);
+    insertDataForFactionNames(jdbi, campaignOwner, factionOwner, faction2Owner);
 
     var result = repository.getAllFactionNamesOfCampaign("campaign", campaignOwner);
 
@@ -104,10 +105,11 @@ public class CampaignFactionRepositoryIT {
   public void testAlliedFactions() {
     var campaignOwner = UUID.randomUUID();
     var factionOwner = UUID.randomUUID();
+    var faction2Owner = UUID.randomUUID();
     cleanFactionTable(jdbi);
     cleanCampaignTable(jdbi);
     cleanCampaignFactionTable(jdbi);
-    insertDataForFactionNames(jdbi, campaignOwner, factionOwner);
+    insertDataForFactionNames(jdbi, campaignOwner, factionOwner, faction2Owner);
 
     var result = repository.getAlliedFactionNamesOfCampaign("campaign", factionOwner);
 
@@ -119,17 +121,64 @@ public class CampaignFactionRepositoryIT {
     var someOtherOwner = UUID.randomUUID();
     var campaignOwner = UUID.randomUUID();
     var factionOwner = UUID.randomUUID();
+    var faction2Owner = UUID.randomUUID();
     cleanFactionTable(jdbi);
     cleanCampaignTable(jdbi);
     cleanCampaignFactionTable(jdbi);
-    insertDataForFactionNames(jdbi, campaignOwner, factionOwner);
+    insertDataForFactionNames(jdbi, campaignOwner, factionOwner, faction2Owner);
 
     assertThrows(NotAuthorizedException.class, () -> {
       repository.getAlliedFactionNamesOfCampaign("campaign", someOtherOwner);
     });
   }
 
-  private void insertDataForFactionNames(Jdbi jdbi, UUID campaignOwner, UUID factionOwner) {
+  @Test
+  public void testEnemyFactions() {
+    var campaignOwner = UUID.randomUUID();
+    var factionOwner = UUID.randomUUID();
+    var faction2Owner = UUID.randomUUID();
+    cleanFactionTable(jdbi);
+    cleanCampaignTable(jdbi);
+    cleanCampaignFactionTable(jdbi);
+    insertDataForFactionNames(jdbi, campaignOwner, factionOwner, faction2Owner);
+
+    var result = repository.getEnemyFactionNamesOfCampaign("campaign", factionOwner);
+
+    assertThat(result, is(List.of("faction2")));
+  }
+
+  @Test
+  public void testEnemyFactionsOtherFaction() {
+    var campaignOwner = UUID.randomUUID();
+    var factionOwner = UUID.randomUUID();
+    var faction2Owner = UUID.randomUUID();
+    cleanFactionTable(jdbi);
+    cleanCampaignTable(jdbi);
+    cleanCampaignFactionTable(jdbi);
+    insertDataForFactionNames(jdbi, campaignOwner, factionOwner, faction2Owner);
+
+    var result = repository.getEnemyFactionNamesOfCampaign("campaign", faction2Owner);
+
+    assertThat(result, is(List.of("faction")));
+  }
+
+  @Test
+  public void testEnemyFactionsWrongRole() {
+    var someOtherOwner = UUID.randomUUID();
+    var campaignOwner = UUID.randomUUID();
+    var factionOwner = UUID.randomUUID();
+    var faction2Owner = UUID.randomUUID();
+    cleanFactionTable(jdbi);
+    cleanCampaignTable(jdbi);
+    cleanCampaignFactionTable(jdbi);
+    insertDataForFactionNames(jdbi, campaignOwner, factionOwner, faction2Owner);
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      repository.getEnemyFactionNamesOfCampaign("campaign", someOtherOwner);
+    });
+  }
+
+  private void insertDataForFactionNames(Jdbi jdbi, UUID campaignOwner, UUID factionOwner, UUID faction2Owner) {
     jdbi.useHandle(h -> h.execute(
       "insert into campaign(name, manager_user)"
         + " values(?, ?)", "campaign",
@@ -141,7 +190,7 @@ public class CampaignFactionRepositoryIT {
     jdbi.useHandle(h -> h.execute(
       "insert into faction(name, commander_user)"
         + " values(?, ?)", "faction2",
-        UUID.randomUUID()));
+        faction2Owner));
     jdbi.useHandle(h -> h.execute(
       "insert into campaign_faction(id, campaign_name, faction_name, airbase, is_blue)"
         + " values(?, ?, ?, ?, ?)",

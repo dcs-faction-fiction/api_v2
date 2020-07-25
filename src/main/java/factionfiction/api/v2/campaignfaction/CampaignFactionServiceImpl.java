@@ -1,5 +1,6 @@
 package factionfiction.api.v2.campaignfaction;
 
+import base.game.FactionAirbase;
 import base.game.FactionSituation;
 import base.game.FactionUnit;
 import base.game.ImmutableFactionAirbase;
@@ -88,6 +89,16 @@ public class CampaignFactionServiceImpl {
     List<String> factionNames = repository.getAlliedFactionNamesOfCampaign(campaignName, userId);
     return factionNames.stream()
       .map(name -> getSituation(campaignName, name))
+      .collect(toList());
+  }
+
+  public List<Location> getEnemyFactionLocations(String campaignName, UUID userId) {
+    var enemyFactionNames = repository.getEnemyFactionNamesOfCampaign(campaignName, userId);
+    return enemyFactionNames.stream()
+      .flatMap(name -> getSituation(campaignName, name)
+        .airbases()
+        .stream()
+        .map(FactionAirbase::location))
       .collect(toList());
   }
 

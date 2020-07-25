@@ -54,9 +54,30 @@ public class CampaignFactionRepository {
   }
 
   public List<String> getAlliedFactionNamesOfCampaign(String campaignName, UUID userId) {
+    boolean isBlue = ensurePartOfCampaignAndReturnIfBlue(campaignName, userId);
+    return returnAlliedFactions(campaignName, isBlue);
+  }
+
+  public List<String> getEnemyFactionNamesOfCampaign(String campaignName, UUID userId) {
+    boolean isBlue = ensurePartOfCampaignAndReturnIfBlue(campaignName, userId);
+    return returnAlliedFactions(campaignName, !isBlue);
+  }
+
+  List<String> returnAlliedFactions(String campaignName, Boolean isBlue) {
+    return jdbi.withHandle(h -> h.select(
+      "select cf.faction_name from campaign_faction cf"
+        + " left join campaign c on cf.campaign_name = c.name"
+        + " where cf.campaign_name = ? and is_blue = ?",
+      campaignName,
+      isBlue)
+      .mapTo(String.class)
+      .list());
+  }
+
+  boolean ensurePartOfCampaignAndReturnIfBlue(String campaignName, UUID userId) {
     // Important on security, in this case permission filtering is done
     // through joining in selects for owner for allied factions.
-    var isBlue = jdbi.withHandle(h -> h.select(
+    return jdbi.withHandle(h -> h.select(
       "select is_blue from campaign_faction cf"
         + " left join faction f on cf.faction_name = f.name"
         + " where cf.campaign_name = ? and f.commander_user = ?",
@@ -66,15 +87,6 @@ public class CampaignFactionRepository {
       .findFirst()
       .orElseThrow(() -> new NotAuthorizedException("Not part of this campaign"))
     );
-
-    return jdbi.withHandle(h -> h.select(
-      "select cf.faction_name from campaign_faction cf"
-        + " left join campaign c on cf.campaign_name = c.name"
-        + " where cf.campaign_name = ? and is_blue = ?",
-      campaignName,
-      isBlue)
-      .mapTo(String.class)
-      .list());
   }
 
   public void moveUnit(

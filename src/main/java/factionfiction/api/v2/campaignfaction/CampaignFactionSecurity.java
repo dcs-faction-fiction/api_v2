@@ -78,6 +78,14 @@ public class CampaignFactionSecurity implements CampaignFactionService {
   }
 
   @Override
+  public List<Location> getEnemyFactionLocations(String campaignName) {
+    if (!authInfo.isFactionManager())
+      throw new NotAuthorizedException("Only faction manager can view enemy faction locations.");
+
+    return impl.getEnemyFactionLocations(campaignName, authInfo.getUserUUID());
+  }
+
+  @Override
   public void moveUnit(String campaignName, String factionName, UUID uid, Location location) {
     if (!authInfo.isFactionManager())
       throw new NotAuthorizedException("Only faction manager can move own units.");

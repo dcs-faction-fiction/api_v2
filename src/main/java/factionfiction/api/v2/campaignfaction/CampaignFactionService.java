@@ -14,4 +14,5 @@ public interface CampaignFactionService {
   List<FactionSituation> getAllFactions(String campaignName);
   List<FactionSituation> getAlliedFactions(String campaignName);
   void moveUnit(String campaignName, String factionName, UUID uid, Location location);
+  List<Location> getEnemyFactionLocations(String campaignName);
 }

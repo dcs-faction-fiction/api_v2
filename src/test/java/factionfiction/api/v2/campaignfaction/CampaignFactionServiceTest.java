@@ -117,6 +117,18 @@ public class CampaignFactionServiceTest {
   }
 
   @Test
+  public void testPassOnEnemyFactions() {
+    mockFactionSituation();
+    var uuid = UUID.randomUUID();
+    given(repository.getEnemyFactionNamesOfCampaign(sample.campaignName(), uuid))
+      .willReturn(List.of(sample.factionName()));
+
+    var result = impl.getEnemyFactionLocations(sample.campaignName(), uuid);
+
+    assertThat(result, is(List.of(sampleSituation().airbases().get(0).location())));
+  }
+
+  @Test
   public void testPassMoveUnit() {
     var cfid = UUID.randomUUID();
     var location = mock(Location.class);

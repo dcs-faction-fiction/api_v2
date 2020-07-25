@@ -228,6 +228,27 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
+  public void testGetEnemyFactions() {
+    var expected = List.of(mock(Location.class));
+    mockFactionManagerAndFactionOwner();
+    given(impl.getEnemyFactionLocations("campaign", owner))
+      .willReturn(expected);
+
+    var result = security.getEnemyFactionLocations("campaign");
+
+    assertThat(result, is(expected));
+  }
+
+  @Test
+  public void testGetEnemyFactionsNoFactionManager() {
+    mockNoFactionManager();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.getEnemyFactionLocations("campaign");
+    });;
+  }
+
+  @Test
   public void testMoveUnit() {
     var unitId = UUID.randomUUID();
     var newLocation = mock(Location.class);
