@@ -1,8 +1,10 @@
 package factionfiction.api.v2.campaign;
 
 import base.game.units.ImmutableMissionConfiguration;
+import base.game.units.ImmutableMissionOptions;
 import base.game.units.ImmutableMissionTime;
 import base.game.units.ImmutableMissionWeather;
+import static base.game.units.MissionOptionExternalView.optview_all;
 import com.github.apilab.core.GSONModule;
 import com.google.gson.Gson;
 import static factionfiction.api.v2.campaign.CampaignHelper.cleanCampaignTable;
@@ -175,6 +177,10 @@ public class CampaignRepositoryIT {
 
   ImmutableMissionConfiguration makeMissionConfiguration() {
     var conf = ImmutableMissionConfiguration.builder()
+      .options(ImmutableMissionOptions.builder()
+        .externalViews(true)
+        .externalViewType(optview_all)
+        .build())
       .time(ImmutableMissionTime.builder()
         .year(2020)
         .month(6)
