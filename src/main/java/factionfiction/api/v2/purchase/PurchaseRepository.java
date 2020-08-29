@@ -113,11 +113,15 @@ public class PurchaseRepository {
 
   void buyItem(String campaignName, String factionName, BigDecimal cost, WarehouseItemCode code) {
     jdbi.useHandle(h -> {
+      // Lock the campaignfaction so that purchases are serialized and solve the problem of the insert/upsert
+      UUID cfId = campaignFactionRepository.getCampaignFactionId(campaignName, factionName);
+      h.execute("select id from campaign_faction where id = ? for update", cfId);
+      // buy item and then take credits
+      addNewItem(cfId, campaignName, code, h);
       addCreditsWithHandle(
         campaignName, factionName,
         cost.negate(),
         h);
-      addNewItem(campaignName, factionName, code, h);
     });
   }
 
@@ -144,8 +148,7 @@ public class PurchaseRepository {
     );
   }
 
-  private void addNewItem(String campaignName, String factionName, WarehouseItemCode code, Handle h) {
-    UUID cfId = campaignFactionRepository.getCampaignFactionId(campaignName, factionName);
+  private void addNewItem(UUID cfId, String campaignName, WarehouseItemCode code, Handle h) {
     var cf = campaignFactionRepository.getCampaignFaction(cfId);
     UUID cawid = getWarehouseId(h, campaignName, cf);
     UUID itemid = getWarehouseItemId(h, cawid, code);
