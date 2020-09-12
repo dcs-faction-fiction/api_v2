@@ -6,6 +6,7 @@ import static base.game.warehouse.WarehouseItemCode.JF_17;
 import factionfiction.api.v2.campaignfaction.CampaignFaction;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.cleanCampaignFactionTable;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.insertSampleCampaignFaction;
+import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.insertSampleCampaignFaction2;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
 import factionfiction.api.v2.campaignfaction.CampaignFactionRepository;
 import factionfiction.api.v2.game.GameOptionsLoader;
@@ -166,8 +167,10 @@ class PurchaseRepositoryIT {
     cleanRecoShots(jdbi);
 
     var cfId = UUID.randomUUID();
+    var cfId2 = UUID.randomUUID();
     insertSampleCampaignFaction(jdbi, cfId, owner);
-    insertSampleFactionUnit(jdbi, UUID.randomUUID(), cfId);
+    insertSampleCampaignFaction2(jdbi, cfId2, owner);
+    insertSampleFactionUnit(jdbi, UUID.randomUUID(), cfId2);
 
     var location = Location.of("1", "2");
     var options = new GameOptionsLoader().loadDefaults();

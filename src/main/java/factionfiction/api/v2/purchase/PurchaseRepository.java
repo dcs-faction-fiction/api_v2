@@ -140,11 +140,12 @@ public class PurchaseRepository {
     var lonmin = location.longitude().doubleValue() - deltaLon;
     var lonmax = location.longitude().doubleValue() + deltaLon;
     jdbi.useHandle(h -> {
-      var foundUnits = h.select("select id, type, x, y, z, angle from campaign_faction_units where "
-        + "campaign_faction_id = ? "
+      var foundUnits = h.select("select cfu.id as id, cfu.type as type, cfu.x as x, cfu.y as y, cfu.z as z, cfu.angle as angle from campaign_faction_units cfu "
+        + "left join campaign_faction cf on cf.id = campaign_faction_id "
+        + "where cf.campaign_name = ? and cf.faction_name != ? "
         + "and y between ? and ? "
         + "and x between ? and ?",
-        cfId,
+        campaign, faction,
         latmin, latmax,
         lonmin, lonmax)
       .map(factionUnitMapper())
