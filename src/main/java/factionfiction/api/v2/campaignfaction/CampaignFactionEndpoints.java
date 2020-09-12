@@ -43,6 +43,7 @@ public class CampaignFactionEndpoints implements Endpoint {
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/allied-factions", this::getAlliedFactions, roles(FACTION_MANAGER));
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/enemy-faction-locations", this::getEnemyFactionLocations, roles(FACTION_MANAGER));
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction", this::getSituation, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
+    javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/reco-shots", this::getRecoShots, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/game-options", this::getGameOptions, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
     javalin.get("/v2/campaignfaction-api/factions/:faction/campaigns", this::getAvailableCampaigns, roles(FACTION_MANAGER));
     javalin.post("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/units/:unitid/new-location", this::moveUnit, roles(FACTION_MANAGER));
@@ -140,6 +141,16 @@ public class CampaignFactionEndpoints implements Endpoint {
     var campaignName = ctx.pathParam(CAMPAIGN_PATHPARAM, String.class).get();
 
     var result = service.getEnemyFactionLocations(campaignName);
+
+    ctx.json(result);
+  }
+
+  public void getRecoShots(Context ctx) {
+    var service = cfServiceProvider.apply(ctx);
+    var campaignName = ctx.pathParam(CAMPAIGN_PATHPARAM, String.class).get();
+    var factionName = ctx.pathParam(FACTION_PATHPARAM, String.class).get();
+
+    var result = service.getRecoShots(campaignName, factionName);
 
     ctx.json(result);
   }

@@ -14,6 +14,7 @@ import factionfiction.api.v2.campaign.CampaignService;
 import factionfiction.api.v2.campaign.ImmutableCampaignCreatePayloadFactions;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
 import factionfiction.api.v2.game.GameOptionsLoader;
+import factionfiction.api.v2.game.ImmutableRecoShot;
 import static factionfiction.api.v2.units.UnitHelper.makeSampleFactionUnit;
 import static factionfiction.api.v2.warehouse.WarehouseHelper.makeSampleWarehouseMap;
 import io.javalin.Javalin;
@@ -62,6 +63,7 @@ class CampaignFactionEndpointsTest {
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/allied-factions"), any(), eq(roles(FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/enemy-faction-locations"), any(), eq(roles(FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
+    verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/reco-shots"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/game-options"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/factions/:faction/campaigns"), any(), eq(roles(FACTION_MANAGER)));
     verify(javalin).post(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/units/:unitid/new-location"), any(), eq(roles(FACTION_MANAGER)));
@@ -213,6 +215,29 @@ class CampaignFactionEndpointsTest {
     endpoints.deleteRecoShot(ctx);
 
     verify(campFactionService).deleteRecoShot("campaign1", "faction1", id);
+  }
+
+  @Test
+  void testGetRecoShots() {
+    given(ctx.pathParam("campaign", String.class))
+      .willReturn(Validator.create(String.class, "campaign1"));
+    given(ctx.pathParam("faction", String.class))
+      .willReturn(Validator.create(String.class, "faction1"));
+
+    var recoshot = ImmutableRecoShot.builder()
+      .id(UUID.randomUUID())
+      .minLat(ZERO)
+      .maxLat(ZERO)
+      .minLon(ZERO)
+      .maxLon(ZERO)
+      .units(List.of())
+      .build();
+    given(campFactionService.getRecoShots("campaign1", "faction1"))
+      .willReturn(List.of(recoshot));
+
+    endpoints.getRecoShots(ctx);
+
+    verify(ctx).json(List.of(recoshot));
   }
 
   FactionSituation sampleSituation() {

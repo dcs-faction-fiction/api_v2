@@ -146,6 +146,13 @@ class CampaignFactionServiceTest {
     verify(repository).deleteRecoShot(id);
   }
 
+  @Test
+  void testPassGetRecoShots() {
+    impl.getRecoShots("campaign", "faction");
+
+    verify(repository).getRecoShots("campaign", "faction");
+  }
+
   void mockFactionSituation() {
     given(repository.getCampaignFactionId(sample.campaignName(), sample.factionName()))
       .willReturn(cfId);

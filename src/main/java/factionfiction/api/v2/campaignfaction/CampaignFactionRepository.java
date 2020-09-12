@@ -3,13 +3,20 @@ package factionfiction.api.v2.campaignfaction;
 import base.game.Airbases;
 import static base.game.CampaignCoalition.BLUE;
 import static base.game.CampaignCoalition.RED;
+import base.game.FactionUnit;
 import base.game.Location;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import com.github.apilab.rest.exceptions.NotFoundException;
+import factionfiction.api.v2.game.ImmutableRecoShot;
+import factionfiction.api.v2.game.RecoShot;
+import static factionfiction.api.v2.mappers.RowMappers.factionUnitMapper;
+import static factionfiction.api.v2.mappers.RowMappers.recoShotMapper;
 import factionfiction.api.v2.math.MathService;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+import static java.util.stream.Collectors.toList;
+import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 
 public class CampaignFactionRepository {
@@ -122,6 +129,28 @@ public class CampaignFactionRepository {
       h.execute("delete from recoshot where id = ?", id);
       h.execute("delete from recoshot_item where recoshot_id = ?", id);
     });
+  }
+
+  public List<RecoShot> getRecoShots(String campaignName, String factionName) {
+    return jdbi.withHandle(h -> {
+      UUID cfid = getCampaignFactionId(campaignName, factionName);
+      return h.select("select id, latmin, latmax, lonmin, lonmax from recoshot where campaign_faction_id = ?", cfid)
+        .map(recoShotMapper())
+        .list()
+        .stream()
+        .map(shot ->
+          ImmutableRecoShot.builder().from(shot)
+            .units(getUnitsFromRecoShot(h, shot.id()))
+            .build()
+        )
+        .collect(toList());
+    });
+  }
+
+  List<FactionUnit> getUnitsFromRecoShot(Handle h, UUID id) {
+    return h.select("select null as id, type, x, y, z, angle from recoshot_item where recoshot_id = ?", id)
+      .map(factionUnitMapper())
+      .list();
   }
 
   CampaignFaction find(UUID id) {

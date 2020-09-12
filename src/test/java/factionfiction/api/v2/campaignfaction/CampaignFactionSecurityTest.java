@@ -290,7 +290,7 @@ class CampaignFactionSecurityTest {
 
     assertThrows(NotAuthorizedException.class, () -> {
       security.moveUnit(campaign, faction, id, loc);
-    });;
+    });
   }
 
   @Test
@@ -314,7 +314,7 @@ class CampaignFactionSecurityTest {
 
     assertThrows(NotAuthorizedException.class, () -> {
       security.deleteRecoShot(campaign, faction, id);
-    });;
+    });
   }
 
   @Test
@@ -326,7 +326,38 @@ class CampaignFactionSecurityTest {
 
     assertThrows(NotAuthorizedException.class, () -> {
       security.deleteRecoShot(campaign, faction, id);
-    });;
+    });
+  }
+
+  @Test
+  void testGetRecoShots() {
+    mockFactionManagerAndFactionOwner();
+
+    security.getRecoShots(sample.campaignName(), sample.factionName());
+
+    verify(impl).getRecoShots(sample.campaignName(), sample.factionName());
+  }
+
+  @Test
+  void testGetRecoShotsNoFactionManager() {
+    mockNoFactionManager();
+    var campaign = sample.campaignName();
+    var faction = sample.factionName();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.getRecoShots(campaign, faction);
+    });
+  }
+
+  @Test
+  void testGetRecoShotsFactionOwner() {
+    mockFactionManagerAndNoFactionOwner();
+    var campaign = sample.campaignName();
+    var faction = sample.factionName();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.getRecoShots(campaign, faction);
+    });
   }
 
   void mockGameOptions(GameOptions options) {

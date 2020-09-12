@@ -7,10 +7,13 @@ import factionfiction.api.v2.auth.AuthInfo;
 import factionfiction.api.v2.campaign.CampaignRepository;
 import factionfiction.api.v2.faction.FactionRepository;
 import factionfiction.api.v2.game.GameOptions;
+import factionfiction.api.v2.game.RecoShot;
 import java.util.List;
 import java.util.UUID;
 
 public class CampaignFactionSecurity implements CampaignFactionService {
+
+  static final String NOT_OWNING_THIS_FACTION = "Not owning this faction.";
 
   final AuthInfo authInfo;
   final CampaignFactionServiceImpl impl;
@@ -90,7 +93,7 @@ public class CampaignFactionSecurity implements CampaignFactionService {
     if (!authInfo.isFactionManager())
       throw new NotAuthorizedException("Only faction manager can move own units.");
     if (!isFactionOwner(factionName))
-      throw new NotAuthorizedException("Not owning this faction.");
+      throw new NotAuthorizedException(NOT_OWNING_THIS_FACTION);
 
     impl.moveUnit(campaignName, factionName, uid, location);
   }
@@ -100,9 +103,19 @@ public class CampaignFactionSecurity implements CampaignFactionService {
     if (!authInfo.isFactionManager())
       throw new NotAuthorizedException("Only faction manager can delete reco shots.");
     if (!isFactionOwner(factionName))
-      throw new NotAuthorizedException("Not owning this faction.");
+      throw new NotAuthorizedException(NOT_OWNING_THIS_FACTION);
 
     impl.deleteRecoShot(id);
+  }
+
+  @Override
+  public List<RecoShot> getRecoShots(String campaignName, String factionName) {
+    if (!authInfo.isFactionManager())
+      throw new NotAuthorizedException("Only faction manager can get shots.");
+    if (!isFactionOwner(factionName))
+      throw new NotAuthorizedException(NOT_OWNING_THIS_FACTION);
+
+    return impl.getRecoShots(campaignName, factionName);
   }
 
   boolean isFactionOwner(String factionName) {

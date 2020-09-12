@@ -188,7 +188,7 @@ public class CampaignRepository {
 
   private List<FactionUnit> getCoalitionUnitsForCampaign(String campaignName, CampaignCoalition coa) {
     return jdbi.withHandle(h ->
-      h.select("select u.id, u.type, u.x, u.y, u.z, angle from campaign_faction_units u "
+      h.select("select u.id as id, u.type as type, u.x as x, u.y as y, u.z as z, angle as angle from campaign_faction_units u "
         + "left join campaign_faction cf on u.campaign_faction_id = cf.id "
         + "where cf.campaign_name = ? and cf.is_blue = ?"
         + "limit 10000", // 10k units per coalition max

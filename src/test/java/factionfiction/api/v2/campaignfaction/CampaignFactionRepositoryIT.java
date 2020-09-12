@@ -14,6 +14,7 @@ import static factionfiction.api.v2.faction.FactionHelper.cleanFactionTable;
 import static factionfiction.api.v2.test.InMemoryDB.jdbi;
 import static factionfiction.api.v2.units.UnitHelper.cleanRecoShots;
 import static factionfiction.api.v2.units.UnitHelper.insertRecoShot;
+import static factionfiction.api.v2.units.UnitHelper.makeSampleRecoShot;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -255,6 +256,22 @@ class CampaignFactionRepositoryIT {
         .get());
 
     assertThat(count, is(0));
+  }
+
+  @Test
+  void testGetRecoShots() {
+    var id = UUID.randomUUID();
+    var cfId = UUID.randomUUID();
+    cleanCampaignFactionTable(jdbi);
+    cleanRecoShots(jdbi);
+    insertSampleCampaignFaction(jdbi, cfId, owner);
+    insertRecoShot(jdbi, id, cfId);
+
+    var result = repository.getRecoShots("campaign name", "faction name");
+    var output = makeSampleRecoShot(id);
+
+    assertThat(result.size(), is(1));
+    assertThat(result.get(0), is(output));
   }
 
   Location getLocationOfUnitById(UUID unitId) {

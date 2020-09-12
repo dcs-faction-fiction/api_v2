@@ -1,5 +1,6 @@
 package factionfiction.api.v2.campaignfaction;
 
+import factionfiction.api.v2.game.RecoShot;
 import base.game.FactionSituation;
 import base.game.Location;
 import factionfiction.api.v2.game.GameOptions;
@@ -15,5 +16,6 @@ public interface CampaignFactionService {
   List<FactionSituation> getAlliedFactions(String campaignName);
   void moveUnit(String campaignName, String factionName, UUID uid, Location location);
   List<Location> getEnemyFactionLocations(String campaignName);
+  List<RecoShot> getRecoShots(String campaignName, String factionName);
   void deleteRecoShot(String campaignName, String factionName, UUID id);
 }

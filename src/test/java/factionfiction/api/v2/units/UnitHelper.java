@@ -4,7 +4,11 @@ import base.game.FactionUnit;
 import base.game.ImmutableFactionUnit;
 import base.game.ImmutableLocation;
 import base.game.units.Unit;
+import static base.game.units.Unit.T_80;
+import factionfiction.api.v2.game.ImmutableRecoShot;
+import factionfiction.api.v2.game.RecoShot;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 
@@ -62,6 +66,25 @@ public final class UnitHelper {
       new BigDecimal(3),
       new BigDecimal(4)
     ));
+  }
+
+  public static RecoShot makeSampleRecoShot(UUID id) {
+    return ImmutableRecoShot.builder()
+      .id(id)
+      .minLat(new BigDecimal(1))
+      .maxLat(new BigDecimal(2))
+      .minLon(new BigDecimal(1))
+      .maxLon(new BigDecimal(2))
+      .units(List.of(ImmutableFactionUnit.builder()
+        .type(T_80)
+        .location(ImmutableLocation.builder()
+          .latitude(new BigDecimal(1.5))
+          .longitude(new BigDecimal(1.5))
+          .altitude(new BigDecimal(1.5))
+          .angle(new BigDecimal(1.5))
+          .build())
+        .build()))
+    .build();
   }
 
   public static FactionUnit makeSampleFactionUnit(UUID id) {

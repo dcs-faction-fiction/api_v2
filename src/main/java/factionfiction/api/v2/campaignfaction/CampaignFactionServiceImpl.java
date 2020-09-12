@@ -9,6 +9,7 @@ import base.game.Location;
 import base.game.warehouse.WarehouseItemCode;
 import factionfiction.api.v2.campaign.CampaignRepository;
 import factionfiction.api.v2.faction.FactionRepository;
+import factionfiction.api.v2.game.RecoShot;
 import factionfiction.api.v2.units.UnitRepository;
 import factionfiction.api.v2.warehouse.WarehouseRepository;
 import java.util.List;
@@ -100,6 +101,10 @@ public class CampaignFactionServiceImpl {
         .stream()
         .map(FactionAirbase::location))
       .collect(toList());
+  }
+
+  public List<RecoShot> getRecoShots(String campaignName, String factionName) {
+    return repository.getRecoShots(campaignName, factionName);
   }
 
   public void moveUnit(String campaignName, String factionName, UUID uid, Location location) {
