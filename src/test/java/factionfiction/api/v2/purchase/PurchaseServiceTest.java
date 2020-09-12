@@ -2,6 +2,7 @@ package factionfiction.api.v2.purchase;
 
 import base.game.ImmutableFactionUnit;
 import base.game.ImmutableLocation;
+import base.game.Location;
 import static base.game.units.Unit.ABRAMS;
 import static base.game.units.Unit.T_80;
 import static base.game.warehouse.WarehouseItemCode.AV_8B_NA;
@@ -30,7 +31,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class PurchaseServiceTest {
+class PurchaseServiceTest {
 
   UUID unitUUID;
   String campaignName;
@@ -41,7 +42,7 @@ public class PurchaseServiceTest {
   CampaignFactionRepository campaignFactionRepository;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     unitUUID = UUID.randomUUID();
     campaignName = "Campaign";
     factionName = "Faction";
@@ -55,7 +56,7 @@ public class PurchaseServiceTest {
   }
 
   @Test
-  public void testGiveCredits() {
+  void testGiveCredits() {
     given(purchaseRepository.giveCredits(campaignName, factionName, ONE))
       .willReturn(ONE);
 
@@ -68,7 +69,7 @@ public class PurchaseServiceTest {
   }
 
   @Test
-  public void testBuyUnit() throws IOException {
+  void testBuyUnit() throws IOException {
     var unit = mockBuyUnitSituation(new BigDecimal(30));
 
     var result = service.buyUnit(campaignName, factionName, unit);
@@ -77,7 +78,7 @@ public class PurchaseServiceTest {
   }
 
   @Test
-  public void testBuyUnitOutsideAirbase() throws IOException {
+  void testBuyUnitOutsideAirbase() throws IOException {
     var units = mockBuyUnitSituationOutsideAirbase(new BigDecimal(30));
     var unit = units.get(0);
     var changedUnit = units.get(1);
@@ -88,7 +89,7 @@ public class PurchaseServiceTest {
   }
 
   @Test
-  public void testBuyUnitWithNotEnoughCredits() throws IOException {
+  void testBuyUnitWithNotEnoughCredits() throws IOException {
     var unit = mockBuyUnitSituation(new BigDecimal(0));
 
     assertThrows(NotEnoughCreditsException.class, () -> {
@@ -97,7 +98,7 @@ public class PurchaseServiceTest {
   }
 
   @Test
-  public void testBuyUnitWithNotAllowedUnit() throws IOException {
+  void testBuyUnitWithNotAllowedUnit() throws IOException {
     var unit = mockBuyUnitSituationUnitNotAllowed(new BigDecimal(0));
 
     assertThrows(UnitNotAllowedInCampaignException.class, () -> {
@@ -106,7 +107,7 @@ public class PurchaseServiceTest {
   }
 
   @Test
-  public void testBuyWarehouseItem() throws IOException {
+  void testBuyWarehouseItem() throws IOException {
     mockBuyItemSituation(new BigDecimal(30));
 
     service.buyWarehouseItem(campaignName, factionName, JF_17);
@@ -116,7 +117,7 @@ public class PurchaseServiceTest {
   }
 
   @Test
-  public void testBuyWarehouseItemNoCredits() throws IOException {
+  void testBuyWarehouseItemNoCredits() throws IOException {
     mockBuyItemSituation(new BigDecimal(0));
 
     assertThrows(NotEnoughCreditsException.class, () -> {
@@ -125,7 +126,7 @@ public class PurchaseServiceTest {
   }
 
   @Test
-  public void testBuyWarehouseItemNotAllowedItem() throws IOException {
+  void testBuyWarehouseItemNotAllowedItem() throws IOException {
     mockBuyItemSituation(new BigDecimal(30));
 
     assertThrows(WarehouseItemNotAllowedInCampaignException.class, () -> {
@@ -134,7 +135,7 @@ public class PurchaseServiceTest {
   }
 
   @Test
-  public void testPassIncrease() throws IOException {
+  void testPassIncrease() throws IOException {
     var c = makeSampleCampaign();
     given(campaignRepository.find("c"))
       .willReturn(c);
@@ -145,7 +146,7 @@ public class PurchaseServiceTest {
   }
 
   @Test
-  public void testPassDecrease() throws IOException {
+  void testPassDecrease() throws IOException {
     var c = makeSampleCampaign();
     given(campaignRepository.find("c"))
       .willReturn(c);
@@ -153,6 +154,17 @@ public class PurchaseServiceTest {
     service.zoneDecrease("c", "f");
 
     verify(purchaseRepository).zoneDecrease("c", "f", c.gameOptions());
+  }
+
+  @Test
+  void testPassBuyRecoShot() throws IOException {
+    var c = makeSampleCampaign();
+    given(campaignRepository.find("c"))
+      .willReturn(c);
+
+    service.buyRecoShot("c", "f", Location.of("1", "2"));
+
+    verify(purchaseRepository).buyRecoShot("c", "f", Location.of("1", "2"), c.gameOptions());
   }
 
   ImmutableFactionUnit mockBuyUnitSituation(BigDecimal creditsAvailable) throws IOException {

@@ -18,18 +18,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class FactionServiceTest {
+class FactionServiceTest {
   FactionRepository repository;
   FactionServiceImpl service;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     repository = mock(FactionRepository.class);
     service = new FactionServiceImpl(repository);
   }
 
   @Test
-  public void testNoFactionsAtStart() {
+  void testNoFactionsAtStart() {
     given(repository.listFactions(any())).willReturn(emptyList());
 
     var factions = service.listFactions(UUID.randomUUID());
@@ -38,7 +38,7 @@ public class FactionServiceTest {
   }
 
   @Test
-  public void testFactionsReturned() {
+  void testFactionsReturned() {
     var list = List.of(makeSampleFaction());
     given(repository.listFactions(any())).willReturn(list);
 
@@ -48,7 +48,7 @@ public class FactionServiceTest {
   }
 
   @Test
-  public void testCreateNewFaction() {
+  void testCreateNewFaction() {
     var uuid = UUID.randomUUID();
     String name = "test name";
     service.newFaction(name, uuid);
@@ -57,7 +57,7 @@ public class FactionServiceTest {
   }
 
   @Test
-  public void testCreateNewFactionNull() {
+  void testCreateNewFactionNull() {
     assertThrows(NullPointerException.class, () -> {
       service.newFaction(null, null);
     });
@@ -69,9 +69,10 @@ public class FactionServiceTest {
     "with, comma",
     "with bang!",
     "with question?"})
-  public void testInvalidFactionNames(String name) {
+  void testInvalidFactionNames(String name) {
+    var id = UUID.randomUUID();
     var ex = assertThrows(RuntimeException.class, () -> {
-      service.newFaction(name, UUID.randomUUID());
+      service.newFaction(name, id);
     });
 
     assertThat(ex.getMessage(), containsString("Invalid name"));

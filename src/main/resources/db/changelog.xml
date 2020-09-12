@@ -245,4 +245,45 @@
     <modifyDataType tableName="campaign_airfield_warehouse_item" columnName="item_quantity" newDataType="decimal"/>
   </changeSet>
 
+  <changeSet author="raf" id="0011_recoshots">
+    <createTable tableName="recoshot">
+      <column name="id" type="uuid"><constraints nullable="false"/></column>
+      <column name="campaign_faction_id" type="uuid"><constraints nullable="false"/></column>
+      <column name="latmin" type="decimal"><constraints nullable="false"/></column>
+      <column name="latmax" type="decimal"><constraints nullable="false"/></column>
+      <column name="lonmin" type="decimal"><constraints nullable="false"/></column>
+      <column name="lonmax" type="decimal"><constraints nullable="false"/></column>
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP" />
+      <column name="created_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+      <column name="modified_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="modified_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+    </createTable>
+    <createTable tableName="recoshot_item">
+      <column name="id" type="uuid"><constraints nullable="false"/></column>
+      <column name="recoshot_id" type="uuid"><constraints nullable="false"/></column>
+      <column name="type" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="x" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="y" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="z" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="angle" type="varchar(255)"><constraints nullable="false"/></column>
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP" />
+      <column name="created_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+      <column name="modified_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="modified_by" type="uuid" defaultValueComputed="uuid_nil()"/>
+    </createTable>
+    <addPrimaryKey tableName="recoshot" columnNames="id"/>
+    <addPrimaryKey tableName="recoshot_item" columnNames="id"/>
+    <createIndex indexName="recoshot_campaign_faction_id" tableName="recoshot">
+      <column name="campaign_faction_id"/>
+    </createIndex>
+    <createIndex indexName="recoshot_item_recoshot_id" tableName="recoshot_item">
+      <column name="recoshot_id"/>
+    </createIndex>
+
+    <modifyDataType tableName="campaign_faction_units" columnName="x" newDataType="decimal"/>
+    <modifyDataType tableName="campaign_faction_units" columnName="y" newDataType="decimal"/>
+    <modifyDataType tableName="campaign_faction_units" columnName="z" newDataType="decimal"/>
+    <modifyDataType tableName="campaign_faction_units" columnName="angle" newDataType="decimal"/>
+  </changeSet>
+
 </databaseChangeLog>

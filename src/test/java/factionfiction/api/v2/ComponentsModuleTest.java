@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-public class ComponentsModuleTest {
+class ComponentsModuleTest {
   @Test
-  public void testExceptions() throws IOException {
+  void testExceptions() throws IOException {
     var module = new ComponentsModule();
     var loader = mock(GameOptionsLoader.class);
 

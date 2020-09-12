@@ -17,21 +17,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class FactionSecurityTest {
+class FactionSecurityTest {
 
   AuthInfo authInfo;
   FactionServiceImpl impl;
   FactionSecurity security;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     authInfo = mock(AuthInfo.class);
     impl = mock(FactionServiceImpl.class);
     security = new FactionSecurity(impl, authInfo);
   }
 
   @Test
-  public void testCanCreateFactionWhenFactionManager() {
+  void testCanCreateFactionWhenFactionManager() {
     String name = "valid name";
     var uuid = UUID.randomUUID();
     given(authInfo.getUserUUID()).willReturn(uuid);
@@ -43,7 +43,7 @@ public class FactionSecurityTest {
   }
 
   @Test
-  public void testCannotCreateFactionWhenNotFactionManager() {
+  void testCannotCreateFactionWhenNotFactionManager() {
     String name = "valid name";
     given(authInfo.isFactionManager()).willReturn(false);
 
@@ -56,7 +56,7 @@ public class FactionSecurityTest {
   }
 
   @Test
-  public void testCanViewFactionsWhenFactionManager() {
+  void testCanViewFactionsWhenFactionManager() {
     var list = List.of(makeSampleFaction());
     given(impl.listFactions(any())).willReturn(list);
     given(authInfo.isFactionManager()).willReturn(true);
@@ -67,7 +67,7 @@ public class FactionSecurityTest {
   }
 
   @Test
-  public void testCannotViewFactionsWhenNotFactionManager() {
+  void testCannotViewFactionsWhenNotFactionManager() {
     given(authInfo.isFactionManager()).willReturn(false);
 
     var ex = assertThrows(NotAuthorizedException.class, () -> {

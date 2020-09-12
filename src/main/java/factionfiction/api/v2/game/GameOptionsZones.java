@@ -11,12 +11,14 @@ public interface GameOptionsZones {
   GameOptionsZonesSizes sizes();
   GameOptionsZonesIncrease increase();
   GameOptionsZonesDecrease decrease();
+  GameOptionsRecoShot recoShot();
 
   public static GameOptionsZones from(Map map) {
     return ImmutableGameOptionsZones.builder()
       .sizes(GameOptionsZonesSizes.from((Map) map.get("sizes")))
       .increase(GameOptionsZonesIncrease.from((Map) map.get("increase")))
       .decrease(GameOptionsZonesDecrease.from((Map) map.get("decrease")))
+      .recoShot(GameOptionsRecoShot.from((Map) map.get("reco-shot")))
       .build();
   }
 }

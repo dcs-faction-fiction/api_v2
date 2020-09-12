@@ -18,6 +18,11 @@ public final class UnitHelper {
       + UnitRepository.TABLE_NAME));
   }
 
+  public static void cleanRecoShots(Jdbi jdbi) {
+    jdbi.useHandle(h -> h.execute("truncate table recoshot_item"));
+    jdbi.useHandle(h -> h.execute("truncate table recoshot"));
+  }
+
   public static void insertSampleFactionUnit(Jdbi jdbi, UUID id, UUID cfId) {
     jdbi.useHandle(h -> h.execute(
       "insert into campaign_faction_units"

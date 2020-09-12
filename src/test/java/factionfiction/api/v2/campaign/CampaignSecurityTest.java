@@ -21,7 +21,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class CampaignSecurityTest {
+class CampaignSecurityTest {
 
   GameOptions gameOptions;
   AuthInfo authInfo;
@@ -29,7 +29,7 @@ public class CampaignSecurityTest {
   CampaignSecurity security;
 
   @BeforeEach
-  public void setup() throws IOException {
+  void setup() throws IOException {
     gameOptions = new GameOptionsLoader().loadDefaults();
     authInfo = mock(AuthInfo.class);
     impl = mock(CampaignServiceImpl.class);
@@ -37,7 +37,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void testNeedsCampaignManagerToListOwnCampaigns() throws IOException {
+  void testNeedsCampaignManagerToListOwnCampaigns() throws IOException {
     var uuid = UUID.randomUUID();
     given(authInfo.isCampaignManager()).willReturn(true);
     given(authInfo.getUserUUID()).willReturn(uuid);
@@ -51,7 +51,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void testCannotListIfNotCampaignManager() {
+  void testCannotListIfNotCampaignManager() {
     given(authInfo.isCampaignManager()).willReturn(false);
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -60,7 +60,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void testCanCreateCampaignWhenCampaignManager() {
+  void testCanCreateCampaignWhenCampaignManager() {
     String name = "valid name";
     var uuid = UUID.randomUUID();
     given(authInfo.getUserUUID()).willReturn(uuid);
@@ -72,7 +72,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void testCannotCreateCampaignWhenNotCampaignManager() {
+  void testCannotCreateCampaignWhenNotCampaignManager() {
     String name = "valid name";
     var uuid = UUID.randomUUID();
     given(authInfo.getUserUUID()).willReturn(uuid);
@@ -84,7 +84,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void testFindCampaignNotPermission() throws IOException {
+  void testFindCampaignNotPermission() throws IOException {
     given(authInfo.isCampaignManager()).willReturn(false);
     assertThrows(NotAuthorizedException.class, () -> {
       security.find("");
@@ -92,7 +92,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void testFindCampaignNotOwned() throws IOException {
+  void testFindCampaignNotOwned() throws IOException {
     var uuid = UUID.randomUUID();
     given(authInfo.getUserUUID()).willReturn(uuid);
     given(authInfo.isCampaignManager()).willReturn(true);
@@ -103,7 +103,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void testFindCampaignOwned() throws IOException {
+  void testFindCampaignOwned() throws IOException {
     var uuid = UUID.randomUUID();
     var campaign = makeSampleCampaign();
     given(authInfo.getUserUUID()).willReturn(uuid);
@@ -117,7 +117,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void testGetServerInfo() throws IOException {
+  void testGetServerInfo() throws IOException {
     var uuid = UUID.randomUUID();
     var campaign = makeSampleCampaign();
     var info = mock(ServerInfo.class);
@@ -132,7 +132,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void testGetServerInfoNoManager() throws IOException {
+  void testGetServerInfoNoManager() throws IOException {
     given(authInfo.isCampaignManager()).willReturn(false);
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -141,7 +141,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void testGetServerInfoNoOwner() throws IOException {
+  void testGetServerInfoNoOwner() throws IOException {
     var uuid = UUID.randomUUID();
     given(authInfo.getUserUUID()).willReturn(uuid);
     given(authInfo.isCampaignManager()).willReturn(true);
@@ -153,7 +153,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void teststartMissionAsAdmin() throws IOException {
+  void teststartMissionAsAdmin() throws IOException {
     var conf = mock(MissionConfiguration.class);
     given(authInfo.isAdmin()).willReturn(true);
 
@@ -163,7 +163,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void teststartMission() throws IOException {
+  void teststartMission() throws IOException {
     var conf = mock(MissionConfiguration.class);
     var uuid = UUID.randomUUID();
     given(authInfo.getUserUUID()).willReturn(uuid);
@@ -177,7 +177,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void teststartMissionNoManager() throws IOException {
+  void teststartMissionNoManager() throws IOException {
     var conf = mock(MissionConfiguration.class);
     given(authInfo.isCampaignManager()).willReturn(false);
 
@@ -187,7 +187,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void teststartMissionNoOwner() throws IOException {
+  void teststartMissionNoOwner() throws IOException {
     var conf = mock(MissionConfiguration.class);
     var uuid = UUID.randomUUID();
     given(authInfo.getUserUUID()).willReturn(uuid);
@@ -200,7 +200,7 @@ public class CampaignSecurityTest {
   }
 
   @Test
-  public void teststartMissionNoServerOwner() throws IOException {
+  void teststartMissionNoServerOwner() throws IOException {
     var conf = mock(MissionConfiguration.class);
     var uuid = UUID.randomUUID();
     given(authInfo.getUserUUID()).willReturn(uuid);

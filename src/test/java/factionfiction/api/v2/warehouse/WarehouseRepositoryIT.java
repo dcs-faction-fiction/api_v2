@@ -11,19 +11,19 @@ import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class WarehouseRepositoryIT {
+class WarehouseRepositoryIT {
 
   Jdbi jdbi;
   WarehouseRepository repository;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     jdbi = InMemoryDB.jdbi();
     repository = new WarehouseRepository(jdbi);
   }
 
   @Test
-  public void testGetInventory() {
+  void testGetInventory() {
     cleanWarehouseTable(jdbi);
     insertSampleWarehouseItems(jdbi);
     var cf = makeSampleCampaignFaction();

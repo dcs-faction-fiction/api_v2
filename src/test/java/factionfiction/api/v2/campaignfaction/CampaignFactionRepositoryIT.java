@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class CampaignFactionRepositoryIT {
+class CampaignFactionRepositoryIT {
 
   CampaignFaction sample;
   BigDecimal initialCredits;
@@ -34,7 +34,7 @@ public class CampaignFactionRepositoryIT {
   UUID owner;
 
   @BeforeEach
-  public void setup() throws IOException {
+  void setup() throws IOException {
     sample = makeSampleCampaignFaction();
     owner = UUID.randomUUID();
     jdbi = jdbi();
@@ -42,7 +42,7 @@ public class CampaignFactionRepositoryIT {
   }
 
   @Test
-  public void testNewCampaignFaction() {
+  void testNewCampaignFaction() {
     cleanCampaignFactionTable(jdbi);
 
     var campaignFaction = repository.newCampaignFaction(sample);
@@ -51,7 +51,7 @@ public class CampaignFactionRepositoryIT {
   }
 
   @Test
-  public void testNewCampaignFactionRed() {
+  void testNewCampaignFactionRed() {
     var sampleRed = ImmutableCampaignFaction.builder()
       .from(sample)
       .airbase(ANAPA)
@@ -65,7 +65,7 @@ public class CampaignFactionRepositoryIT {
   }
 
   @Test
-  public void testGetCFID() {
+  void testGetCFID() {
     var id = UUID.randomUUID();
     cleanCampaignFactionTable(jdbi);
     insertSampleCampaignFaction(jdbi, id, owner);
@@ -76,7 +76,7 @@ public class CampaignFactionRepositoryIT {
   }
 
   @Test
-  public void testGtById() {
+  void testGtById() {
     var id = UUID.randomUUID();
     cleanCampaignFactionTable(jdbi);
     insertSampleCampaignFaction(jdbi, id, owner);
@@ -87,7 +87,7 @@ public class CampaignFactionRepositoryIT {
   }
 
   @Test
-  public void testGetAllFactionNamesOfCampaign() {
+  void testGetAllFactionNamesOfCampaign() {
     var campaignOwner = UUID.randomUUID();
     var factionOwner = UUID.randomUUID();
     var faction2Owner = UUID.randomUUID();
@@ -102,7 +102,7 @@ public class CampaignFactionRepositoryIT {
   }
 
   @Test
-  public void testAlliedFactions() {
+  void testAlliedFactions() {
     var campaignOwner = UUID.randomUUID();
     var factionOwner = UUID.randomUUID();
     var faction2Owner = UUID.randomUUID();
@@ -117,7 +117,7 @@ public class CampaignFactionRepositoryIT {
   }
 
   @Test
-  public void testAlliedFactionsWrongRole() {
+  void testAlliedFactionsWrongRole() {
     var someOtherOwner = UUID.randomUUID();
     var campaignOwner = UUID.randomUUID();
     var factionOwner = UUID.randomUUID();
@@ -133,7 +133,7 @@ public class CampaignFactionRepositoryIT {
   }
 
   @Test
-  public void testEnemyFactions() {
+  void testEnemyFactions() {
     var campaignOwner = UUID.randomUUID();
     var factionOwner = UUID.randomUUID();
     var faction2Owner = UUID.randomUUID();
@@ -148,7 +148,7 @@ public class CampaignFactionRepositoryIT {
   }
 
   @Test
-  public void testEnemyFactionsOtherFaction() {
+  void testEnemyFactionsOtherFaction() {
     var campaignOwner = UUID.randomUUID();
     var factionOwner = UUID.randomUUID();
     var faction2Owner = UUID.randomUUID();
@@ -163,7 +163,7 @@ public class CampaignFactionRepositoryIT {
   }
 
   @Test
-  public void testEnemyFactionsWrongRole() {
+  void testEnemyFactionsWrongRole() {
     var someOtherOwner = UUID.randomUUID();
     var campaignOwner = UUID.randomUUID();
     var factionOwner = UUID.randomUUID();
@@ -202,7 +202,7 @@ public class CampaignFactionRepositoryIT {
   }
 
   @Test
-  public void testMoveUnit() {
+  void testMoveUnit() {
     var newLocation = KUTAISI.location();
     UUID unitId = UUID.randomUUID();
     cleanCampaignFactionTable(jdbi);
@@ -216,7 +216,7 @@ public class CampaignFactionRepositoryIT {
   }
 
   @Test
-  public void testMoveUnitOutsideBase() {
+  void testMoveUnitOutsideBase() {
     var newLocation = ANAPA.location();
     UUID unitId = UUID.randomUUID();
     cleanCampaignFactionTable(jdbi);

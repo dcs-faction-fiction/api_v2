@@ -33,7 +33,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class CampaignFactionEndpointsTest {
+class CampaignFactionEndpointsTest {
 
   Context ctx;
   Javalin javalin;
@@ -42,7 +42,7 @@ public class CampaignFactionEndpointsTest {
   CampaignFactionService campFactionService;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     javalin = mock(Javalin.class);
     ctx = mock(Context.class);
     campService = mock(CampaignService.class);
@@ -53,7 +53,7 @@ public class CampaignFactionEndpointsTest {
   }
 
   @Test
-  public void testRegister() {
+  void testRegister() {
     endpoints.register(javalin);
 
     verify(javalin).get(eq("/v2/campaignfaction-api"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
@@ -68,14 +68,14 @@ public class CampaignFactionEndpointsTest {
   }
 
   @Test
-  public void testVersion() throws Exception {
+  void testVersion() throws Exception {
     endpoints.handle(ctx);
 
     verify(ctx).json(Map.of("version", "2"));
   }
 
   @Test
-  public void testAddCampaignFaction() throws IOException {
+  void testAddCampaignFaction() throws IOException {
     var cf = makeSampleCampaignFaction();
     var campaign = makeSampleCampaign();
     var payload = ImmutableCampaignCreatePayloadFactions.builder()
@@ -98,7 +98,7 @@ public class CampaignFactionEndpointsTest {
   }
 
   @Test
-  public void testGetSituation() throws IOException {
+  void testGetSituation() throws IOException {
     var cf = makeSampleCampaignFaction();
     var situation = mock(FactionSituation.class);
     given(ctx.pathParam("faction", String.class))
@@ -114,7 +114,7 @@ public class CampaignFactionEndpointsTest {
   }
 
   @Test
-  public void testGetOptions() throws IOException {
+  void testGetOptions() throws IOException {
     var cf = makeSampleCampaignFaction();
     var options = new GameOptionsLoader().loadDefaults();
     given(ctx.pathParam("faction", String.class))
@@ -130,7 +130,7 @@ public class CampaignFactionEndpointsTest {
   }
 
   @Test
-  public void testGetAvailableCampaigns() {
+  void testGetAvailableCampaigns() {
     given(ctx.pathParam("faction", String.class))
       .willReturn(Validator.create(String.class, "faction"));
     given(campFactionService.getAvailableCampaigns("faction"))
@@ -141,7 +141,7 @@ public class CampaignFactionEndpointsTest {
   }
 
   @Test
-  public void testGetAllFactions() {
+  void testGetAllFactions() {
     var situation = sampleSituation();
     given(ctx.pathParam("campaign", String.class))
       .willReturn(Validator.create(String.class, "campaign1"));
@@ -154,7 +154,7 @@ public class CampaignFactionEndpointsTest {
   }
 
   @Test
-  public void testGetAlliedFactions() {
+  void testGetAlliedFactions() {
     var situation = sampleSituation();
     given(ctx.pathParam("campaign", String.class))
       .willReturn(Validator.create(String.class, "campaign1"));
@@ -169,7 +169,7 @@ public class CampaignFactionEndpointsTest {
   }
 
   @Test
-  public void testEnemyLocations() {
+  void testEnemyLocations() {
     var location = mock(Location.class);
     given(ctx.pathParam("campaign", String.class))
       .willReturn(Validator.create(String.class, "campaign1"));
@@ -182,7 +182,7 @@ public class CampaignFactionEndpointsTest {
   }
 
   @Test
-  public void testMoveUnit() {
+  void testMoveUnit() {
     var uuid = UUID.randomUUID();
     var location = mock(Location.class);
     given(ctx.pathParam("campaign", String.class))

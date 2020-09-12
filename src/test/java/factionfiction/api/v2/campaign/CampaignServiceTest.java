@@ -18,7 +18,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class CampaignServiceTest {
+class CampaignServiceTest {
 
   UUID owner;
   CampaignRepository repository;
@@ -26,7 +26,7 @@ public class CampaignServiceTest {
   GameOptions defaultOptions;
 
   @BeforeEach
-  public void setup() throws IOException {
+  void setup() throws IOException {
     defaultOptions = new GameOptionsLoader().loadDefaults();
     owner = UUID.randomUUID();
     repository = mock(CampaignRepository.class);
@@ -34,21 +34,21 @@ public class CampaignServiceTest {
   }
 
   @Test
-  public void testListCampaignsEmpty() {
+  void testListCampaignsEmpty() {
     var list = service.listCampaigns(owner);
 
     assertThat(list, is(emptyList()));
   }
 
   @Test
-  public void testListCampaignsNull() {
+  void testListCampaignsNull() {
     assertThrows(NullPointerException.class, () -> {
       service.listCampaigns(null);
     });
   }
 
   @Test
-  public void testListCampaignsResults() throws IOException {
+  void testListCampaignsResults() throws IOException {
     var list = List.of(makeSampleCampaign());
     given(repository.listCampaigns(owner)).willReturn(list);
     var result = service.listCampaigns(owner);
@@ -57,7 +57,7 @@ public class CampaignServiceTest {
   }
 
   @Test
-  public void testFindCampaign() throws IOException {
+  void testFindCampaign() throws IOException {
     var campaign = makeSampleCampaign();
     given(repository.find(campaign.name())).willReturn(campaign);
     var result = service.find(campaign.name());
@@ -66,7 +66,7 @@ public class CampaignServiceTest {
   }
 
   @Test
-  public void testIsOwner() throws IOException {
+  void testIsOwner() throws IOException {
     var campaign = makeSampleCampaign();
     given(repository.isOwner(campaign.name(), owner)).willReturn(true);
     var isowner = service.isOwner(campaign.name(), owner);
@@ -76,7 +76,7 @@ public class CampaignServiceTest {
   }
 
   @Test
-  public void testCreateCampaign() {
+  void testCreateCampaign() {
     var name = "Campaign";
     GameOptions options = ImmutableGameOptions.copyOf(defaultOptions);
     given(repository.newCampaign(name, owner, options))
@@ -93,20 +93,20 @@ public class CampaignServiceTest {
   }
 
   @Test
-  public void testPassServerInfo() {
+  void testPassServerInfo() {
     service.getServerInfo("camp");
     verify(repository).getInfoFromCampaign("camp");
   }
 
   @Test
-  public void testPassStartMission() {
+  void testPassStartMission() {
     var conf = mock(MissionConfiguration.class);
     service.startMission("camp", "serv", conf);
     verify(repository).startMission("camp", "serv", conf);
   }
 
   @Test
-  public void testPassUserCanManageServer() {
+  void testPassUserCanManageServer() {
     var user = UUID.randomUUID();
     service.userCanManageServer(user, "serv");
     verify(repository).userCanManageServer(user, "serv");

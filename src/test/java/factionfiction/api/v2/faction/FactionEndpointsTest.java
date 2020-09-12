@@ -18,7 +18,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class FactionEndpointsTest {
+class FactionEndpointsTest {
 
   UUID user;
   Context ctx;
@@ -27,7 +27,7 @@ public class FactionEndpointsTest {
   FactionEndpoints endpoints;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     user = UUID.randomUUID();
     ctx = mock(Context.class);
     javalin = mock(Javalin.class);
@@ -36,7 +36,7 @@ public class FactionEndpointsTest {
   }
 
   @Test
-  public void testRegister() {
+  void testRegister() {
     endpoints.register(javalin);
 
     verify(javalin).get(eq("/v2/faction-api"), any(), eq(roles(FACTION_MANAGER)));
@@ -45,14 +45,14 @@ public class FactionEndpointsTest {
   }
 
   @Test
-  public void testVersion() throws Exception {
+  void testVersion() throws Exception {
     endpoints.handle(ctx);
 
     verify(ctx).json(Map.of("version", "2"));
   }
 
   @Test
-  public void testNewFaction() {
+  void testNewFaction() {
     var faction = makeSampleFaction();
     mockUserWIthFactionRole();
     given(ctx.bodyAsClass(String.class)).willReturn(faction.name());
@@ -64,7 +64,7 @@ public class FactionEndpointsTest {
   }
 
   @Test
-  public void testGetFactions() {
+  void testGetFactions() {
     var faction = makeSampleFaction();
     var factions = List.of(faction);
     mockUserWIthFactionRole();

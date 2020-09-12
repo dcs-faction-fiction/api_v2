@@ -13,6 +13,9 @@ game:
     decrease:
       amount: 50000
       gain: 1
+    reco-shot:
+      edge-size: 10000
+      cost: 0.5
   units:
     - code: "AWACS"
       cost: 3

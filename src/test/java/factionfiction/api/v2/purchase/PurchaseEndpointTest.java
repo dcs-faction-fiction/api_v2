@@ -1,6 +1,7 @@
 package factionfiction.api.v2.purchase;
 
 import base.game.FactionUnit;
+import base.game.Location;
 import base.game.warehouse.WarehouseItemCode;
 import static base.game.warehouse.WarehouseItemCode.JF_17;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
@@ -20,7 +21,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class PurchaseEndpointTest {
+class PurchaseEndpointTest {
 
   static final String FACTION_NAME = "Faction";
   static final String CAMPAIGN_NAME = "Campaign";
@@ -33,7 +34,7 @@ public class PurchaseEndpointTest {
   PurchaseEndpoints endpoint;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     javalin = mock(Javalin.class);
     ctx = mock(Context.class);
     service = mock(PurchaseService.class);
@@ -41,24 +42,25 @@ public class PurchaseEndpointTest {
   }
 
   @Test
-  public void testRegister() {
+  void testRegister() {
     endpoint.register(javalin);
 
     verify(javalin).get(eq("/v2/purchase-api"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
     verify(javalin).post(eq("/v2/purchase-api/campaigns/:campaign/factions/:faction/give-credits"), any(), eq(roles(CAMPAIGN_MANAGER)));
-    javalin.post(eq("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-unit"), any(), eq(roles(FACTION_MANAGER)));
-    javalin.post(eq("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-warehouse-item"), any(), eq(roles(FACTION_MANAGER)));
+    verify(javalin).post(eq("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-unit"), any(), eq(roles(FACTION_MANAGER)));
+    verify(javalin).post(eq("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-warehouse-item"), any(), eq(roles(FACTION_MANAGER)));
+    verify(javalin).post(eq("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-recoshot"), any(), eq(roles(FACTION_MANAGER)));
   }
 
   @Test
-  public void testVersion() throws Exception {
+  void testVersion() throws Exception {
     endpoint.handle(ctx);
 
     verify(ctx).json(Map.of("version", "2"));
   }
 
   @Test
-  public void testGiveCredits() throws Exception {
+  void testGiveCredits() throws Exception {
     var credits = new BigDecimal(0.2);
     given(ctx.pathParam(CAMPAIGN_PATHPARAM, String.class))
       .willReturn(Validator.create(String.class, CAMPAIGN_NAME));
@@ -72,7 +74,7 @@ public class PurchaseEndpointTest {
   }
 
   @Test
-  public void testBuyUnit() throws Exception {
+  void testBuyUnit() throws Exception {
     var unit = makeSampleFactionUnit();
     given(ctx.pathParam(CAMPAIGN_PATHPARAM, String.class))
       .willReturn(Validator.create(String.class, CAMPAIGN_NAME));
@@ -86,7 +88,7 @@ public class PurchaseEndpointTest {
   }
 
   @Test
-  public void testBuyWarehouseItem() throws Exception {
+  void testBuyWarehouseItem() throws Exception {
     var code = JF_17;
     given(ctx.pathParam(CAMPAIGN_PATHPARAM, String.class))
       .willReturn(Validator.create(String.class, CAMPAIGN_NAME));
@@ -100,7 +102,7 @@ public class PurchaseEndpointTest {
   }
 
   @Test
-  public void testZoneIncrease() throws Exception {
+  void testZoneIncrease() throws Exception {
     given(ctx.pathParam(CAMPAIGN_PATHPARAM, String.class))
       .willReturn(Validator.create(String.class, CAMPAIGN_NAME));
     given(ctx.pathParam(FACTION_PATHPARAM, String.class))
@@ -111,7 +113,7 @@ public class PurchaseEndpointTest {
   }
 
   @Test
-  public void testZoneDecrease() throws Exception {
+  void testZoneDecrease() throws Exception {
     given(ctx.pathParam(CAMPAIGN_PATHPARAM, String.class))
       .willReturn(Validator.create(String.class, CAMPAIGN_NAME));
     given(ctx.pathParam(FACTION_PATHPARAM, String.class))
@@ -119,5 +121,19 @@ public class PurchaseEndpointTest {
     endpoint.zoneDecrease(ctx);
 
     verify(service).zoneDecrease(CAMPAIGN_NAME, FACTION_NAME);
+  }
+
+  @Test
+  void testBuyShot() {
+    given(ctx.pathParam(CAMPAIGN_PATHPARAM, String.class))
+      .willReturn(Validator.create(String.class, CAMPAIGN_NAME));
+    given(ctx.pathParam(FACTION_PATHPARAM, String.class))
+      .willReturn(Validator.create(String.class, FACTION_NAME));
+    given(ctx.bodyAsClass(Location.class))
+      .willReturn(Location.of("1", "2"));
+
+    endpoint.buyRecoShot(ctx);
+
+    verify(service).buyRecoShot(CAMPAIGN_NAME, FACTION_NAME, Location.of("1", "2"));
   }
 }

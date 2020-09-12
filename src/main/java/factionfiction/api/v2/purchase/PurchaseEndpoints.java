@@ -1,6 +1,7 @@
 package factionfiction.api.v2.purchase;
 
 import base.game.FactionUnit;
+import base.game.Location;
 import base.game.warehouse.WarehouseItemCode;
 import com.github.apilab.rest.Endpoint;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
@@ -31,7 +32,7 @@ public class PurchaseEndpoints implements Endpoint {
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-unit", this::buyUnit, roles(FACTION_MANAGER));
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-warehouse-item", this::buyWarehouseItem, roles(FACTION_MANAGER));
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/zone-increase", this::zoneIncrease, roles(FACTION_MANAGER));
-    javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/zone-decrease", this::zoneDecrease, roles(FACTION_MANAGER));
+    javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-recoshot", this::buyRecoShot, roles(FACTION_MANAGER));
   }
 
   @OpenApi(ignore = true)
@@ -80,6 +81,15 @@ public class PurchaseEndpoints implements Endpoint {
     var faction = ctx.pathParam(FACTION_PATHPARAM, String.class).get();
 
     serviceProvider.apply(ctx).zoneDecrease(campaign, faction);
+    ctx.json("{}");
+  }
+
+  void buyRecoShot(Context ctx) {
+    var campaign = ctx.pathParam(CAMPAIGN_PATHPARAM, String.class).get();
+    var faction = ctx.pathParam(FACTION_PATHPARAM, String.class).get();
+    var location = ctx.bodyAsClass(Location.class);
+
+    serviceProvider.apply(ctx).buyRecoShot(campaign, faction, location);
     ctx.json("{}");
   }
 }

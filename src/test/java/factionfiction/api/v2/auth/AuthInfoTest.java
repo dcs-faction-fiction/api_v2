@@ -12,10 +12,10 @@ import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 
-public class AuthInfoTest {
+class AuthInfoTest {
 
   @Test
-  public void testFromContextFactionManager() {
+  void testFromContextFactionManager() {
     var uuid = UUID.randomUUID();
     Context ctx = mock(Context.class);
     mockUser(ctx, uuid, Set.of(FACTION_MANAGER));
@@ -27,7 +27,7 @@ public class AuthInfoTest {
   }
 
   @Test
-  public void testFromContextCampaignManager() {
+  void testFromContextCampaignManager() {
     var uuid = UUID.randomUUID();
     Context ctx = mock(Context.class);
     mockUser(ctx, uuid, Set.of(CAMPAIGN_MANAGER));
@@ -39,7 +39,7 @@ public class AuthInfoTest {
   }
 
   @Test
-  public void testFromContextAdmin() {
+  void testFromContextAdmin() {
     var uuid = UUID.randomUUID();
     Context ctx = mock(Context.class);
     mockUser(ctx, uuid, Set.of(ADMIN));

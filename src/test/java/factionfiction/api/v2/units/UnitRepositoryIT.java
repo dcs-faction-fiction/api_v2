@@ -12,7 +12,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class UnitRepositoryIT {
+class UnitRepositoryIT {
 
   UUID id;
   UUID owner;
@@ -20,7 +20,7 @@ public class UnitRepositoryIT {
   UnitRepository repository;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     jdbi = InMemoryDB.jdbi();
     id = UUID.randomUUID();
     owner = UUID.randomUUID();
@@ -28,7 +28,7 @@ public class UnitRepositoryIT {
   }
 
   @Test
-  public void testListUnits() {
+  void testListUnits() {
     cleanUnitTable(jdbi);
 
     insertSampleFactionUnit(jdbi, id, owner);

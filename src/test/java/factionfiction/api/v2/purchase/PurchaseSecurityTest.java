@@ -1,6 +1,7 @@
 package factionfiction.api.v2.purchase;
 
 import base.game.FactionUnit;
+import base.game.Location;
 import static base.game.warehouse.WarehouseItemCode.JF_17;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import factionfiction.api.v2.auth.AuthInfo;
@@ -21,7 +22,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class PurchaseSecurityTest {
+class PurchaseSecurityTest {
 
   UUID owner;
   CampaignFaction cf;
@@ -35,7 +36,7 @@ public class PurchaseSecurityTest {
   PurchaseSecurity security;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     owner = UUID.randomUUID();
     cf = makeSampleCampaignFaction();
     unit = makeSampleFactionUnit();
@@ -49,7 +50,7 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testGiveCredits() {
+  void testGiveCredits() {
     mockCorrectCampaignSecurity();
     given(impl.giveCredits(campaignName, factionName, ONE))
       .willReturn(ZERO);
@@ -61,7 +62,7 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testBuyUnit() {
+  void testBuyUnit() {
     mockCorrectFactionSecurity();
     given(impl.buyUnit(campaignName, factionName, unit))
       .willReturn(unit);
@@ -73,7 +74,7 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testBuyWarehouseItem() {
+  void testBuyWarehouseItem() {
     mockCorrectFactionSecurity();
 
     security.buyWarehouseItem(campaignName, factionName, JF_17);
@@ -82,7 +83,7 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testIncreaseZone() {
+  void testIncreaseZone() {
     mockCorrectFactionSecurity();
 
     security.zoneIncrease(campaignName, factionName);
@@ -91,7 +92,7 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testDecreaseZone() {
+  void testDecreaseZone() {
     mockCorrectFactionSecurity();
 
     security.zoneDecrease(campaignName, factionName);
@@ -100,7 +101,16 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testGiveCreditsNoManager() {
+  void testBuyRecoShot() {
+    mockCorrectFactionSecurity();
+
+    security.buyRecoShot(campaignName, factionName, Location.of("1", "2"));
+
+    verify(impl).buyRecoShot(campaignName, factionName, Location.of("1", "2"));
+  }
+
+  @Test
+  void testGiveCreditsNoManager() {
     mockNoCampaignManager();
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -109,7 +119,7 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testBuyUnitNoManager() {
+  void testBuyUnitNoManager() {
     mockNoFactionManager();
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -118,7 +128,7 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testBuyWarehouseItemNoManager() {
+  void testBuyWarehouseItemNoManager() {
     mockNoFactionManager();
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -127,7 +137,7 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testIncreaseZoneItemNoManager() {
+  void testIncreaseZoneItemNoManager() {
     mockNoFactionManager();
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -136,7 +146,7 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testDecreaseZoneItemNoManager() {
+  void testDecreaseZoneItemNoManager() {
     mockNoFactionManager();
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -145,7 +155,17 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testGiveCreditsNoOwner() {
+  void testBuyRecoShotNoManager() {
+    mockNoFactionManager();
+    var loc = Location.of("1", "2");
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.buyRecoShot(campaignName, factionName, loc);
+    });
+  }
+
+  @Test
+  void testGiveCreditsNoOwner() {
     mockNoCampaignOwner();
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -154,7 +174,7 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testBuyUnitNoOwner() {
+  void testBuyUnitNoOwner() {
     mockNoFactionOwner();
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -163,7 +183,7 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testBuyWarehouseItemNoOwner() {
+  void testBuyWarehouseItemNoOwner() {
     mockNoFactionOwner();
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -172,7 +192,7 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testIncreaseZoneNoOwner() {
+  void testIncreaseZoneNoOwner() {
     mockNoFactionOwner();
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -181,11 +201,20 @@ public class PurchaseSecurityTest {
   }
 
   @Test
-  public void testDecreaseZoneItemNoOwner() {
+  void testDecreaseZoneItemNoOwner() {
     mockNoFactionOwner();
 
     assertThrows(NotAuthorizedException.class, () -> {
       security.zoneDecrease(campaignName, factionName);
+    });
+  }
+  @Test
+  void testBuyRecoShotNoOwner() {
+    mockNoFactionOwner();
+    var loc = Location.of("1", "2");
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.buyRecoShot(campaignName, factionName, loc);
     });
   }
 

@@ -27,7 +27,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class CampaignRepositoryIT {
+class CampaignRepositoryIT {
 
   UUID owner;
   Jdbi jdbi;
@@ -36,7 +36,7 @@ public class CampaignRepositoryIT {
   GameOptions defaultOptions;
 
   @BeforeEach
-  public void setup() throws IOException {
+  void setup() throws IOException {
     owner = UUID.randomUUID();
     jdbi = InMemoryDB.jdbi();
     gson = new GSONModule().gson();
@@ -45,7 +45,7 @@ public class CampaignRepositoryIT {
   }
 
   @Test
-  public void testCampaignListZero() {
+  void testCampaignListZero() {
     cleanCampaignTable(jdbi);
 
     var campaigns = repository.listCampaigns(owner);
@@ -54,7 +54,7 @@ public class CampaignRepositoryIT {
   }
 
   @Test
-  public void testCampaignListOne() throws IOException {
+  void testCampaignListOne() throws IOException {
     cleanCampaignTable(jdbi);
 
     insertSampleCampaign(jdbi, owner);
@@ -65,7 +65,7 @@ public class CampaignRepositoryIT {
   }
 
   @Test
-  public void testNewCampaign() throws IOException {
+  void testNewCampaign() throws IOException {
     cleanCampaignTable(jdbi);
     var campaignToCreate = makeSampleCampaign();
 
@@ -77,7 +77,7 @@ public class CampaignRepositoryIT {
   }
 
   @Test
-  public void testIsOwner() throws IOException {
+  void testIsOwner() throws IOException {
     cleanCampaignTable(jdbi);
     insertSampleCampaign(jdbi, owner);
     var sample = makeSampleCampaign();
@@ -88,7 +88,7 @@ public class CampaignRepositoryIT {
   }
 
   @Test
-  public void testIsNotOwner() throws IOException {
+  void testIsNotOwner() throws IOException {
     cleanCampaignTable(jdbi);
     insertSampleCampaign(jdbi, owner);
     var sample = makeSampleCampaign();
@@ -99,7 +99,7 @@ public class CampaignRepositoryIT {
   }
 
   @Test
-  public void testGetAvailableCampaignsForFaction() throws IOException {
+  void testGetAvailableCampaignsForFaction() throws IOException {
     cleanCampaignFactionTable(jdbi);
     insertSampleCampaignFaction(jdbi, UUID.randomUUID(), owner);
 
@@ -109,7 +109,7 @@ public class CampaignRepositoryIT {
   }
 
   @Test
-  public void testCanManageServer() {
+  void testCanManageServer() {
     var uuid = UUID.randomUUID();
     cleanUserServerTable(jdbi);
 
@@ -124,7 +124,7 @@ public class CampaignRepositoryIT {
   }
 
   @Test
-  public void testGetServerInfo() {
+  void testGetServerInfo() {
     cleanServerTable(jdbi);
     insertSampleServer(jdbi, "campaign");
 
@@ -138,7 +138,7 @@ public class CampaignRepositoryIT {
   }
 
   @Test
-  public void testStartMissionNoServerExisting() {
+  void testStartMissionNoServerExisting() {
     var conf = makeMissionConfiguration();
 
     cleanServerTable(jdbi);
@@ -157,7 +157,7 @@ public class CampaignRepositoryIT {
   }
 
   @Test
-  public void testStartMissionServerExisting() {
+  void testStartMissionServerExisting() {
     var conf = makeMissionConfiguration();
     cleanServerTable(jdbi);
     cleanAndInsertMissionData(jdbi);

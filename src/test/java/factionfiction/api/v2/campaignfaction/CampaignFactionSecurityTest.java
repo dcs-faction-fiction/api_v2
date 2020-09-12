@@ -26,7 +26,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class CampaignFactionSecurityTest {
+class CampaignFactionSecurityTest {
 
   CampaignFaction sample;
   UUID owner;
@@ -37,7 +37,7 @@ public class CampaignFactionSecurityTest {
   FactionRepository factionRepository;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     owner = UUID.randomUUID();
     sample = makeSampleCampaignFaction();
     authInfo = mock(AuthInfo.class);
@@ -48,7 +48,7 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testCreateCampaignFaction() {
+  void testCreateCampaignFaction() {
     given(authInfo.isCampaignManager()).willReturn(true);
     given(authInfo.getUserUUID()).willReturn(owner);
     given(campaignRepository.isOwner(sample.campaignName(), owner)).willReturn(true);
@@ -60,7 +60,7 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testCreateCampaignFactionNotOwned() {
+  void testCreateCampaignFactionNotOwned() {
     given(authInfo.isCampaignManager()).willReturn(true);
     given(authInfo.getUserUUID()).willReturn(owner);
     given(campaignRepository.isOwner(sample.campaignName(), owner)).willReturn(false);
@@ -72,7 +72,7 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testCannotCreateCampaignFactionWithoutPermission() {
+  void testCannotCreateCampaignFactionWithoutPermission() {
     given(authInfo.isCampaignManager()).willReturn(false);
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -81,7 +81,7 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testCannotCreateCampaignFactionWithoutOwner() {
+  void testCannotCreateCampaignFactionWithoutOwner() {
     given(authInfo.isCampaignManager()).willReturn(true);
     given(authInfo.getUserUUID()).willReturn(owner);
     given(campaignRepository.isOwner(sample.campaignName(), owner)).willReturn(false);
@@ -92,19 +92,21 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testCanGetSituationCampaignCasesNone() {
+  void testCanGetSituationCampaignCasesNone() {
     var situation = makeSituation();
     mockNoFactionManager();
     mockNoCamapignManager();
     mockOwnerAndResponse(situation);
+    var campaign = sample.campaignName();
+    var faction = sample.factionName();
 
     assertThrows(NotAuthorizedException.class, () -> {
-      security.getSituation(sample.campaignName(), sample.factionName());
+      security.getSituation(campaign, faction);
     });
   }
 
   @Test
-  public void testCanGetSituationCampaignCasesCampaign() {
+  void testCanGetSituationCampaignCasesCampaign() {
     var situation = makeSituation();
     mockNoFactionManager();
     mockCampaignManagerAndCampaignOwner();
@@ -116,7 +118,7 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testCanGetSituationCampaignCasesFaction() {
+  void testCanGetSituationCampaignCasesFaction() {
     var situation = makeSituation();
     mockFactionManagerAndFactionOwner();
     mockNoCamapignManager();
@@ -128,31 +130,35 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testCanGetSituationCampaignCasesCampaignNoOwner() {
+  void testCanGetSituationCampaignCasesCampaignNoOwner() {
     var situation = makeSituation();
     mockNoFactionManager();
     mockCampaignManagerAndNoCampaignOwner();
     mockOwnerAndResponse(situation);
+    var campaign = sample.campaignName();
+    var faction = sample.factionName();
 
     assertThrows(NotAuthorizedException.class, () -> {
-      security.getSituation(sample.campaignName(), sample.factionName());
+      security.getSituation(campaign, faction);
     });
   }
 
   @Test
-  public void testCanGetSituationCampaignCasesFactionNoOwner() {
+  void testCanGetSituationCampaignCasesFactionNoOwner() {
     var situation = makeSituation();
     mockFactionManagerAndNoFactionOwner();
     mockNoCamapignManager();
     mockOwnerAndResponse(situation);
+    var campaign = sample.campaignName();
+    var faction = sample.factionName();
 
     assertThrows(NotAuthorizedException.class, () -> {
-      security.getSituation(sample.campaignName(), sample.factionName());
+      security.getSituation(campaign, faction);
     });
   }
 
   @Test
-  public void testCanGetGameOptions() throws IOException {
+  void testCanGetGameOptions() throws IOException {
     var options = makeSampleOptions();
     mockGameOptions(options);
     mockFactionManagerAndFactionOwner();
@@ -164,19 +170,21 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testCannotGetGameOptions() throws IOException {
+  void testCannotGetGameOptions() throws IOException {
     var options = makeSampleOptions();
     mockGameOptions(options);
     mockNoFactionManager();
     mockNoCamapignManager();
+    var campaign = sample.campaignName();
+    var faction = sample.factionName();
 
     assertThrows(NotAuthorizedException.class, () -> {
-      security.getGameOptions(sample.campaignName(), sample.factionName());
+      security.getGameOptions(campaign, faction);
     });
   }
 
   @Test
-  public void testGetAvailableCampaigns() {
+  void testGetAvailableCampaigns() {
     given(campaignRepository.getAvailableCampaignsForFaction("faction"))
       .willReturn(List.of("campaign"));
 
@@ -186,7 +194,7 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testGetAllFactions() {
+  void testGetAllFactions() {
     var expected = List.of(mock(FactionSituation.class));
     mockCampaignManagerAndCampaignOwner();
     given(impl.getAllFactions("campaign", owner))
@@ -198,7 +206,7 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testGetAllFactionsNoCampaignManager() {
+  void testGetAllFactionsNoCampaignManager() {
     mockNoCamapignManager();
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -207,7 +215,7 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testGetAlliedFactions() {
+  void testGetAlliedFactions() {
     var expected = List.of(mock(FactionSituation.class));
     mockFactionManagerAndFactionOwner();
     given(impl.getAlliedFactions("campaign", owner))
@@ -219,7 +227,7 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testGetAlliedFactionsNoFactionManager() {
+  void testGetAlliedFactionsNoFactionManager() {
     mockNoFactionManager();
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -228,7 +236,7 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testGetEnemyFactions() {
+  void testGetEnemyFactions() {
     var expected = List.of(mock(Location.class));
     mockFactionManagerAndFactionOwner();
     given(impl.getEnemyFactionLocations("campaign", owner))
@@ -240,7 +248,7 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testGetEnemyFactionsNoFactionManager() {
+  void testGetEnemyFactionsNoFactionManager() {
     mockNoFactionManager();
 
     assertThrows(NotAuthorizedException.class, () -> {
@@ -249,7 +257,7 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testMoveUnit() {
+  void testMoveUnit() {
     var unitId = UUID.randomUUID();
     var newLocation = mock(Location.class);
     mockFactionManagerAndFactionOwner();
@@ -260,20 +268,28 @@ public class CampaignFactionSecurityTest {
   }
 
   @Test
-  public void testMoveUnitNoFactionManager() {
+  void testMoveUnitNoFactionManager() {
     mockNoFactionManager();
+    var campaign = sample.campaignName();
+    var faction = sample.factionName();
+    var id = UUID.randomUUID();
+    var loc = ANAPA.location();
 
     assertThrows(NotAuthorizedException.class, () -> {
-      security.moveUnit(sample.campaignName(), sample.factionName(), UUID.randomUUID(), ANAPA.location());
+      security.moveUnit(campaign, faction, id, loc);
     });
   }
 
   @Test
-  public void testMoveUnitNoFactionOwner() {
+  void testMoveUnitNoFactionOwner() {
     mockFactionManagerAndNoFactionOwner();
+    var campaign = sample.campaignName();
+    var faction = sample.factionName();
+    var id = UUID.randomUUID();
+    var loc = ANAPA.location();
 
     assertThrows(NotAuthorizedException.class, () -> {
-      security.moveUnit(sample.campaignName(), sample.factionName(), UUID.randomUUID(), ANAPA.location());
+      security.moveUnit(campaign, faction, id, loc);
     });;
   }
 

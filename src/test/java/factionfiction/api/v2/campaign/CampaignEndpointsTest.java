@@ -23,7 +23,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class CampaignEndpointsTest {
+class CampaignEndpointsTest {
 
   Context ctx;
   Javalin javalin;
@@ -32,7 +32,7 @@ public class CampaignEndpointsTest {
   CampaignEndpoints endpoint;
 
   @BeforeEach
-  public void setup() throws IOException {
+  void setup() throws IOException {
     ctx = mock(Context.class);
     javalin = mock(Javalin.class);
     campaignService = mock(CampaignService.class);
@@ -43,7 +43,7 @@ public class CampaignEndpointsTest {
   }
 
   @Test
-  public void testRegister() {
+  void testRegister() {
     endpoint.register(javalin);
 
     verify(javalin).get(eq("/v2/campaign-api"), any(), eq(roles(CAMPAIGN_MANAGER)));
@@ -52,14 +52,14 @@ public class CampaignEndpointsTest {
   }
 
   @Test
-  public void testVersion() throws Exception {
+  void testVersion() throws Exception {
     endpoint.handle(ctx);
 
     verify(ctx).json(Map.of("version", "2"));
   }
 
   @Test
-  public void testNewCampaign() throws IOException {
+  void testNewCampaign() throws IOException {
     var campaign = makeSampleCampaign();
     var factionPayload = ImmutableCampaignCreatePayloadFactions.builder()
         .faction("Faction")
@@ -80,7 +80,7 @@ public class CampaignEndpointsTest {
   }
 
   @Test
-  public void testGetCampaigns() throws IOException {
+  void testGetCampaigns() throws IOException {
     var campaign = makeSampleCampaign();
     var campaigns = List.of(campaign);
     given(campaignService.listCampaigns()).willReturn(campaigns);
@@ -91,7 +91,7 @@ public class CampaignEndpointsTest {
   }
 
   @Test
-  public void testGetServerInfo() {
+  void testGetServerInfo() {
     var response = mock(ServerInfo.class);
     given(ctx.pathParam("campaign", String.class))
       .willReturn(Validator.create(String.class, "camp"));
@@ -104,7 +104,7 @@ public class CampaignEndpointsTest {
   }
 
   @Test
-  public void testStartServer() {
+  void testStartServer() {
     var conf = mock(MissionConfiguration.class);
     given(ctx.pathParam("campaign", String.class))
       .willReturn(Validator.create(String.class, "camp"));

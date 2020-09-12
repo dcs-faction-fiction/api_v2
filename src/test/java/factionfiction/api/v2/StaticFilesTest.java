@@ -19,19 +19,19 @@ import static org.mockito.Mockito.verify;
  *
  * @author Raffaele Ragni
  */
-public class StaticFilesTest {
+class StaticFilesTest {
   Javalin javalin;
   StaticFiles files;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     javalin = mock(Javalin.class);
     javalin.config = mock(JavalinConfig.class);
     files = new StaticFiles(javalin);
   }
 
   @Test
-  public void testVarIsOn() {
+  void testVarIsOn() {
     System.setProperty("API_STATIC_FOLDER", ".");
 
     files.start();
@@ -40,7 +40,7 @@ public class StaticFilesTest {
   }
 
   @Test
-  public void testVarIsOff() {
+  void testVarIsOff() {
     System.setProperty("API_STATIC_FOLDER", "");
 
     files.start();

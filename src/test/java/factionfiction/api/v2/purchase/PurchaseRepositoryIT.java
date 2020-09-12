@@ -1,6 +1,7 @@
 package factionfiction.api.v2.purchase;
 
 import base.game.ImmutableFactionUnit;
+import base.game.Location;
 import static base.game.warehouse.WarehouseItemCode.JF_17;
 import factionfiction.api.v2.campaignfaction.CampaignFaction;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.cleanCampaignFactionTable;
@@ -9,6 +10,9 @@ import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSa
 import factionfiction.api.v2.campaignfaction.CampaignFactionRepository;
 import factionfiction.api.v2.game.GameOptionsLoader;
 import factionfiction.api.v2.test.InMemoryDB;
+import static factionfiction.api.v2.units.UnitHelper.cleanRecoShots;
+import static factionfiction.api.v2.units.UnitHelper.cleanUnitTable;
+import static factionfiction.api.v2.units.UnitHelper.insertSampleFactionUnit;
 import static factionfiction.api.v2.units.UnitHelper.makeSampleFactionUnit;
 import factionfiction.api.v2.units.UnitRepository;
 import java.io.IOException;
@@ -22,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class PurchaseRepositoryIT {
+class PurchaseRepositoryIT {
 
   UUID owner;
   Jdbi jdbi;
@@ -32,7 +36,7 @@ public class PurchaseRepositoryIT {
   CampaignFactionRepository campaignFactionRepository;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     owner = UUID.randomUUID();
     jdbi = InMemoryDB.jdbi();
     sample = makeSampleCampaignFaction();
@@ -42,7 +46,7 @@ public class PurchaseRepositoryIT {
   }
 
   @Test
-  public void testGiveCredits() {
+  void testGiveCredits() {
     cleanCampaignFactionTable(jdbi);
     insertSampleCampaignFaction(jdbi, UUID.randomUUID(), owner);
 
@@ -55,7 +59,7 @@ public class PurchaseRepositoryIT {
   }
 
   @Test
-  public void testGetCredits() {
+  void testGetCredits() {
     cleanCampaignFactionTable(jdbi);
     insertSampleCampaignFaction(jdbi, UUID.randomUUID(), owner);
 
@@ -67,7 +71,7 @@ public class PurchaseRepositoryIT {
   }
 
   @Test
-  public void testBuyUnit() {
+  void testBuyUnit() {
     cleanCampaignFactionTable(jdbi);
     insertSampleCampaignFaction(jdbi, UUID.randomUUID(), owner);
     var unit = makeSampleFactionUnit();
@@ -92,7 +96,7 @@ public class PurchaseRepositoryIT {
   }
 
   @Test
-  public void testBuyItem() {
+  void testBuyItem() {
     cleanCampaignFactionTable(jdbi);
     insertSampleCampaignFaction(jdbi, UUID.randomUUID(), owner);
 
@@ -110,15 +114,17 @@ public class PurchaseRepositoryIT {
   }
 
   @Test
-  public void testIncreaseDecreaseZone() throws IOException {
+  void testIncreaseDecreaseZone() throws IOException {
     cleanCampaignFactionTable(jdbi);
     insertSampleCampaignFaction(jdbi, UUID.randomUUID(), owner);
-
+    var campaign = sample.campaignName();
+    var faction = sample.factionName();
+    var options = new GameOptionsLoader().loadDefaults();
     assertThrows(ZoneAtMinumum.class, () -> {
       repository.zoneDecrease(
-        sample.campaignName(),
-        sample.factionName(),
-        new GameOptionsLoader().loadDefaults());
+        campaign,
+        faction,
+        options);
     });
 
     repository.zoneIncrease(
@@ -147,10 +153,45 @@ public class PurchaseRepositoryIT {
 
     assertThrows(NotEnoughCreditsException.class, () -> {
       repository.zoneIncrease(
-      sample.campaignName(),
-      sample.factionName(),
-         new GameOptionsLoader().loadDefaults());
+        campaign,
+        faction,
+        options);
     });
+  }
+
+  @Test
+  void testBuyRecoShot() throws IOException {
+    cleanCampaignFactionTable(jdbi);
+    cleanUnitTable(jdbi);
+    cleanRecoShots(jdbi);
+
+    var cfId = UUID.randomUUID();
+    insertSampleCampaignFaction(jdbi, cfId, owner);
+    insertSampleFactionUnit(jdbi, UUID.randomUUID(), cfId);
+
+    var location = Location.of("1", "2");
+    var options = new GameOptionsLoader().loadDefaults();
+
+    repository.buyRecoShot(sample.campaignName(), sample.factionName(), location, options);
+
+    var credits = repository.getCredits(
+      sample.campaignName(),
+      sample.factionName());
+
+    assertThat(credits.compareTo(sample.credits()), is(-1));
+
+    jdbi.useHandle(h -> {
+      var id = h.select("select id from recoshot where campaign_faction_id = ?", cfId)
+        .mapTo(UUID.class)
+        .findOne()
+        .get();
+      var type = h.select("select type from recoshot_item where recoshot_id = ?", id)
+        .mapTo(String.class)
+        .findOne()
+        .get();
+      assertThat(type, is("T_80"));
+    });
+
   }
 
 }

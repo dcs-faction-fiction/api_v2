@@ -8,16 +8,14 @@ import base.game.CampaignMap;
 import static base.game.CampaignMap.CAUCASUS;
 import base.game.FactionUnit;
 import base.game.FullMissionBuilder;
-import base.game.ImmutableFactionUnit;
-import base.game.ImmutableLocation;
 import base.game.units.MissionConfiguration;
-import base.game.units.Unit;
 import base.game.warehouse.WarehouseItemCode;
 import com.github.apilab.rest.exceptions.NotFoundException;
 import com.google.gson.Gson;
 import static factionfiction.api.v2.daemon.ServerAction.START_NEW_MISSION;
 import factionfiction.api.v2.daemon.ServerInfo;
 import factionfiction.api.v2.game.GameOptions;
+import static factionfiction.api.v2.mappers.RowMappers.factionUnitMapper;
 import java.io.ByteArrayOutputStream;
 import static java.lang.Boolean.TRUE;
 import java.math.BigDecimal;
@@ -195,18 +193,7 @@ public class CampaignRepository {
         + "where cf.campaign_name = ? and cf.is_blue = ?"
         + "limit 10000", // 10k units per coalition max
         campaignName, coa == BLUE)
-        .map((rs, st) ->
-          (FactionUnit) ImmutableFactionUnit
-            .builder()
-            .id(UUID.fromString(rs.getString(1)))
-            .type(Unit.valueOf(rs.getString(2)))
-            .location(ImmutableLocation.builder()
-              .longitude(new BigDecimal(rs.getString(3)))
-              .latitude(new BigDecimal(rs.getString(4)))
-              .altitude(new BigDecimal(rs.getString(5)))
-              .angle(new BigDecimal(rs.getString(6)))
-              .build())
-            .build())
+        .map(factionUnitMapper())
         .list()
     );
   }

@@ -20,7 +20,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class DaemonEndpointTest {
+class DaemonEndpointTest {
 
   UUID user;
   Context ctx;
@@ -29,7 +29,7 @@ public class DaemonEndpointTest {
   DaemonEndpoints endpoints;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     user = UUID.randomUUID();
     ctx = mock(Context.class);
     javalin = mock(Javalin.class);
@@ -38,7 +38,7 @@ public class DaemonEndpointTest {
   }
 
   @Test
-  public void testRegister() {
+  void testRegister() {
     endpoints.register(javalin);
 
     verify(javalin).get(eq("/v2/daemon-api"), any(), eq(roles(DAEMON)));
@@ -51,14 +51,14 @@ public class DaemonEndpointTest {
   }
 
   @Test
-  public void testVersion() throws Exception {
+  void testVersion() throws Exception {
     endpoints.handle(ctx);
 
     verify(ctx).json(Map.of("version", "2"));
   }
 
   @Test
-  public void testWarehouses() {
+  void testWarehouses() {
     var request = sampleWarehouseSpent();
     given(ctx.pathParam("server", String.class))
       .willReturn(Validator.create(String.class, "server1"));
@@ -71,7 +71,7 @@ public class DaemonEndpointTest {
   }
 
   @Test
-  public void testDeadUnits() {
+  void testDeadUnits() {
     var uuid = UUID.randomUUID();
     var request = new String[]{ uuid.toString() };
     given(ctx.bodyAsClass(String[].class))
@@ -83,7 +83,7 @@ public class DaemonEndpointTest {
   }
 
   @Test
-  public void testMovedUnits() {
+  void testMovedUnits() {
     var item = sampleMovedUnit();
     var request = new ImmutableFactionUnitPosition[] { item };
     given(ctx.bodyAsClass(ImmutableFactionUnitPosition[].class))
@@ -95,7 +95,7 @@ public class DaemonEndpointTest {
   }
 
   @Test
-  public void testDownloadMission() {
+  void testDownloadMission() {
     given(ctx.pathParam("server", String.class))
       .willReturn(Validator.create(String.class, "server1"));
 
@@ -105,7 +105,7 @@ public class DaemonEndpointTest {
   }
 
   @Test
-  public void testPullAction() {
+  void testPullAction() {
     var response = Optional.of(ServerAction.MISSION_STARTED);
     given(repository.pullNextAction("server1"))
       .willReturn(response);
@@ -119,7 +119,7 @@ public class DaemonEndpointTest {
   }
 
   @Test
-  public void testSetAction() {
+  void testSetAction() {
     var info = ImmutableServerInfo.builder()
       .address("localhost")
       .port(1)

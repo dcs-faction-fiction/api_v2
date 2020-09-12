@@ -1,10 +1,14 @@
 package factionfiction.api.v2.purchase;
 
 import base.game.FactionUnit;
+import base.game.Location;
 import base.game.warehouse.WarehouseItemCode;
 import factionfiction.api.v2.campaignfaction.CampaignFaction;
 import factionfiction.api.v2.campaignfaction.CampaignFactionRepository;
 import factionfiction.api.v2.game.GameOptions;
+import static factionfiction.api.v2.mappers.RowMappers.factionUnitMapper;
+import static factionfiction.api.v2.math.MathService.metersToLat;
+import static factionfiction.api.v2.math.MathService.metersToLon;
 import factionfiction.api.v2.units.UnitRepository;
 import java.math.BigDecimal;
 import static java.math.BigDecimal.ZERO;
@@ -120,6 +124,43 @@ public class PurchaseRepository {
       addNewItem(cfId, campaignName, code, h);
       addCreditsWithHandle(
         campaignName, factionName,
+        cost.negate(),
+        h);
+    });
+  }
+
+  void buyRecoShot(String campaign, String faction, Location location, GameOptions gameOptions) {
+    UUID cfId = campaignFactionRepository.getCampaignFactionId(campaign, faction);
+    var size = (double) gameOptions.zones().recoShot().edgeSize();
+    var cost = gameOptions.zones().recoShot().cost();
+    var deltaLat = metersToLat(size/2);
+    var deltaLon = metersToLon(size/2, location.latitude().doubleValue());
+    var latmin = location.latitude().doubleValue() - deltaLat;
+    var latmax = location.latitude().doubleValue() + deltaLat;
+    var lonmin = location.longitude().doubleValue() - deltaLon;
+    var lonmax = location.longitude().doubleValue() + deltaLon;
+    jdbi.useHandle(h -> {
+      var foundUnits = h.select("select id, type, x, y, z, angle from campaign_faction_units where "
+        + "campaign_faction_id = ? "
+        + "and y between ? and ? "
+        + "and x between ? and ?",
+        cfId,
+        latmin, latmax,
+        lonmin, lonmax)
+      .map(factionUnitMapper())
+      .list();
+
+      UUID recoId = UUID.randomUUID();
+      h.execute("insert into recoshot (id, campaign_faction_id, latmin, latmax, lonmin, lonmax) values(?, ?, ?, ?, ?, ?)", recoId, cfId, latmin, latmax, lonmin, lonmax);
+      foundUnits.forEach(unit ->
+        h.execute("insert into recoshot_item (id, recoshot_id, type, x, y, z, angle) values(?, ?, ?, ?, ?, ?, ?)",
+          UUID.randomUUID(), recoId,
+          unit.type(), unit.location().longitude(), unit.location().latitude(), unit.location().altitude(), unit.location().angle()
+        )
+      );
+
+      addCreditsWithHandle(
+        campaign, faction,
         cost.negate(),
         h);
     });

@@ -1,7 +1,9 @@
 package factionfiction.api.v2.math;
 
 import base.game.Location;
+import static java.lang.Math.abs;
 import static java.lang.Math.atan2;
+import static java.lang.Math.cos;
 import static java.lang.Math.pow;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
@@ -36,6 +38,14 @@ public final class MathService {
     } else {
       return point;
     }
+  }
+
+  public static double metersToLat(double meters) {
+    return abs(meters / 111_111);
+  }
+
+  public static double metersToLon(double meters, double referenceLatitude) {
+    return abs(meters / 111_111 * cos(referenceLatitude));
   }
 
   /**

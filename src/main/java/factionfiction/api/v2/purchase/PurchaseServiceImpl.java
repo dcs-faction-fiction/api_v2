@@ -2,6 +2,7 @@ package factionfiction.api.v2.purchase;
 
 import base.game.FactionUnit;
 import base.game.ImmutableFactionUnit;
+import base.game.Location;
 import base.game.warehouse.WarehouseItemCode;
 import factionfiction.api.v2.campaign.CampaignRepository;
 import factionfiction.api.v2.campaignfaction.CampaignFactionRepository;
@@ -45,14 +46,19 @@ public class PurchaseServiceImpl {
       campaignName, factionName);
   }
 
-  void zoneIncrease(String campaign, String faction) {
+  public void zoneIncrease(String campaign, String faction) {
     var c = campaignRepository.find(campaign);
     purchaseRepository.zoneIncrease(campaign, faction, c.gameOptions());
   }
 
-  void zoneDecrease(String campaign, String faction) {
+  public void zoneDecrease(String campaign, String faction) {
     var c = campaignRepository.find(campaign);
     purchaseRepository.zoneDecrease(campaign, faction, c.gameOptions());
+  }
+
+  public void buyRecoShot(String campaign, String faction, Location location) {
+    var c = campaignRepository.find(campaign);
+    purchaseRepository.buyRecoShot(campaign, faction, location, c.gameOptions());
   }
 
   FactionUnit confineUnitWithinFactionZone(String campaignName, String factionName, FactionUnit unit) {

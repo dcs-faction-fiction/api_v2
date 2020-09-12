@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-public class CampaignSimulatorIT {
+class CampaignSimulatorIT {
 
   static HttpCaller http = new HttpCaller();
 
@@ -20,17 +20,17 @@ public class CampaignSimulatorIT {
   static String campaignName = "New campaign"+System.currentTimeMillis();
 
   @BeforeAll
-  public static void startup() {
+  static void startup() {
     Main.main(new String[]{});
   }
 
   @AfterAll
-  public static void teardown() {
+  static void teardown() {
     Main.stop();
   }
 
   @Test
-  public void testHealthChecks() throws JSONException {
+  void testHealthChecks() throws JSONException {
     var result = http.get("/status/health");
     JSONAssert.assertEquals("{\"database\": true, \"javalin\": true}", result, false);
 
@@ -42,7 +42,7 @@ public class CampaignSimulatorIT {
   }
 
   @Test
-  public void testDefaultGameOptions() throws JSONException {
+  void testDefaultGameOptions() throws JSONException {
     var result = http.get("/v2/common-api/default-game-options");
 
     BigDecimal credits = new BigDecimal(JsonPath.read(result, "$.credits.starting").toString());

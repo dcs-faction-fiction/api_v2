@@ -26,7 +26,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class CampaignFactionServiceTest {
+class CampaignFactionServiceTest {
 
   CampaignFaction sample;
   CampaignFactionServiceImpl impl;
@@ -40,7 +40,7 @@ public class CampaignFactionServiceTest {
   UUID unitUUID;
 
   @BeforeEach
-  public void setup() throws IOException {
+  void setup() throws IOException {
     cfId = UUID.randomUUID();
     unitUUID = UUID.randomUUID();
     sample = makeSampleCampaignFaction();
@@ -56,7 +56,7 @@ public class CampaignFactionServiceTest {
   }
 
   @Test
-  public void testCreateCampaignFaction() throws IOException {
+  void testCreateCampaignFaction() throws IOException {
     given(campRepo.find(sample.campaignName()))
       .willReturn(makeSampleCampaign());
     given(facRepo.find(sample.factionName()))
@@ -68,7 +68,7 @@ public class CampaignFactionServiceTest {
   }
 
   @Test
-  public void testConverter() throws IOException {
+  void testConverter() throws IOException {
     var options = new GameOptionsLoader().loadDefaults();
     var result = fromCampaignAndFactionAndOptions(
       sample.campaignName(),
@@ -81,7 +81,7 @@ public class CampaignFactionServiceTest {
   }
 
   @Test
-  public void testGetSituation() {
+  void testGetSituation() {
     mockFactionSituation();
 
     var situation = impl.getSituation(
@@ -93,7 +93,7 @@ public class CampaignFactionServiceTest {
   }
 
   @Test
-  public void testPassOnAllFactions() {
+  void testPassOnAllFactions() {
     mockFactionSituation();
     var uuid = UUID.randomUUID();
     given(repository.getAllFactionNamesOfCampaign(sample.campaignName(), uuid))
@@ -105,7 +105,7 @@ public class CampaignFactionServiceTest {
   }
 
   @Test
-  public void testPassOnAlliedFactions() {
+  void testPassOnAlliedFactions() {
     mockFactionSituation();
     var uuid = UUID.randomUUID();
     given(repository.getAlliedFactionNamesOfCampaign(sample.campaignName(), uuid))
@@ -117,7 +117,7 @@ public class CampaignFactionServiceTest {
   }
 
   @Test
-  public void testPassOnEnemyFactions() {
+  void testPassOnEnemyFactions() {
     mockFactionSituation();
     var uuid = UUID.randomUUID();
     given(repository.getEnemyFactionNamesOfCampaign(sample.campaignName(), uuid))
@@ -129,7 +129,7 @@ public class CampaignFactionServiceTest {
   }
 
   @Test
-  public void testPassMoveUnit() {
+  void testPassMoveUnit() {
     var cfid = UUID.randomUUID();
     var location = mock(Location.class);
     impl.moveUnit("campaign", "faction", cfid, location);

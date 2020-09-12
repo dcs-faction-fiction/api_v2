@@ -13,21 +13,21 @@ import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class FactionRepositoryIT {
+class FactionRepositoryIT {
 
   Jdbi jdbi;
   FactionRepository repository;
   UUID owner;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     owner = UUID.randomUUID();
     jdbi = jdbi();
     repository = new FactionRepository(jdbi);
   }
 
   @Test
-  public void testFactionListZero() {
+  void testFactionListZero() {
     cleanFactionTable(jdbi);
 
     var factions = repository.listFactions(owner);
@@ -36,7 +36,7 @@ public class FactionRepositoryIT {
   }
 
   @Test
-  public void testFactionListOne() {
+  void testFactionListOne() {
     cleanFactionTable(jdbi);
 
     insertSampleFaction(jdbi, owner);
@@ -47,7 +47,7 @@ public class FactionRepositoryIT {
   }
 
   @Test
-  public void testNewFaction() {
+  void testNewFaction() {
     cleanFactionTable(jdbi);
 
     var faction = repository.newFaction("name", owner);
@@ -58,7 +58,7 @@ public class FactionRepositoryIT {
   }
 
   @Test
-  public void testIsOwner() {
+  void testIsOwner() {
     cleanFactionTable(jdbi);
     insertSampleFaction(jdbi, owner);
     var sample = makeSampleFaction();
@@ -69,7 +69,7 @@ public class FactionRepositoryIT {
   }
 
   @Test
-  public void testIsNotOwner() {
+  void testIsNotOwner() {
     cleanFactionTable(jdbi);
     insertSampleFaction(jdbi, owner);
     var sample = makeSampleFaction();

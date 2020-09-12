@@ -1,6 +1,7 @@
 package factionfiction.api.v2.purchase;
 
 import base.game.FactionUnit;
+import base.game.Location;
 import base.game.warehouse.WarehouseItemCode;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import factionfiction.api.v2.auth.AuthInfo;
@@ -62,6 +63,13 @@ public class PurchaseSecurity implements PurchaseService {
     if (!managerAndOwnsFaction(faction))
       throw errorNotFactionManager();
     impl.zoneDecrease(campaign, faction);
+  }
+
+  @Override
+  public void buyRecoShot(String campaign, String faction, Location location) {
+    if (!managerAndOwnsFaction(faction))
+      throw errorNotFactionManager();
+    impl.buyRecoShot(campaign, faction, location);
   }
 
   boolean managerAndOwnsCampaign(String campaignName) {

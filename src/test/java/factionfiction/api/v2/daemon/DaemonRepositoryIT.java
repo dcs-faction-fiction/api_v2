@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class DaemonRepositoryIT {
+class DaemonRepositoryIT {
 
   static final byte[] MISSION_BYTES = new byte[]{1,2,3};
 
@@ -37,7 +37,7 @@ public class DaemonRepositoryIT {
   DaemonRepository repository;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     unit1 = UUID.randomUUID();
     unit2 = UUID.randomUUID();
     jdbi = jdbi();
@@ -45,7 +45,7 @@ public class DaemonRepositoryIT {
   }
 
   @Test
-  public void testReportWarehouses() {
+  void testReportWarehouses() {
     cleanTables();
     addData();
     var request = makeWarehouseRequest();
@@ -56,7 +56,7 @@ public class DaemonRepositoryIT {
   }
 
   @Test
-  public void testReportWarehousesNotInitializedServer() {
+  void testReportWarehousesNotInitializedServer() {
     cleanTables();
     addData();
     var request = makeWarehouseRequest();
@@ -67,7 +67,7 @@ public class DaemonRepositoryIT {
   }
 
   @Test
-  public void testReportWarehousesRandomServer() {
+  void testReportWarehousesRandomServer() {
     cleanTables();
     addData();
     var request = makeWarehouseRequest();
@@ -78,7 +78,7 @@ public class DaemonRepositoryIT {
   }
 
   @Test
-  public void testReportDeadUnit() {
+  void testReportDeadUnit() {
     cleanTables();
     addData();
 
@@ -89,7 +89,7 @@ public class DaemonRepositoryIT {
   }
 
   @Test
-  public void testReportMovedUnit() {
+  void testReportMovedUnit() {
     cleanTables();
     addData();
     var location = ImmutableLocation.builder()
@@ -109,7 +109,7 @@ public class DaemonRepositoryIT {
   }
 
   @Test
-  public void testDownloadMission() {
+  void testDownloadMission() {
     cleanTables();
     addData();
     var result = new byte[3];
@@ -125,7 +125,7 @@ public class DaemonRepositoryIT {
   }
 
   @Test
-  public void testActions() {
+  void testActions() {
     var info = Optional.of((ServerInfo) ImmutableServerInfo.builder()
       .address("localhost")
       .port(1)
