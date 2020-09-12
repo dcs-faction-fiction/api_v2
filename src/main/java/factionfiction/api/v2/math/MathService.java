@@ -41,11 +41,11 @@ public final class MathService {
   }
 
   public static double metersToLat(double meters) {
-    return abs(meters / 111_111);
+    return abs(meters / 111_111d);
   }
 
   public static double metersToLon(double meters, double referenceLatitude) {
-    return abs(meters / 111_111 * cos(referenceLatitude));
+    return abs(meters / 111_111d * cos(toRadians(referenceLatitude)));
   }
 
   /**
