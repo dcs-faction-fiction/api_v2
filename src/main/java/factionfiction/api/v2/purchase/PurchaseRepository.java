@@ -30,37 +30,21 @@ public class PurchaseRepository {
 
   public BigDecimal giveCredits(String campaignName, String factionName, BigDecimal credits) {
     return jdbi.withHandle(h -> {
-      addCreditsWithHandle(campaignName, factionName, credits, h);
+      UUID cfId = campaignFactionRepository.getCampaignFactionId(campaignName, factionName);
+      addCredits(h, cfId, credits);
       return getCreditsWithHandle(campaignName, factionName, h);
     });
   }
 
   public BigDecimal getCredits(String campaignName, String factionName) {
-    return jdbi.withHandle(h -> h.select("select credits from campaign_faction where campaign_name = ? and faction_name = ?",
-      campaignName,
-      factionName)
-      .mapTo(BigDecimal.class)
-      .findFirst()
-      .orElse(ZERO)
-    );
-  }
-
-  public static BigDecimal getCreditsWithHandle(String campaignName, String factionName, Handle h) {
-    return h.select("select credits from campaign_faction where campaign_name = ? and faction_name = ?",
-      campaignName,
-      factionName)
-      .mapTo(BigDecimal.class)
-      .findFirst()
-      .orElse(ZERO);
+    return jdbi.withHandle(h -> getCreditsWithHandle(campaignName, factionName, h));
   }
 
   public FactionUnit buyUnit(String campaignName, String factionName, BigDecimal cost, FactionUnit unit) {
     UUID id = UUID.randomUUID();
     jdbi.useHandle(h -> {
-      addCreditsWithHandle(
-        campaignName, factionName,
-        cost.negate(),
-        h);
+      UUID cfId = campaignFactionRepository.getCampaignFactionId(campaignName, factionName);
+      spendCreditsOrFail(h, cfId, cost);
       addNewUnit(id, campaignName, factionName, unit, h);
     });
 
@@ -76,12 +60,7 @@ public class PurchaseRepository {
         .mapTo(UUID.class)
         .first();
 
-      var creditsAvailable = h.select(
-        "select credits from campaign_faction where id = ?", cfid)
-        .mapTo(BigDecimal.class).findFirst().orElse(ZERO);
-      if (options.zones().increase().cost().compareTo(creditsAvailable) > 0) {
-        throw new NotEnoughCreditsException();
-      }
+      checkIfEnoughCretidsToSpend(h, cfid, options.zones().increase().cost());
 
       h.execute("update campaign_faction set "
         + "zone_size_ft = zone_size_ft + ?, "
@@ -115,21 +94,7 @@ public class PurchaseRepository {
     });
   }
 
-  void buyItem(String campaignName, String factionName, BigDecimal cost, WarehouseItemCode code) {
-    jdbi.useHandle(h -> {
-      // Lock the campaignfaction so that purchases are serialized and solve the problem of the insert/upsert
-      UUID cfId = campaignFactionRepository.getCampaignFactionId(campaignName, factionName);
-      h.execute("select id from campaign_faction where id = ? for update", cfId);
-      // buy item and then take credits
-      addNewItem(cfId, campaignName, code, h);
-      addCreditsWithHandle(
-        campaignName, factionName,
-        cost.negate(),
-        h);
-    });
-  }
-
-  void buyRecoShot(String campaign, String faction, Location location, GameOptions gameOptions) {
+  public void buyRecoShot(String campaign, String faction, Location location, GameOptions gameOptions) {
     UUID cfId = campaignFactionRepository.getCampaignFactionId(campaign, faction);
     var size = (double) gameOptions.zones().recoShot().edgeSize();
     var cost = gameOptions.zones().recoShot().cost();
@@ -160,21 +125,22 @@ public class PurchaseRepository {
         )
       );
 
-      addCreditsWithHandle(
-        campaign, faction,
-        cost.negate(),
-        h);
+      spendCreditsOrFail(h, cfId, cost);
     });
   }
 
-  private static int addCreditsWithHandle(String campaignName, String factionName, BigDecimal credits, Handle h) {
-    return h.execute("update campaign_faction set credits = greatest(0, credits + ?) where campaign_name = ? and faction_name = ?",
-      credits,
-      campaignName,
-      factionName);
+  void buyItem(String campaignName, String factionName, BigDecimal cost, WarehouseItemCode code) {
+    jdbi.useHandle(h -> {
+      // Lock the campaignfaction so that purchases are serialized and solve the problem of the insert/upsert
+      UUID cfId = campaignFactionRepository.getCampaignFactionId(campaignName, factionName);
+      h.execute("select id from campaign_faction where id = ? for update", cfId);
+      // buy item and then take credits
+      addNewItem(cfId, campaignName, code, h);
+      spendCreditsOrFail(h, cfId, cost);
+    });
   }
 
-  private void addNewUnit(UUID id, String campaignName, String factionName, FactionUnit unit, Handle h) {
+  void addNewUnit(UUID id, String campaignName, String factionName, FactionUnit unit, Handle h) {
     UUID cfId = campaignFactionRepository.getCampaignFactionId(campaignName, factionName);
     h.execute(
       "insert into campaign_faction_units"
@@ -190,7 +156,7 @@ public class PurchaseRepository {
     );
   }
 
-  private void addNewItem(UUID cfId, String campaignName, WarehouseItemCode code, Handle h) {
+  void addNewItem(UUID cfId, String campaignName, WarehouseItemCode code, Handle h) {
     var cf = campaignFactionRepository.getCampaignFaction(cfId);
     UUID cawid = getWarehouseId(h, campaignName, cf);
     UUID itemid = getWarehouseItemId(h, cawid, code);
@@ -236,5 +202,34 @@ public class PurchaseRepository {
         );
         return newid;
       });
+  }
+
+  static BigDecimal getCreditsWithHandle(String campaignName, String factionName, Handle h) {
+    return h.select("select credits from campaign_faction where campaign_name = ? and faction_name = ?",
+      campaignName,
+      factionName)
+      .mapTo(BigDecimal.class)
+      .findFirst()
+      .orElse(ZERO);
+  }
+
+  static void spendCreditsOrFail(Handle h, UUID cfId, BigDecimal credits) {
+    checkIfEnoughCretidsToSpend(h, cfId, credits);
+    addCredits(h, cfId, credits.negate());
+  }
+
+  static void addCredits(Handle h, UUID cfId, BigDecimal credits) {
+    h.execute("update campaign_faction set credits = greatest(0, credits + ?) where id = ?",
+      credits,
+      cfId);
+  }
+
+  static void checkIfEnoughCretidsToSpend(Handle h, UUID cfid, BigDecimal cost) throws NotEnoughCreditsException {
+    var creditsAvailable = h.select(
+      "select credits from campaign_faction where id = ?", cfid)
+      .mapTo(BigDecimal.class).findFirst().orElse(ZERO);
+    if (cost.compareTo(creditsAvailable) > 0) {
+      throw new NotEnoughCreditsException();
+    }
   }
 }
