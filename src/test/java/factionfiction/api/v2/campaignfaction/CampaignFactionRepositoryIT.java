@@ -12,6 +12,8 @@ import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.insert
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
 import static factionfiction.api.v2.faction.FactionHelper.cleanFactionTable;
 import static factionfiction.api.v2.test.InMemoryDB.jdbi;
+import static factionfiction.api.v2.units.UnitHelper.cleanRecoShots;
+import static factionfiction.api.v2.units.UnitHelper.insertRecoShot;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -227,6 +229,32 @@ class CampaignFactionRepositoryIT {
 
     Location location = getLocationOfUnitById(unitId);
     assertThat(location, is(not(newLocation)));
+  }
+
+  @Test
+  void testDeleteRecoShot() {
+    var id = UUID.randomUUID();
+    var cfId = UUID.randomUUID();
+    cleanRecoShots(jdbi);
+    insertRecoShot(jdbi, id, cfId);
+
+    repository.deleteRecoShot(id);
+
+    var count = jdbi.withHandle(h ->
+      h.select("select count(id) from recoshot where id = ?", id)
+        .mapTo(Integer.class)
+        .findOne()
+        .get());
+
+    assertThat(count, is(0));
+
+    count = jdbi.withHandle(h ->
+      h.select("select count(recoshot_id) from recoshot_item where recoshot_id = ?", id)
+        .mapTo(Integer.class)
+        .findOne()
+        .get());
+
+    assertThat(count, is(0));
   }
 
   Location getLocationOfUnitById(UUID unitId) {

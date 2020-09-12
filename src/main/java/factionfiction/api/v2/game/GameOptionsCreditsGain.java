@@ -11,7 +11,7 @@ import org.immutables.value.Value;
 public interface GameOptionsCreditsGain {
   BigDecimal mission();
 
-  public static GameOptionsCreditsGain from(Map map) {
+  public static GameOptionsCreditsGain from(Map<?, ?> map) {
     return ImmutableGameOptionsCreditsGain.builder()
       .mission(new BigDecimal(map.get("mission").toString()))
       .build();

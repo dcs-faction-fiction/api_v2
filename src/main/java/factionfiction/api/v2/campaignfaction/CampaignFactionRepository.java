@@ -117,6 +117,13 @@ public class CampaignFactionRepository {
     });
   }
 
+  public void deleteRecoShot(UUID id) {
+    jdbi.useHandle(h -> {
+      h.execute("delete from recoshot where id = ?", id);
+      h.execute("delete from recoshot_item where recoshot_id = ?", id);
+    });
+  }
+
   CampaignFaction find(UUID id) {
     return jdbi.withHandle(h -> h.select(
       "select campaign_name, faction_name, airbase, zone_size_ft, credits, is_blue"

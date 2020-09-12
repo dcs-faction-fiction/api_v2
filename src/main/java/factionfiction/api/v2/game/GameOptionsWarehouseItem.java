@@ -13,7 +13,7 @@ public interface GameOptionsWarehouseItem {
   WarehouseItemCode code();
   BigDecimal cost();
 
-  public static GameOptionsWarehouseItem from(Map map) {
+  public static GameOptionsWarehouseItem from(Map<?, ?> map) {
     return ImmutableGameOptionsWarehouseItem.builder()
       .code(WarehouseItemCode.valueOf(map.get("code").toString()))
       .cost(new BigDecimal(map.get("cost").toString()))

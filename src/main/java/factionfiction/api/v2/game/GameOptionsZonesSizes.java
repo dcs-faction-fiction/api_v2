@@ -11,7 +11,7 @@ public interface GameOptionsZonesSizes {
   Integer min();
   Integer max();
 
-  public static GameOptionsZonesSizes from(Map map) {
+  public static GameOptionsZonesSizes from(Map<?, ?> map) {
     return ImmutableGameOptionsZonesSizes.builder()
       .min(Integer.valueOf(map.get("min").toString()))
       .max(Integer.valueOf(map.get("max").toString()))

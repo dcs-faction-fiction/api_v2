@@ -13,7 +13,7 @@ public interface GameOptionsUnit {
   Unit code();
   BigDecimal cost();
 
-  public static GameOptionsUnit from(Map map) {
+  public static GameOptionsUnit from(Map<?, ?> map) {
     return ImmutableGameOptionsUnit.builder()
       .code(Unit.valueOf(map.get("code").toString()))
       .cost(new BigDecimal(map.get("cost").toString()))

@@ -15,12 +15,12 @@ public interface GameOptions {
   List<GameOptionsUnit> units();
   List<GameOptionsWarehouseItem> warehouseItems();
 
-  public static GameOptions from(Map map) {
-    List<Map> units = (List<Map>) map.get("units");
-    List<Map> warehouseItems = (List<Map>) map.get("warehouseItems");
+  public static GameOptions from(Map<?, ?> map) {
+    List<Map<?, ?>> units = (List<Map<?, ?>>) map.get("units");
+    List<Map<?, ?>> warehouseItems = (List<Map<?, ?>>) map.get("warehouseItems");
     return ImmutableGameOptions.builder()
-      .credits(GameOptionsCredits.from((Map) map.get("credits")))
-      .zones(GameOptionsZones.from((Map) map.get("zones")))
+      .credits(GameOptionsCredits.from((Map<?, ?>) map.get("credits")))
+      .zones(GameOptionsZones.from((Map<?, ?>) map.get("zones")))
       .units(units.stream()
         .map(GameOptionsUnit::from)
         .collect(toList()))

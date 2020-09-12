@@ -293,6 +293,42 @@ class CampaignFactionSecurityTest {
     });;
   }
 
+  @Test
+  void testDeleteRecoShot() {
+    mockFactionManagerAndFactionOwner();
+    var campaign = sample.campaignName();
+    var faction = sample.factionName();
+    var id = UUID.randomUUID();
+
+    security.deleteRecoShot(campaign, faction, id);
+
+    verify(impl).deleteRecoShot(id);
+  }
+
+  @Test
+  void testDeleteRecoShotNoFactionManager() {
+    mockNoFactionManager();
+    var campaign = sample.campaignName();
+    var faction = sample.factionName();
+    var id = UUID.randomUUID();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.deleteRecoShot(campaign, faction, id);
+    });;
+  }
+
+  @Test
+  void testDeleteRecoShotNoFactionOwner() {
+    mockFactionManagerAndNoFactionOwner();
+    var campaign = sample.campaignName();
+    var faction = sample.factionName();
+    var id = UUID.randomUUID();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.deleteRecoShot(campaign, faction, id);
+    });;
+  }
+
   void mockGameOptions(GameOptions options) {
     given(campaignRepository.find(sample.campaignName()))
       .willReturn(ImmutableCampaign.builder()

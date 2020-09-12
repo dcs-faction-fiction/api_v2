@@ -23,6 +23,32 @@ public final class UnitHelper {
     jdbi.useHandle(h -> h.execute("truncate table recoshot"));
   }
 
+  public static void insertRecoShot(Jdbi jdbi, UUID id, UUID cfId) {
+    jdbi.useHandle(h -> h.execute(
+      "insert into recoshot"
+        + " (id, campaign_faction_id, latmin, latmax, lonmin, lonmax)"
+        + " values(?, ?, ?, ?, ?, ?)",
+      id,
+      cfId,
+      1,
+      2,
+      1,
+      2
+    ));
+    jdbi.useHandle(h -> h.execute(
+      "insert into recoshot_item"
+        + " (id, recoshot_id, type, x, y, z, angle)"
+        + " values(?, ?, ?, ?, ?, ?, ?)",
+      UUID.randomUUID(),
+      id,
+      Unit.T_80,
+      new BigDecimal(1.5),
+      new BigDecimal(1.5),
+      new BigDecimal(1.5),
+      new BigDecimal(1.5)
+    ));
+  }
+
   public static void insertSampleFactionUnit(Jdbi jdbi, UUID id, UUID cfId) {
     jdbi.useHandle(h -> h.execute(
       "insert into campaign_faction_units"

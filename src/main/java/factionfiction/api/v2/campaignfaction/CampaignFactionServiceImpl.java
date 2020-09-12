@@ -105,4 +105,8 @@ public class CampaignFactionServiceImpl {
   public void moveUnit(String campaignName, String factionName, UUID uid, Location location) {
     repository.moveUnit(campaignName, factionName, uid, location);
   }
+
+  void deleteRecoShot(UUID id) {
+    repository.deleteRecoShot(id);
+  }
 }

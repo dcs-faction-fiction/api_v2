@@ -12,7 +12,7 @@ public interface GameOptionsCredits {
   BigDecimal starting();
   GameOptionsCreditsGain gain();
 
-  public static GameOptionsCredits from(Map map) {
+  public static GameOptionsCredits from(Map<?, ?> map) {
     return ImmutableGameOptionsCredits.builder()
       .starting(new BigDecimal(map.get("starting").toString()))
       .gain(GameOptionsCreditsGain.from((Map) map.get("gain")))

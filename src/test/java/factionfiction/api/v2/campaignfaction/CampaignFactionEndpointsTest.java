@@ -65,6 +65,7 @@ class CampaignFactionEndpointsTest {
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/game-options"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/factions/:faction/campaigns"), any(), eq(roles(FACTION_MANAGER)));
     verify(javalin).post(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/units/:unitid/new-location"), any(), eq(roles(FACTION_MANAGER)));
+    verify(javalin).delete(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/reco-shots/:id"), any(), eq(roles(FACTION_MANAGER)));
   }
 
   @Test
@@ -197,6 +198,21 @@ class CampaignFactionEndpointsTest {
     endpoints.moveUnit(ctx);
 
     verify(campFactionService).moveUnit("campaign1", "faction1", uuid, location);
+  }
+
+  @Test
+  void testDeleteRecoShot() {
+    var id = UUID.randomUUID();
+    given(ctx.pathParam("campaign", String.class))
+      .willReturn(Validator.create(String.class, "campaign1"));
+    given(ctx.pathParam("faction", String.class))
+      .willReturn(Validator.create(String.class, "faction1"));
+    given(ctx.pathParam("id", String.class))
+      .willReturn(Validator.create(String.class, id.toString()));
+
+    endpoints.deleteRecoShot(ctx);
+
+    verify(campFactionService).deleteRecoShot("campaign1", "faction1", id);
   }
 
   FactionSituation sampleSituation() {

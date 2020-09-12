@@ -95,6 +95,16 @@ public class CampaignFactionSecurity implements CampaignFactionService {
     impl.moveUnit(campaignName, factionName, uid, location);
   }
 
+  @Override
+  public void deleteRecoShot(String campaignName, String factionName, UUID id) {
+    if (!authInfo.isFactionManager())
+      throw new NotAuthorizedException("Only faction manager can delete reco shots.");
+    if (!isFactionOwner(factionName))
+      throw new NotAuthorizedException("Not owning this faction.");
+
+    impl.deleteRecoShot(id);
+  }
+
   boolean isFactionOwner(String factionName) {
     return factionRepository.isOwner(factionName, authInfo.getUserUUID());
   }

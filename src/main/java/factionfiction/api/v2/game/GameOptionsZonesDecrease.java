@@ -12,7 +12,7 @@ public interface GameOptionsZonesDecrease {
   Integer amount();
   BigDecimal cost();
 
-  public static GameOptionsZonesDecrease from(Map map) {
+  public static GameOptionsZonesDecrease from(Map<?, ?> map) {
     return ImmutableGameOptionsZonesDecrease.builder()
       .amount(Integer.valueOf(map.get("amount").toString()))
       .cost(new BigDecimal(map.get("gain").toString()))

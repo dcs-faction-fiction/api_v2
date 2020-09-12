@@ -137,6 +137,15 @@ class CampaignFactionServiceTest {
     verify(repository).moveUnit("campaign", "faction", cfid, location);
   }
 
+  @Test
+  void testPassDeleteRecoShot() {
+    var id = UUID.randomUUID();
+
+    impl.deleteRecoShot(id);
+
+    verify(repository).deleteRecoShot(id);
+  }
+
   void mockFactionSituation() {
     given(repository.getCampaignFactionId(sample.campaignName(), sample.factionName()))
       .willReturn(cfId);

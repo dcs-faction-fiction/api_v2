@@ -46,6 +46,7 @@ public class CampaignFactionEndpoints implements Endpoint {
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/game-options", this::getGameOptions, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
     javalin.get("/v2/campaignfaction-api/factions/:faction/campaigns", this::getAvailableCampaigns, roles(FACTION_MANAGER));
     javalin.post("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/units/:unitid/new-location", this::moveUnit, roles(FACTION_MANAGER));
+    javalin.delete("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/reco-shots/:id", this::deleteRecoShot, roles(FACTION_MANAGER));
   }
 
   @OpenApi(ignore = true)
@@ -141,5 +142,16 @@ public class CampaignFactionEndpoints implements Endpoint {
     var result = service.getEnemyFactionLocations(campaignName);
 
     ctx.json(result);
+  }
+
+  public void deleteRecoShot(Context ctx) {
+    var service = cfServiceProvider.apply(ctx);
+    var campaignName = ctx.pathParam(CAMPAIGN_PATHPARAM, String.class).get();
+    var factionName = ctx.pathParam(FACTION_PATHPARAM, String.class).get();
+    var id = UUID.fromString(ctx.pathParam("id", String.class).get());
+
+    service.deleteRecoShot(campaignName, factionName, id);
+
+    ctx.json("{}");
   }
 }
