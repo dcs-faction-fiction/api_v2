@@ -60,10 +60,10 @@ public class DaemonRepository {
           + "z = ?, "
           + "angle = ? "
           + "where id = ?",
-          u.location().longitude().toString(),
-          u.location().latitude().toString(),
-          u.location().altitude().toString(),
-          u.location().angle().toString(),
+          u.location().longitude(),
+          u.location().latitude(),
+          u.location().altitude(),
+          u.location().angle(),
           u.id())
       )
     );
