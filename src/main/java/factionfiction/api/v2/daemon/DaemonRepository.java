@@ -58,7 +58,7 @@ public class DaemonRepository {
           + "x = ?, "
           + "y = ?, "
           + "z = ?, "
-          + "angle = ?"
+          + "angle = ? "
           + "where id = ?",
           u.location().longitude().toString(),
           u.location().latitude().toString(),
