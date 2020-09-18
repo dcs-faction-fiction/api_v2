@@ -13,7 +13,6 @@ import static io.javalin.core.security.SecurityUtil.roles;
 import io.javalin.core.validation.Validator;
 import io.javalin.http.Context;
 import java.math.BigDecimal;
-import java.util.EnumMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -106,11 +105,11 @@ class PurchaseEndpointTest {
 
   @Test
   void testBuyWarehouseItems() throws Exception {
-    var basket = new EnumMap<WarehouseItemCode, Integer>(WarehouseItemCode.class);
-    basket.put(JF_17, 2);
-    basket.put(R_77, 3);
     var request = ImmutablePurchaseBucket.builder()
-      .basket(basket)
+      .basket(Map.of(
+        JF_17, 2,
+        R_77, 3
+      ))
       .build();
     given(ctx.pathParam(CAMPAIGN_PATHPARAM, String.class))
       .willReturn(Validator.create(String.class, CAMPAIGN_NAME));

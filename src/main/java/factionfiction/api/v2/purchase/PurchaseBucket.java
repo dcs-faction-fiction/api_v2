@@ -1,7 +1,7 @@
 package factionfiction.api.v2.purchase;
 
 import base.game.warehouse.WarehouseItemCode;
-import java.util.EnumMap;
+import java.util.Map;
 import org.immutables.gson.Gson;
 import org.immutables.value.Value;
 
@@ -9,5 +9,5 @@ import org.immutables.value.Value;
 @Gson.TypeAdapters
 @Value.Style(jdkOnly = true)
 public interface PurchaseBucket {
-  EnumMap<WarehouseItemCode, Integer> basket();
+  Map<WarehouseItemCode, Integer> basket();
 }
