@@ -31,6 +31,7 @@ public class PurchaseEndpoints implements Endpoint {
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/give-credits", this::giveCredits, roles(CAMPAIGN_MANAGER));
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-unit", this::buyUnit, roles(FACTION_MANAGER));
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-warehouse-item", this::buyWarehouseItem, roles(FACTION_MANAGER));
+    javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-warehouse-items", this::buyWarehouseItems, roles(FACTION_MANAGER));
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/zone-increase", this::zoneIncrease, roles(FACTION_MANAGER));
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-recoshot", this::buyRecoShot, roles(FACTION_MANAGER));
   }
@@ -65,6 +66,20 @@ public class PurchaseEndpoints implements Endpoint {
     var code = ctx.bodyAsClass(WarehouseItemCode.class);
 
     serviceProvider.apply(ctx).buyWarehouseItem(campaign, faction, code);
+    ctx.json("{}");
+  }
+
+  public void buyWarehouseItems(Context ctx) {
+    var campaign = ctx.pathParam(CAMPAIGN_PATHPARAM, String.class).get();
+    var faction = ctx.pathParam(FACTION_PATHPARAM, String.class).get();
+    var code = ctx.bodyAsClass(PurchaseBucket.class);
+    var service = serviceProvider.apply(ctx);
+
+    code.basket().entrySet().stream().forEach(e -> {
+      for (int i = 0; i < e.getValue(); i++)
+        service.buyWarehouseItem(campaign, faction, e.getKey());
+    });
+
     ctx.json("{}");
   }
 

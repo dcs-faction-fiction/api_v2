@@ -224,7 +224,7 @@ public class PurchaseRepository {
       cfId);
   }
 
-  static void checkIfEnoughCretidsToSpend(Handle h, UUID cfid, BigDecimal cost) throws NotEnoughCreditsException {
+  static void checkIfEnoughCretidsToSpend(Handle h, UUID cfid, BigDecimal cost) {
     var creditsAvailable = h.select(
       "select credits from campaign_faction where id = ?", cfid)
       .mapTo(BigDecimal.class).findFirst().orElse(ZERO);

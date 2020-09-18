@@ -70,6 +70,8 @@ game:
       cost: 2
     - code: "SU_27"
       cost: 2
+    - code: "J_11A"
+      cost: 2
     - code: "SU_33"
       cost: 2
     - code: "MIG_29_S"
@@ -184,9 +186,15 @@ game:
       cost: 0.12
     - code: "MK_82Y"
       cost: 0.12
+    - code: "S_25"
+      cost: 0.2
     - code: "ZUNI"
       cost: 0.1
+    - code: "S_13"
+      cost: 0.1
     - code: "M151"
+      cost: 0.01
+    - code: "S_8"
       cost: 0.01
     - code: "M5_HE"
       cost: 0.01
