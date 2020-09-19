@@ -190,6 +190,10 @@ game:
       cost: 0.2
     - code: "ZUNI"
       cost: 0.1
+    - code: "FAB_250"
+      cost: 0.15
+    - code: "FAB_500"
+      cost: 0.2
     - code: "S_13"
       cost: 0.1
     - code: "M151"

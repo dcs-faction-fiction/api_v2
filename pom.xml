@@ -85,6 +85,8 @@
             <configuration>
               <outputDirectory>${project.build.directory}/lib</outputDirectory>
               <excludeScope>provided</excludeScope>
+              <includeScope>compile</includeScope>
+              <includeScope>runtime</includeScope>
             </configuration>
           </execution>
         </executions>
