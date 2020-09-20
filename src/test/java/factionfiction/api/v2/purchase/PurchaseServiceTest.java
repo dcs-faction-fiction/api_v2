@@ -1,5 +1,6 @@
 package factionfiction.api.v2.purchase;
 
+import base.game.Airbases;
 import base.game.ImmutableFactionUnit;
 import base.game.ImmutableLocation;
 import base.game.Location;
@@ -13,6 +14,7 @@ import factionfiction.api.v2.campaign.CampaignRepository;
 import factionfiction.api.v2.campaign.ImmutableCampaign;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
 import factionfiction.api.v2.campaignfaction.CampaignFactionRepository;
+import factionfiction.api.v2.campaignfaction.ImmutableCampaignFaction;
 import factionfiction.api.v2.game.ImmutableGameOptions;
 import factionfiction.api.v2.game.ImmutableGameOptionsUnit;
 import factionfiction.api.v2.game.ImmutableGameOptionsWarehouseItem;
@@ -27,8 +29,10 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 class PurchaseServiceTest {
@@ -107,6 +111,15 @@ class PurchaseServiceTest {
   }
 
   @Test
+  void testBuyUnitNotAllowedUnitCarrier() throws IOException {
+    var unit = mockBuyUnitSituationCarrier(new BigDecimal(0));
+
+    assertThrows(UnitNotAllowedInCampaignException.class, () -> {
+      service.buyUnit(campaignName, factionName, unit);
+    });
+  }
+
+  @Test
   void testBuyWarehouseItem() throws IOException {
     mockBuyItemSituation(new BigDecimal(30));
 
@@ -137,6 +150,14 @@ class PurchaseServiceTest {
   @Test
   void testPassIncrease() throws IOException {
     var c = makeSampleCampaign();
+    var cfId = UUID.randomUUID();
+    given(campaignFactionRepository.getCampaignFactionId("c", "f"))
+      .willReturn(cfId);
+    given(campaignFactionRepository.getCampaignFaction(cfId))
+      .willReturn(ImmutableCampaignFaction.builder().from(makeSampleCampaignFaction())
+        .airbase(Airbases.ANAPA)
+        .build());
+
     given(campaignRepository.find("c"))
       .willReturn(c);
 
@@ -148,12 +169,91 @@ class PurchaseServiceTest {
   @Test
   void testPassDecrease() throws IOException {
     var c = makeSampleCampaign();
+    var cfId = UUID.randomUUID();
+    given(campaignFactionRepository.getCampaignFactionId("c", "f"))
+      .willReturn(cfId);
+    given(campaignFactionRepository.getCampaignFaction(cfId))
+      .willReturn(ImmutableCampaignFaction.builder().from(makeSampleCampaignFaction())
+        .airbase(Airbases.ANAPA)
+        .build());
     given(campaignRepository.find("c"))
       .willReturn(c);
 
     service.zoneDecrease("c", "f");
 
     verify(purchaseRepository).zoneDecrease("c", "f", c.gameOptions());
+  }
+
+  @Test
+  void testNotPassIncreaseFarp() throws IOException {
+    var c = makeSampleCampaign();
+    var cfId = UUID.randomUUID();
+    given(campaignFactionRepository.getCampaignFactionId("c", "f"))
+      .willReturn(cfId);
+    given(campaignFactionRepository.getCampaignFaction(cfId))
+      .willReturn(ImmutableCampaignFaction.builder().from(makeSampleCampaignFaction())
+        .airbase(Airbases.FARP_GORI)
+        .build());
+    given(campaignRepository.find("c"))
+      .willReturn(c);
+
+    service.zoneIncrease("c", "f");
+
+    verify(purchaseRepository, times(0)).zoneDecrease(any(), any(), any());
+  }
+
+  @Test
+  void testNotPassDecreaseFarp() throws IOException {
+    var c = makeSampleCampaign();
+    var cfId = UUID.randomUUID();
+    given(campaignFactionRepository.getCampaignFactionId("c", "f"))
+      .willReturn(cfId);
+    given(campaignFactionRepository.getCampaignFaction(cfId))
+      .willReturn(ImmutableCampaignFaction.builder().from(makeSampleCampaignFaction())
+        .airbase(Airbases.FARP_GORI)
+        .build());
+    given(campaignRepository.find("c"))
+      .willReturn(c);
+
+    service.zoneDecrease("c", "f");
+
+    verify(purchaseRepository, times(0)).zoneDecrease(any(), any(), any());
+  }
+
+  @Test
+  void testNotPassIncreaseCarrier() throws IOException {
+    var c = makeSampleCampaign();
+    var cfId = UUID.randomUUID();
+    given(campaignFactionRepository.getCampaignFactionId("c", "f"))
+      .willReturn(cfId);
+    given(campaignFactionRepository.getCampaignFaction(cfId))
+      .willReturn(ImmutableCampaignFaction.builder().from(makeSampleCampaignFaction())
+        .airbase(Airbases.SUPERCARRIER_SNAKE)
+        .build());
+    given(campaignRepository.find("c"))
+      .willReturn(c);
+
+    service.zoneIncrease("c", "f");
+
+    verify(purchaseRepository, times(0)).zoneDecrease(any(), any(), any());
+  }
+
+  @Test
+  void testNotPassDecreaseCarrier() throws IOException {
+    var c = makeSampleCampaign();
+    var cfId = UUID.randomUUID();
+    given(campaignFactionRepository.getCampaignFactionId("c", "f"))
+      .willReturn(cfId);
+    given(campaignFactionRepository.getCampaignFaction(cfId))
+      .willReturn(ImmutableCampaignFaction.builder().from(makeSampleCampaignFaction())
+        .airbase(Airbases.SUPERCARRIER_SNAKE)
+        .build());
+    given(campaignRepository.find("c"))
+      .willReturn(c);
+
+    service.zoneDecrease("c", "f");
+
+    verify(purchaseRepository, times(0)).zoneDecrease(any(), any(), any());
   }
 
   @Test
@@ -185,6 +285,48 @@ class PurchaseServiceTest {
         .build())
       .build();
     var cf = makeSampleCampaignFaction();
+    campaignName = cf.campaignName();
+    factionName = cf.factionName();
+    var unit = ImmutableFactionUnit.builder()
+      .type(ABRAMS)
+      .location(cf.airbase().location())
+      .build();
+    var cost = campaign.gameOptions().units().stream()
+      .filter(u -> u.code() == unit.type())
+      .filter(u -> u.cost().compareTo(ZERO) > 0)
+      .findFirst()
+      .orElseThrow(() -> new UnitNotAllowedInCampaignException())
+      .cost();
+    given(campaignRepository.find(cf.campaignName())).willReturn(campaign);
+    given(campaignFactionRepository.getCampaignFactionId(cf.campaignName(), cf.factionName())).willReturn(cfId);
+    given(campaignFactionRepository.getCampaignFaction(cfId)).willReturn(cf);
+    given(purchaseRepository.buyUnit(cf.campaignName(), cf.factionName(), cost, unit)).willReturn(unit);
+    given(purchaseRepository.getCredits(campaignName, factionName)).willReturn(creditsAvailable);
+    given(purchaseRepository.buyUnit(campaignName, factionName, cost, unit)).willReturn(unit);
+    return unit;
+  }
+
+  ImmutableFactionUnit mockBuyUnitSituationCarrier(BigDecimal creditsAvailable) throws IOException {
+    var cfId = UUID.randomUUID();
+    var campaign = makeSampleCampaign();
+    campaign = ImmutableCampaign.builder()
+      .from(campaign)
+      .gameOptions(ImmutableGameOptions.builder()
+        .from(campaign.gameOptions())
+        .units(List.of(ImmutableGameOptionsUnit.builder()
+          .code(T_80)
+          .cost(ZERO)
+        .build(), ImmutableGameOptionsUnit.builder()
+          .code(ABRAMS)
+          .cost(ONE)
+          .build()
+        ))
+        .build())
+      .build();
+    var cf = makeSampleCampaignFaction();
+    cf = ImmutableCampaignFaction.builder().from(cf)
+      .airbase(Airbases.SUPERCARRIER_SNAKE)
+      .build();
     campaignName = cf.campaignName();
     factionName = cf.factionName();
     var unit = ImmutableFactionUnit.builder()

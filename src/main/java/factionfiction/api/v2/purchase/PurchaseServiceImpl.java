@@ -35,6 +35,11 @@ public class PurchaseServiceImpl {
 
   public FactionUnit buyUnit(String campaignName, String factionName, FactionUnit unit) {
     var campaignUnit = findUnitOptionsFromCampaign(campaignName, unit);
+    var cfId = campaignFactionRepository.getCampaignFactionId(campaignName, factionName);
+    var cf = campaignFactionRepository.getCampaignFaction(cfId);
+
+    if (cf.airbase().carrier())
+      throw new UnitNotAllowedInCampaignException();
 
     return buyUnitTransactionally(campaignUnit, campaignName, factionName,
       confineUnitWithinFactionZone(campaignName, factionName, unit));
@@ -48,11 +53,27 @@ public class PurchaseServiceImpl {
 
   public void zoneIncrease(String campaign, String faction) {
     var c = campaignRepository.find(campaign);
+    var cfId = campaignFactionRepository.getCampaignFactionId(campaign, faction);
+    var cf = campaignFactionRepository.getCampaignFaction(cfId);
+
+    if (cf.airbase().farp())
+      return;
+    if (cf.airbase().carrier())
+      return;
+
     purchaseRepository.zoneIncrease(campaign, faction, c.gameOptions());
   }
 
   public void zoneDecrease(String campaign, String faction) {
     var c = campaignRepository.find(campaign);
+    var cfId = campaignFactionRepository.getCampaignFactionId(campaign, faction);
+    var cf = campaignFactionRepository.getCampaignFaction(cfId);
+
+    if (cf.airbase().farp())
+      return;
+    if (cf.airbase().carrier())
+      return;
+
     purchaseRepository.zoneDecrease(campaign, faction, c.gameOptions());
   }
 
