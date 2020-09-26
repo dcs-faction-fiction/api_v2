@@ -1,6 +1,9 @@
 package factionfiction.api.v2.campaign;
 
 import base.game.units.MissionConfiguration;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import factionfiction.api.v2.auth.AuthInfo;
 import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
@@ -27,6 +30,7 @@ class CampaignSecurityTest {
   AuthInfo authInfo;
   CampaignServiceImpl impl;
   CampaignSecurity security;
+  DecodedJWT token;
 
   @BeforeEach
   void setup() throws IOException {
@@ -34,6 +38,7 @@ class CampaignSecurityTest {
     authInfo = mock(AuthInfo.class);
     impl = mock(CampaignServiceImpl.class);
     security = new CampaignSecurity(impl, authInfo);
+    token = JWT.decode(JWT.create().sign(Algorithm.none()));
   }
 
   @Test
@@ -157,7 +162,7 @@ class CampaignSecurityTest {
     var conf = mock(MissionConfiguration.class);
     given(authInfo.isAdmin()).willReturn(true);
 
-    security.startMission("camp", "serv", conf);
+    security.startMission("camp", "serv", conf, token);
 
     verify(impl).startMission("camp", "serv", conf);
   }
@@ -171,7 +176,7 @@ class CampaignSecurityTest {
     given(impl.isOwner("camp", uuid)).willReturn(true);
     given(impl.userCanManageServer(uuid, "serv")).willReturn(true);
 
-    security.startMission("camp", "serv", conf);
+    security.startMission("camp", "serv", conf, token);
 
     verify(impl).startMission("camp", "serv", conf);
   }
@@ -182,7 +187,7 @@ class CampaignSecurityTest {
     given(authInfo.isCampaignManager()).willReturn(false);
 
     assertThrows(NotAuthorizedException.class, () -> {
-      security.startMission("camp", "serv", conf);
+      security.startMission("camp", "serv", conf, token);
     });
   }
 
@@ -195,7 +200,7 @@ class CampaignSecurityTest {
     given(impl.isOwner("camp", uuid)).willReturn(false);
 
     assertThrows(NotAuthorizedException.class, () -> {
-      security.startMission("camp", "serv", conf);
+      security.startMission("camp", "serv", conf, token);
     });
   }
 
@@ -209,7 +214,22 @@ class CampaignSecurityTest {
     given(impl.userCanManageServer(uuid, "serv")).willReturn(false);
 
     assertThrows(NotAuthorizedException.class, () -> {
-      security.startMission("camp", "serv", conf);
+      security.startMission("camp", "serv", conf, token);
     });
+  }
+
+  @Test
+  void teststartMissionServerOwnerThroughToken() throws IOException {
+    var conf = mock(MissionConfiguration.class);
+    var uuid = UUID.randomUUID();
+    token = JWT.decode(JWT.create().withClaim("servers", List.of("serv")).sign(Algorithm.none()));
+    given(authInfo.getUserUUID()).willReturn(uuid);
+    given(authInfo.isCampaignManager()).willReturn(true);
+    given(impl.isOwner("camp", uuid)).willReturn(true);
+    given(impl.userCanManageServer(uuid, "serv")).willReturn(false);
+
+    security.startMission("camp", "serv", conf, token);
+
+    verify(impl).startMission("camp", "serv", conf);
   }
 }

@@ -3,6 +3,8 @@ package factionfiction.api.v2.campaign;
 import static base.game.Airbases.ANAPA;
 import static base.game.CampaignCoalition.RED;
 import base.game.units.MissionConfiguration;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import static com.github.apilab.rest.auth.JavalinJWTFilter.REQ_ATTR_JWT;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
 import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
 import factionfiction.api.v2.campaignfaction.CampaignFactionService;
@@ -106,16 +108,19 @@ class CampaignEndpointsTest {
   @Test
   void testStartServer() {
     var conf = mock(MissionConfiguration.class);
+    var token = mock(DecodedJWT.class);
     given(ctx.pathParam("campaign", String.class))
       .willReturn(Validator.create(String.class, "camp"));
     given(ctx.pathParam("server", String.class))
       .willReturn(Validator.create(String.class, "serv"));
     given(ctx.bodyAsClass(MissionConfiguration.class))
       .willReturn(conf);
+    given(ctx.attribute(REQ_ATTR_JWT))
+      .willReturn(token);
 
     endpoint.startServer(ctx);
 
-    verify(campaignService).startMission("camp", "serv", conf);
+    verify(campaignService).startMission("camp", "serv", conf, token);
   }
 
 }

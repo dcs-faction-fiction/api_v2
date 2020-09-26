@@ -1,12 +1,14 @@
 package factionfiction.api.v2.campaign;
 
 import base.game.units.MissionConfiguration;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import factionfiction.api.v2.auth.AuthInfo;
 import factionfiction.api.v2.daemon.ServerInfo;
 import factionfiction.api.v2.game.GameOptions;
 import java.util.List;
 import java.util.Optional;
+import static java.util.Optional.ofNullable;
 
 public class CampaignSecurity implements CampaignService {
 
@@ -46,7 +48,7 @@ public class CampaignSecurity implements CampaignService {
   }
 
   @Override
-  public void startMission(String campaignName, String serverName, MissionConfiguration configuration) {
+  public void startMission(String campaignName, String serverName, MissionConfiguration configuration, DecodedJWT token) {
     if (authInfo.isAdmin()) {
       impl.startMission(campaignName, serverName, configuration);
       return;
@@ -58,7 +60,7 @@ public class CampaignSecurity implements CampaignService {
     if (!ownsCampaign(campaignName))
       throw cannotOwnCampaign();
 
-    if (!canManageServer(serverName))
+    if (!canManageServer(serverName, token))
       throw cannotManageServerError();
 
     impl.startMission(campaignName, serverName, configuration);
@@ -87,7 +89,14 @@ public class CampaignSecurity implements CampaignService {
     return authInfo.isCampaignManager();
   }
 
-  boolean canManageServer(String serverName) {
+  boolean canManageServer(String serverName, DecodedJWT token) {
+    var tokenContainsServer = ofNullable(token.getClaim("servers"))
+      .map(claim -> claim.asList(String.class))
+      .map(list -> list.contains(serverName))
+      .orElse(false);
+    if (tokenContainsServer)
+      return true;
+
     return impl.userCanManageServer(authInfo.getUserUUID(), serverName);
   }
 

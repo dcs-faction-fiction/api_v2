@@ -2,6 +2,7 @@ package factionfiction.api.v2.campaign;
 
 import base.game.units.MissionConfiguration;
 import com.github.apilab.rest.Endpoint;
+import static com.github.apilab.rest.auth.JavalinJWTFilter.getToken;
 import static factionfiction.api.v2.auth.Roles.CAMPAIGN_MANAGER;
 import static factionfiction.api.v2.campaignfaction.CampaignFaction.fromCampaignAndFactionAndOptions;
 import factionfiction.api.v2.campaignfaction.CampaignFactionService;
@@ -69,8 +70,9 @@ public class CampaignEndpoints implements Endpoint {
     var campaign = ctx.pathParam("campaign", String.class).get();
     var server = ctx.pathParam("server", String.class).get();
     var configuration = ctx.bodyAsClass(MissionConfiguration.class);
+    var token = getToken(ctx);
 
-    campService.startMission(campaign, server, configuration);
+    campService.startMission(campaign, server, configuration, token);
 
     ctx.json("{}");
   }
