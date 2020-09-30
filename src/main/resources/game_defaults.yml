@@ -84,6 +84,8 @@ game:
       cost: 2
     - code: "KA_50"
       cost: 2
+    - code: "MI_8MT"
+      cost: 2
     - code: "AIM_120_B"
       cost: 0.6
     - code: "AIM_120_C"
@@ -118,7 +120,7 @@ game:
       cost: 0.1
     - code: "R_73"
       cost: 0.4
-    - code: "R_60"
+    - code: "R_60M"
       cost: 0.1
     - code: "R_77"
       cost: 0.7
@@ -156,9 +158,13 @@ game:
       cost: 0.9
     - code: "KH_25MPU"
       cost: 0.7
+    - code: "KH_25ML"
+      cost: 0.6
     - code: "KH_29L"
       cost: 0.6
     - code: "KH_29T"
+      cost: 0.6
+    - code: "S_25L"
       cost: 0.6
     - code: "GBU_10"
       cost: 0.6
@@ -202,3 +208,17 @@ game:
       cost: 0.01
     - code: "M5_HE"
       cost: 0.01
+    - code: "BLG66"
+      cost: 0.1
+    - code: "CBU_87"
+      cost: 0.1
+    - code: "CBU_97"
+      cost: 0.3
+    - code: "CBU_103"
+      cost: 0.1
+    - code: "CBU_105"
+      cost: 0.3
+    - code: "CBU_99"
+      cost: 0.1
+    - code: "MK_20"
+      cost: 0.1

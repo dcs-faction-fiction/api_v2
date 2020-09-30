@@ -33,6 +33,7 @@ public class PurchaseEndpoints implements Endpoint {
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-warehouse-item", this::buyWarehouseItem, roles(FACTION_MANAGER));
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-warehouse-items", this::buyWarehouseItems, roles(FACTION_MANAGER));
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/zone-increase", this::zoneIncrease, roles(FACTION_MANAGER));
+    javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/zone-decrease", this::zoneDecrease, roles(FACTION_MANAGER));
     javalin.post("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-recoshot", this::buyRecoShot, roles(FACTION_MANAGER));
   }
 

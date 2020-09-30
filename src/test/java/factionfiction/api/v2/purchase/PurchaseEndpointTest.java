@@ -52,6 +52,9 @@ class PurchaseEndpointTest {
     verify(javalin).post(eq("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-unit"), any(), eq(roles(FACTION_MANAGER)));
     verify(javalin).post(eq("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-warehouse-item"), any(), eq(roles(FACTION_MANAGER)));
     verify(javalin).post(eq("/v2/purchase-api/campaigns/:campaign/factions/:faction/buy-recoshot"), any(), eq(roles(FACTION_MANAGER)));
+    verify(javalin).post(eq("/v2/purchase-api/campaigns/:campaign/factions/:faction/zone-increase"), any(), eq(roles(FACTION_MANAGER)));
+    verify(javalin).post(eq("/v2/purchase-api/campaigns/:campaign/factions/:faction/zone-decrease"), any(), eq(roles(FACTION_MANAGER)));
+
   }
 
   @Test
