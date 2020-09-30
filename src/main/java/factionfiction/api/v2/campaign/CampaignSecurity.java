@@ -94,7 +94,7 @@ public class CampaignSecurity implements CampaignService {
       .map(claim -> claim.asList(String.class))
       .map(list -> list.contains(serverName))
       .orElse(false);
-    if (tokenContainsServer)
+    if (Boolean.TRUE.equals(tokenContainsServer))
       return true;
 
     return impl.userCanManageServer(authInfo.getUserUUID(), serverName);
