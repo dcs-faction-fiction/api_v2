@@ -208,4 +208,8 @@ public class CampaignRepository {
     }
   }
 
+  public void setGameOptions(String campaignName, GameOptions options) {
+    jdbi.useHandle(h -> h.execute("update campaign set game_options = ? where name = ?", gson.toJson(options), campaignName));
+  }
+
 }

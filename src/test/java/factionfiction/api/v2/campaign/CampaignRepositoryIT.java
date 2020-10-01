@@ -65,6 +65,19 @@ class CampaignRepositoryIT {
   }
 
   @Test
+  void testCampaignSetOptions() throws IOException {
+    cleanCampaignTable(jdbi);
+    insertSampleCampaign(jdbi, owner);
+
+    var options = new GameOptionsLoader().loadDefaults();
+
+    repository.setGameOptions("Campaign name", options);
+    var campaign = repository.listCampaigns(owner).get(0);
+
+    assertThat(campaign.gameOptions(), is(options));
+  }
+
+  @Test
   void testNewCampaign() throws IOException {
     cleanCampaignTable(jdbi);
     var campaignToCreate = makeSampleCampaign();

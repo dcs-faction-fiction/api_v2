@@ -13,6 +13,7 @@ import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
 import factionfiction.api.v2.campaign.CampaignService;
 import factionfiction.api.v2.campaign.ImmutableCampaignCreatePayloadFactions;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
+import factionfiction.api.v2.game.GameOptions;
 import factionfiction.api.v2.game.GameOptionsLoader;
 import factionfiction.api.v2.game.ImmutableRecoShot;
 import static factionfiction.api.v2.units.UnitHelper.makeSampleFactionUnit;
@@ -65,6 +66,7 @@ class CampaignFactionEndpointsTest {
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/reco-shots"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/game-options"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
+    verify(javalin).post(eq("/v2/campaignfaction-api/campaigns/:campaign/game-options"), any(), eq(roles(CAMPAIGN_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/factions/:faction/campaigns"), any(), eq(roles(FACTION_MANAGER)));
     verify(javalin).post(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/units/:unitid/new-location"), any(), eq(roles(FACTION_MANAGER)));
     verify(javalin).delete(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/reco-shots/:id"), any(), eq(roles(FACTION_MANAGER)));
@@ -130,6 +132,20 @@ class CampaignFactionEndpointsTest {
     endpoints.getGameOptions(ctx);
 
     verify(ctx).json(options);
+  }
+
+  @Test
+  void testSetOptions() throws IOException {
+    var cf = makeSampleCampaignFaction();
+    var options = new GameOptionsLoader().loadDefaults();
+    given(ctx.pathParam("campaign", String.class))
+      .willReturn(Validator.create(String.class, cf.campaignName()));
+    given(ctx.bodyAsClass(GameOptions.class))
+      .willReturn(options);
+
+    endpoints.setGameOptions(ctx);
+
+    verify(campFactionService).setGameOptions(cf.campaignName(), options);
   }
 
   @Test

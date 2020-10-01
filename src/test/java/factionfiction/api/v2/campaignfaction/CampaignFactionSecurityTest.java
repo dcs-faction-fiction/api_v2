@@ -95,7 +95,7 @@ class CampaignFactionSecurityTest {
   void testCanGetSituationCampaignCasesNone() {
     var situation = makeSituation();
     mockNoFactionManager();
-    mockNoCamapignManager();
+    mockNoCampaignManager();
     mockOwnerAndResponse(situation);
     var campaign = sample.campaignName();
     var faction = sample.factionName();
@@ -121,7 +121,7 @@ class CampaignFactionSecurityTest {
   void testCanGetSituationCampaignCasesFaction() {
     var situation = makeSituation();
     mockFactionManagerAndFactionOwner();
-    mockNoCamapignManager();
+    mockNoCampaignManager();
     mockOwnerAndResponse(situation);
 
     var result = security.getSituation(sample.campaignName(), sample.factionName());
@@ -147,7 +147,7 @@ class CampaignFactionSecurityTest {
   void testCanGetSituationCampaignCasesFactionNoOwner() {
     var situation = makeSituation();
     mockFactionManagerAndNoFactionOwner();
-    mockNoCamapignManager();
+    mockNoCampaignManager();
     mockOwnerAndResponse(situation);
     var campaign = sample.campaignName();
     var faction = sample.factionName();
@@ -162,7 +162,7 @@ class CampaignFactionSecurityTest {
     var options = makeSampleOptions();
     mockGameOptions(options);
     mockFactionManagerAndFactionOwner();
-    mockNoCamapignManager();
+    mockNoCampaignManager();
 
     var result = security.getGameOptions(sample.campaignName(), sample.factionName());
 
@@ -174,7 +174,7 @@ class CampaignFactionSecurityTest {
     var options = makeSampleOptions();
     mockGameOptions(options);
     mockNoFactionManager();
-    mockNoCamapignManager();
+    mockNoCampaignManager();
     var campaign = sample.campaignName();
     var faction = sample.factionName();
 
@@ -207,7 +207,7 @@ class CampaignFactionSecurityTest {
 
   @Test
   void testGetAllFactionsNoCampaignManager() {
-    mockNoCamapignManager();
+    mockNoCampaignManager();
 
     assertThrows(NotAuthorizedException.class, () -> {
       security.getAllFactions("campaign");
@@ -360,6 +360,35 @@ class CampaignFactionSecurityTest {
     });
   }
 
+  @Test
+  void testSetOptionsNoCampaigManager() {
+    mockNoCampaignManager();
+    var campaign = sample.campaignName();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.setGameOptions(campaign, null);
+    });
+  }
+
+  @Test
+  void testSetOptionsCampaigManagerNoOwner() {
+    mockCampaignManagerAndNoCampaignOwner();
+    var campaign = sample.campaignName();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.setGameOptions(campaign, null);
+    });
+  }
+
+  @Test
+  void testSetOptionsCampaigManagerAndOwner() {
+    mockCampaignManagerAndCampaignOwner();
+    var campaign = sample.campaignName();
+    security.setGameOptions(campaign, null);
+
+    verify(campaignRepository).setGameOptions(campaign, null);
+  }
+
   void mockGameOptions(GameOptions options) {
     given(campaignRepository.find(sample.campaignName()))
       .willReturn(ImmutableCampaign.builder()
@@ -384,7 +413,7 @@ class CampaignFactionSecurityTest {
       .willReturn(false);
   }
 
-  void mockNoCamapignManager() {
+  void mockNoCampaignManager() {
     given(authInfo.getUserUUID()).willReturn(owner);
     given(authInfo.isCampaignManager()).willReturn(false);
     given(campaignRepository.isOwner(sample.factionName(), owner))

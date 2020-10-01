@@ -60,6 +60,17 @@ public class CampaignFactionSecurity implements CampaignFactionService {
   }
 
   @Override
+  public void setGameOptions(String campaignName, GameOptions options) {
+    if (!canCreateCampaignFactions())
+      throw cannotCreateCampaignFactionsError();
+
+    if (!isCampaignOwner(campaignName))
+      throw cannotCreateWithoutOwner();
+
+    campaignRepository.setGameOptions(campaignName, options);
+  }
+
+  @Override
   public List<String> getAvailableCampaigns(String factionName) {
     return campaignRepository.getAvailableCampaignsForFaction(factionName);
   }

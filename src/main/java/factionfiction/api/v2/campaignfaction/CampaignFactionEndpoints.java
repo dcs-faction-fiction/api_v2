@@ -8,6 +8,7 @@ import static factionfiction.api.v2.auth.Roles.FACTION_MANAGER;
 import factionfiction.api.v2.campaign.CampaignCreatePayloadFactions;
 import factionfiction.api.v2.campaign.CampaignService;
 import static factionfiction.api.v2.campaignfaction.CampaignFaction.fromCampaignAndFactionAndOptions;
+import factionfiction.api.v2.game.GameOptions;
 import io.javalin.Javalin;
 import static io.javalin.core.security.SecurityUtil.roles;
 import io.javalin.http.Context;
@@ -45,6 +46,7 @@ public class CampaignFactionEndpoints implements Endpoint {
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction", this::getSituation, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/reco-shots", this::getRecoShots, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
     javalin.get("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/game-options", this::getGameOptions, roles(CAMPAIGN_MANAGER, FACTION_MANAGER));
+    javalin.post("/v2/campaignfaction-api/campaigns/:campaign/game-options", this::setGameOptions, roles(CAMPAIGN_MANAGER));
     javalin.get("/v2/campaignfaction-api/factions/:faction/campaigns", this::getAvailableCampaigns, roles(FACTION_MANAGER));
     javalin.post("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/units/:unitid/new-location", this::moveUnit, roles(FACTION_MANAGER));
     javalin.delete("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction/reco-shots/:id", this::deleteRecoShot, roles(FACTION_MANAGER));
@@ -85,6 +87,16 @@ public class CampaignFactionEndpoints implements Endpoint {
     var result = service.getSituation(campaignName, factionName);
 
     ctx.json(result);
+  }
+
+  public void setGameOptions(Context ctx) {
+    var service = cfServiceProvider.apply(ctx);
+    var campaignName = ctx.pathParam(CAMPAIGN_PATHPARAM, String.class).get();
+    var options = ctx.bodyAsClass(GameOptions.class);
+
+    service.setGameOptions(campaignName, options);
+
+    ctx.json("{}");
   }
 
   public void getGameOptions(Context ctx) {
