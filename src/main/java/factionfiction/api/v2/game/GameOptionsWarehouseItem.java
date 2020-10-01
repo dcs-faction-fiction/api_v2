@@ -1,5 +1,6 @@
 package factionfiction.api.v2.game;
 
+import base.game.warehouse.WarehouseItemCategory;
 import base.game.warehouse.WarehouseItemCode;
 import java.math.BigDecimal;
 import java.util.Map;
@@ -12,6 +13,9 @@ import org.immutables.value.Value;
 public interface GameOptionsWarehouseItem {
   WarehouseItemCode code();
   BigDecimal cost();
+  default WarehouseItemCategory category() {
+    return code().category();
+  }
 
   public static GameOptionsWarehouseItem from(Map<?, ?> map) {
     return ImmutableGameOptionsWarehouseItem.builder()
