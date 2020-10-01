@@ -80,6 +80,8 @@ game:
       cost: 2
     - code: "MIG_29_S"
       cost: 2
+    - code: "SU_25_T"
+      cost: 2
     - code: "M_2000_C"
       cost: 2
     - code: "JF_17"
@@ -89,6 +91,8 @@ game:
     - code: "KA_50"
       cost: 2
     - code: "MI_8MT"
+      cost: 2
+    - code: "SA342M"
       cost: 2
     - code: "AIM_120_B"
       cost: 0.6
@@ -175,6 +179,8 @@ game:
     - code: "KH_29T"
       cost: 0.6
     - code: "S_25L"
+      cost: 0.6
+    - code: "HOT3"
       cost: 0.6
     - code: "GBU_10"
       cost: 0.6
