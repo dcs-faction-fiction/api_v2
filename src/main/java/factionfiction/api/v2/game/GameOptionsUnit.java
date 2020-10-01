@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 import org.immutables.gson.Gson;
 import org.immutables.value.Value;
+import org.immutables.value.Value.Default;
 
 @Value.Immutable
 @Gson.TypeAdapters
@@ -13,7 +14,7 @@ import org.immutables.value.Value;
 public interface GameOptionsUnit {
   Unit code();
   BigDecimal cost();
-  default UnitType type() {
+  @Default default UnitType type() {
     return code().type();
   }
 
