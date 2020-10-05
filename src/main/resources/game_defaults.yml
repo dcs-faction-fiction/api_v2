@@ -19,6 +19,8 @@ game:
   units:
     - code: "AWACS"
       cost: 3
+    - code: "EWR_1L13"
+      cost: 3
     - code: "TANKER"
       cost: 1
     - code: "ABRAMS"
