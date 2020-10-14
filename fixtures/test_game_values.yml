@@ -31,6 +31,10 @@ game:
       cost: 0.5
     - code: "BMP_3"
       cost: 0.5
+    - code: "BTR_80"
+      cost: 0.5
+    - code: "BRDM_2"
+      cost: 0.5
     - code: "SHILKA"
       cost: 0.5
     - code: "SA_9"
