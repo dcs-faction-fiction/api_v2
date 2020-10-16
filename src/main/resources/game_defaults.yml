@@ -55,6 +55,20 @@ game:
       cost: 3
     - code: "SA_PATRIOT"
       cost: 3
+    - code: "LAV_25"
+      cost: 0.5
+    - code: "AAV7"
+      cost: 0.5
+    - code: "M113"
+      cost: 0.5
+    - code: "VULCAN"
+      cost: 0.5
+    - code: "ROLAND"
+      cost: 0.5
+    - code: "LINEBACKER"
+      cost: 0.5
+    - code: "M818"
+      cost: 0.5
   warehouseItems:
     - code: "JET_FUEL_TONS"
       cost: 0.04
