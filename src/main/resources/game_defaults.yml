@@ -104,6 +104,8 @@ game:
       cost: 2
     - code: "M_2000_C"
       cost: 2
+    - code: "AJS37"
+      cost: 2
     - code: "JF_17"
       cost: 2
     - code: "UH_1H"
@@ -260,3 +262,15 @@ game:
       cost: 0.1
     - code: "MK_20"
       cost: 0.1
+    - code: "RB_24_J"
+      cost: 0.5
+    - code: "RB_74"
+      cost: 0.5
+    - code: "RB_75"
+      cost: 0.5
+    - code: "RB_75_T"
+      cost: 0.5
+    - code: "RB_15_F"
+      cost: 0.5
+    - code: "RB_04_E"
+      cost: 0.5
