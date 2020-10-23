@@ -3,6 +3,8 @@ package factionfiction.api.v2.daemon;
 import base.game.ImmutableLocation;
 import static factionfiction.api.v2.auth.Roles.DAEMON;
 import static factionfiction.api.v2.daemon.ServerAction.MISSION_STARTED;
+import static factionfiction.api.v2.daemon.ServerAction.MISSION_STOPPED;
+import static factionfiction.api.v2.daemon.ServerAction.STOP_MISSION;
 import io.javalin.Javalin;
 import static io.javalin.core.security.SecurityUtil.roles;
 import io.javalin.core.validation.Validator;
@@ -140,6 +142,23 @@ class DaemonEndpointTest {
 
     verify(repository).setNextAction("server1", MISSION_STARTED, Optional.of(info));
   }
+
+  @Test
+  void testSetActionStop() {
+    var info = ImmutableServerInfo.builder()
+      .build();
+    given(ctx.bodyAsClass(ServerInfo.class))
+      .willReturn(info);
+    given(ctx.pathParam("server", String.class))
+      .willReturn(Validator.create(String.class, "server1"));
+    given(ctx.pathParam("action", String.class))
+      .willReturn(Validator.create(String.class, "STOP_MISSION"));
+
+    endpoints.setAction(ctx);
+
+    verify(repository).setNextAction("server1", STOP_MISSION, Optional.of(info));
+  }
+
 
   static ImmutableFactionUnitPosition sampleMovedUnit() {
     return ImmutableFactionUnitPosition.builder()
