@@ -74,24 +74,28 @@ class DaemonEndpointTest {
   void testDeadUnits() {
     var uuid = UUID.randomUUID();
     var request = new String[]{ uuid.toString() };
+    given(ctx.pathParam("server", String.class))
+      .willReturn(Validator.create(String.class, "server1"));
     given(ctx.bodyAsClass(String[].class))
       .willReturn(request);
 
     endpoints.destroyedUnits(ctx);
 
-    verify(repository).reportDeadUnits(List.of(uuid));
+    verify(repository).reportDeadUnits("server1", List.of(uuid));
   }
 
   @Test
   void testMovedUnits() {
     var item = sampleMovedUnit();
     var request = new ImmutableFactionUnitPosition[] { item };
+    given(ctx.pathParam("server", String.class))
+      .willReturn(Validator.create(String.class, "server1"));
     given(ctx.bodyAsClass(ImmutableFactionUnitPosition[].class))
       .willReturn(request);
 
     endpoints.movedUnits(ctx);
 
-    verify(repository).reportMovedUnits(List.of(item));
+    verify(repository).reportMovedUnits("server1", List.of(item));
   }
 
   @Test

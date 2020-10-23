@@ -68,9 +68,10 @@ public class DaemonEndpoints implements Endpoint {
     responses = {@OpenApiResponse(status = "201")}
   )
   public void movedUnits(Context ctx) {
+    var serverId = ctx.pathParam(SERVER_PATHPARAM, String.class).get();
     var moved = Arrays.asList(ctx.bodyAsClass(ImmutableFactionUnitPosition[].class));
 
-    repository.reportMovedUnits(moved);
+    repository.reportMovedUnits(serverId, moved);
 
     ctx.result("{}");
     ctx.status(201);
@@ -83,10 +84,11 @@ public class DaemonEndpoints implements Endpoint {
     responses = {@OpenApiResponse(status = "201")}
   )
   public void destroyedUnits(Context ctx) {
+    var serverId = ctx.pathParam(SERVER_PATHPARAM, String.class).get();
     var deadUnits = ctx.bodyAsClass(String[].class);
     var uuids = Arrays.asList(deadUnits).stream().map(UUID::fromString).collect(toList());
 
-    repository.reportDeadUnits(uuids);
+    repository.reportDeadUnits(serverId, uuids);
 
     ctx.result("{}");
     ctx.status(201);

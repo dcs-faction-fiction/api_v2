@@ -2,6 +2,7 @@ package factionfiction.api.v2.daemon;
 
 import base.game.Airbases;
 import base.game.warehouse.WarehouseItemCode;
+import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import com.github.apilab.rest.exceptions.NotFoundException;
 import static factionfiction.api.v2.daemon.ServerAction.MISSION_STARTED;
 import static factionfiction.api.v2.daemon.ServerAction.STOP_MISSION;
@@ -24,7 +25,10 @@ public class DaemonRepository {
   }
 
   public void reportWarehouses(String serverName, WarehousesSpent request) {
-    jdbi.useHandle(h ->
+    jdbi.useHandle(h -> {
+      ensureServerExists(h, serverName);
+      ensureServerHasACampaignAssigned(h, serverName);
+
       request.toWarehouseDelta().entrySet().forEach(e -> {
         var airbase = e.getKey();
         var baseInventory = e.getValue();
@@ -39,20 +43,26 @@ public class DaemonRepository {
               + " where id = ?",
             amount, itemUUID);
         });
-      })
-    );
+      });
+    });
   }
 
-  public void reportDeadUnits(List<UUID> uuids) {
-    jdbi.useHandle(h ->
+  public void reportDeadUnits(String serverName, List<UUID> uuids) {
+    jdbi.useHandle(h -> {
+      ensureServerExists(h, serverName);
+      ensureServerHasACampaignAssigned(h, serverName);
+
       uuids.forEach(uuid ->
         h.execute("delete from campaign_faction_units where id = ?", uuid)
-      )
-    );
+      );
+    });
   }
 
-  public void reportMovedUnits(List<ImmutableFactionUnitPosition> units) {
-    jdbi.useHandle(h ->
+  public void reportMovedUnits(String serverName, List<ImmutableFactionUnitPosition> units) {
+    jdbi.useHandle(h -> {
+      ensureServerExists(h, serverName);
+      ensureServerHasACampaignAssigned(h, serverName);
+
       units.stream().forEach(u ->
         h.execute("update campaign_faction_units set "
           + "x = ?, "
@@ -65,8 +75,8 @@ public class DaemonRepository {
           u.location().altitude(),
           u.location().angle(),
           u.id())
-      )
-    );
+      );
+    });
   }
 
   public void downloadMission(String serverid, Consumer<InputStream> consumer) {
@@ -127,6 +137,15 @@ public class DaemonRepository {
     if (!exists) {
       h.execute("insert into server (name) values(?)", serverid);
     }
+  }
+
+  private void ensureServerHasACampaignAssigned(Handle h, String server) {
+    boolean exists = h.select("select name from server where name = ? and campaign_name is not null", server)
+      .mapTo(String.class)
+      .findFirst()
+      .isPresent();
+    if (!exists)
+      throw new NotAuthorizedException("Cannot operate on a server with no mission assigned");
   }
 
   private UUID ensureWarehouseExists(Handle h, String campaignName, Airbases airbase) {

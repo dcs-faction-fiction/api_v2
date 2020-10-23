@@ -8,6 +8,7 @@ import static base.game.units.Unit.ABRAMS;
 import static base.game.units.Unit.T_80;
 import base.game.warehouse.WarehouseItemCode;
 import static base.game.warehouse.WarehouseItemCode.JET_FUEL_TONS;
+import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import com.github.apilab.rest.exceptions.NotFoundException;
 import static factionfiction.api.v2.daemon.ServerAction.MISSION_STARTED;
 import static factionfiction.api.v2.daemon.ServerAction.START_NEW_MISSION;
@@ -72,7 +73,7 @@ class DaemonRepositoryIT {
     addData();
     var request = makeWarehouseRequest();
 
-    assertThrows(NotFoundException.class, () -> {
+    assertThrows(NotAuthorizedException.class, () -> {
       repository.reportWarehouses("whatever", request);
     });
   }
@@ -82,7 +83,7 @@ class DaemonRepositoryIT {
     cleanTables();
     addData();
 
-    repository.reportDeadUnits(List.of(unit1));
+    repository.reportDeadUnits("server1", List.of(unit1));
 
     var unitIds = getUnitIds();
     assertThat(unitIds, is(List.of(unit2)));
@@ -99,7 +100,7 @@ class DaemonRepositoryIT {
       .angle(ONE)
       .build();
 
-    repository.reportMovedUnits(List.of(ImmutableFactionUnitPosition.builder()
+    repository.reportMovedUnits("server1", List.of(ImmutableFactionUnitPosition.builder()
       .id(unit2)
       .location(location)
       .build()));
