@@ -226,10 +226,9 @@ class CampaignFactionRepositoryIT {
     cleanCampaignFactionUnitsTable(jdbi);
     insertDataForMoveUnit(jdbi, unitId);
 
-    repository.moveUnit("campaign name", "faction name", unitId, newLocation);
-
-    Location location = getLocationOfUnitById(unitId);
-    assertThat(location, is(not(newLocation)));
+    assertThrows(NotAuthorizedException.class, () -> {
+      repository.moveUnit("campaign name", "faction name", unitId, newLocation);
+    });
   }
 
   @Test

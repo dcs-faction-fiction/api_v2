@@ -4,6 +4,7 @@ import base.game.FactionUnit;
 import base.game.ImmutableFactionUnit;
 import base.game.Location;
 import base.game.warehouse.WarehouseItemCode;
+import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import factionfiction.api.v2.campaign.CampaignRepository;
 import factionfiction.api.v2.campaignfaction.CampaignFactionRepository;
 import factionfiction.api.v2.game.GameOptionsUnit;
@@ -85,12 +86,13 @@ public class PurchaseServiceImpl {
   FactionUnit confineUnitWithinFactionZone(String campaignName, String factionName, FactionUnit unit) {
     var cfId = campaignFactionRepository.getCampaignFactionId(campaignName, factionName);
     var cf = campaignFactionRepository.getCampaignFaction(cfId);
-    var confinedLocation = MathService.shrinkToCircle(
-      cf.airbase().location(),  cf.zoneSizeFt(), unit.location());
+
+    if (!MathService.isInCircle(cf.airbase().location(), cf.zoneSizeFt(), unit.location()))
+      throw new NotAuthorizedException("Cannot do it outside zone");
 
     unit = ImmutableFactionUnit.builder()
       .from(unit)
-      .location(confinedLocation)
+      .location(unit.location())
       .build();
     return unit;
   }

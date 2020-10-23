@@ -25,7 +25,7 @@ public final class MathService {
    * @param point point to check
    * @return new point returned or center if was outside
    */
-  public static Location shrinkToCircle(Location center, int sizeFt, Location point) {
+  public static boolean isInCircle(Location center, int sizeFt, Location point) {
     var dist = distance(
       center.latitude().doubleValue(),
       point.latitude().doubleValue(),
@@ -33,11 +33,7 @@ public final class MathService {
       point.longitude().doubleValue());
     var distFt = dist * 3.28084;
 
-    if (distFt > sizeFt) {
-      return center;
-    } else {
-      return point;
-    }
+    return distFt <= sizeFt;
   }
 
   public static double metersToLat(double meters) {

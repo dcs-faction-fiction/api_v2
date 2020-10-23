@@ -112,15 +112,15 @@ public class CampaignFactionRepository {
         + "limit 1", campaignName, factionName)
         .mapTo(Integer.class)
         .first();
-      var newloc = MathService.shrinkToCircle(abloc, radiusft, location);
-      // Can move a unit only if under the control zone
-      if (newloc.equals(location)) {
-        h.execute("update campaign_faction_units "
-          + "set x = ?, y = ?, z = ?, angle = ? "
-          + "where id = ? and campaign_faction_id = ?",
-          location.longitude(), location.latitude(), location.altitude(), location.angle(),
-          uid, cfid);
-      }
+
+      if (!MathService.isInCircle(abloc, radiusft, location))
+        throw new NotAuthorizedException("Cannot move outsize zone");
+
+      h.execute("update campaign_faction_units "
+        + "set x = ?, y = ?, z = ?, angle = ? "
+        + "where id = ? and campaign_faction_id = ?",
+        location.longitude(), location.latitude(), location.altitude(), location.angle(),
+        uid, cfid);
     });
   }
 

@@ -9,6 +9,7 @@ import static base.game.units.Unit.T_80;
 import static base.game.warehouse.WarehouseItemCode.AV_8B_NA;
 import static base.game.warehouse.WarehouseItemCode.JF_17;
 import static base.game.warehouse.WarehouseItemCode.UH_1H;
+import com.github.apilab.rest.exceptions.NotAuthorizedException;
 import static factionfiction.api.v2.campaign.CampaignHelper.makeSampleCampaign;
 import factionfiction.api.v2.campaign.CampaignRepository;
 import factionfiction.api.v2.campaign.ImmutableCampaign;
@@ -87,9 +88,9 @@ class PurchaseServiceTest {
     var unit = units.get(0);
     var changedUnit = units.get(1);
 
-    var result = service.buyUnit(campaignName, factionName, unit);
-
-    assertThat(result, is(changedUnit));
+    assertThrows(NotAuthorizedException.class, () -> {
+      service.buyUnit(campaignName, factionName, unit);
+    });
   }
 
   @Test
