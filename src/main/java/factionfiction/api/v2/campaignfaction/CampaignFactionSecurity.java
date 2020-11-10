@@ -129,7 +129,8 @@ public class CampaignFactionSecurity implements CampaignFactionService {
     return impl.getRecoShots(campaignName, factionName);
   }
 
-  void removeCampaignFaction(String campaign, String faction) {
+  @Override
+  public void removeCampaignFaction(String campaign, String faction) {
     if (!canCreateCampaignFactions())
       throw cannotCreateCampaignFactionsError();
 

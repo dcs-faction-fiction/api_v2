@@ -60,6 +60,7 @@ class CampaignFactionEndpointsTest {
 
     verify(javalin).get(eq("/v2/campaignfaction-api"), any(), eq(roles(CAMPAIGN_MANAGER, FACTION_MANAGER)));
     verify(javalin).post(eq("/v2/campaignfaction-api/campaigns/:campaign/factions"), any(), eq(roles(CAMPAIGN_MANAGER)));
+    verify(javalin).delete(eq("/v2/campaignfaction-api/campaigns/:campaign/factions/:faction"), any(), eq(roles(CAMPAIGN_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/factions"), any(), eq(roles(CAMPAIGN_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/allied-factions"), any(), eq(roles(FACTION_MANAGER)));
     verify(javalin).get(eq("/v2/campaignfaction-api/campaigns/:campaign/enemy-faction-locations"), any(), eq(roles(FACTION_MANAGER)));
@@ -100,6 +101,19 @@ class CampaignFactionEndpointsTest {
     endpoints.addNew(ctx);
 
     verify(ctx).json(cf);
+  }
+
+  @Test
+  void testRemoveFaction() throws IOException {
+    var cf = makeSampleCampaignFaction();
+    given(ctx.pathParam("faction", String.class))
+      .willReturn(Validator.create(String.class, cf.factionName()));
+    given(ctx.pathParam("campaign", String.class))
+      .willReturn(Validator.create(String.class, cf.campaignName()));
+
+    endpoints.removeFaction(ctx);
+
+    verify(campFactionService).removeCampaignFaction(cf.campaignName(), cf.factionName());
   }
 
   @Test

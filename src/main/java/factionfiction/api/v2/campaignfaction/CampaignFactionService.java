@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public interface CampaignFactionService {
   CampaignFaction newCampaignFaction(CampaignFaction campaignFaction);
+  void removeCampaignFaction(String campaign, String faction);
   FactionSituation getSituation(String campaignName, String factionName);
   GameOptions getGameOptions(String campaignName, String factionName);
   void setGameOptions(String campaignName, GameOptions options);
