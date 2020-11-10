@@ -389,6 +389,35 @@ class CampaignFactionSecurityTest {
     verify(campaignRepository).setGameOptions(campaign, null);
   }
 
+  @Test
+  void testRemoveFactionNoCampaigManager() {
+    mockNoCampaignManager();
+    var campaign = sample.campaignName();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.removeCampaignFaction(campaign, null);
+    });
+  }
+
+  @Test
+  void testRemoveFactionCampaigManagerNoOwner() {
+    mockCampaignManagerAndNoCampaignOwner();
+    var campaign = sample.campaignName();
+
+    assertThrows(NotAuthorizedException.class, () -> {
+      security.removeCampaignFaction(campaign, null);
+    });
+  }
+
+  @Test
+  void testRemoveFactionCampaigManagerAndOwner() {
+    mockCampaignManagerAndCampaignOwner();
+    var campaign = sample.campaignName();
+    security.removeCampaignFaction(campaign, null);
+
+    verify(impl).removeCampaignFaction(campaign, null);
+  }
+
   void mockGameOptions(GameOptions options) {
     given(campaignRepository.find(sample.campaignName()))
       .willReturn(ImmutableCampaign.builder()

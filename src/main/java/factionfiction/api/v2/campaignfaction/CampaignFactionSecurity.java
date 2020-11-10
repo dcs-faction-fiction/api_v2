@@ -129,6 +129,16 @@ public class CampaignFactionSecurity implements CampaignFactionService {
     return impl.getRecoShots(campaignName, factionName);
   }
 
+  void removeCampaignFaction(String campaign, String faction) {
+    if (!canCreateCampaignFactions())
+      throw cannotCreateCampaignFactionsError();
+
+    if (!isCampaignOwner(campaign))
+      throw cannotCreateWithoutOwner();
+
+    impl.removeCampaignFaction(campaign, faction);
+  }
+
   boolean isFactionOwner(String factionName) {
     return factionRepository.isOwner(factionName, authInfo.getUserUUID());
   }
