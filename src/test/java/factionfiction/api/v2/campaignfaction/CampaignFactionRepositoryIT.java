@@ -5,6 +5,7 @@ import static base.game.Airbases.KUTAISI;
 import static base.game.CampaignCoalition.RED;
 import base.game.Location;
 import com.github.apilab.rest.exceptions.NotAuthorizedException;
+import com.github.apilab.rest.exceptions.NotFoundException;
 import static factionfiction.api.v2.campaign.CampaignHelper.cleanCampaignTable;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.cleanCampaignFactionTable;
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.cleanCampaignFactionUnitsTable;
@@ -12,9 +13,15 @@ import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.insert
 import static factionfiction.api.v2.campaignfaction.CampaignFactionHelper.makeSampleCampaignFaction;
 import static factionfiction.api.v2.faction.FactionHelper.cleanFactionTable;
 import static factionfiction.api.v2.test.InMemoryDB.jdbi;
+import factionfiction.api.v2.units.UnitHelper;
 import static factionfiction.api.v2.units.UnitHelper.cleanRecoShots;
 import static factionfiction.api.v2.units.UnitHelper.insertRecoShot;
+import static factionfiction.api.v2.units.UnitHelper.insertSampleFactionUnit;
 import static factionfiction.api.v2.units.UnitHelper.makeSampleRecoShot;
+import factionfiction.api.v2.units.UnitRepository;
+import factionfiction.api.v2.warehouse.WarehouseHelper;
+import static factionfiction.api.v2.warehouse.WarehouseHelper.insertSampleWarehouseItems;
+import factionfiction.api.v2.warehouse.WarehouseRepository;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,6 +30,7 @@ import java.util.UUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import org.immutables.gson.Gson.Ignore;
 import org.jdbi.v3.core.Jdbi;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -271,6 +279,35 @@ class CampaignFactionRepositoryIT {
 
     assertThat(result.size(), is(1));
     assertThat(result.get(0), is(output));
+  }
+
+  @Test
+  void testRemoveFaction() {
+    var cfId = UUID.randomUUID();
+    cleanCampaignFactionTable(jdbi);
+    insertSampleCampaignFaction(jdbi, cfId, owner);
+    insertSampleWarehouseItems(jdbi);
+    insertSampleFactionUnit(jdbi, cfId, cfId);
+
+    var warehouseRepository = new WarehouseRepository(jdbi);
+    var warehouse = warehouseRepository.getWarehouseFromCampaignFaction("campaign name", KUTAISI);
+    assertThat(warehouse.isEmpty(), is(false));
+
+    var unitRepository = new UnitRepository(jdbi);
+    var units = unitRepository.getUnitsFromCampaignFaction(cfId);
+    assertThat(units.isEmpty(), is(false));
+
+    repository.removeCampaignFaction(jdbi, cfId);
+
+    assertThrows(NotFoundException.class, () -> {
+      repository.getCampaignFaction(cfId);
+    });
+
+    warehouse = warehouseRepository.getWarehouseFromCampaignFaction("campaign name", KUTAISI);
+    assertThat(warehouse.isEmpty(), is(true));
+
+    units = unitRepository.getUnitsFromCampaignFaction(cfId);
+    assertThat(units.isEmpty(), is(true));
   }
 
   Location getLocationOfUnitById(UUID unitId) {

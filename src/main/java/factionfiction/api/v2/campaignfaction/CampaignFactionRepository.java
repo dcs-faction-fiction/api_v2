@@ -193,4 +193,18 @@ public class CampaignFactionRepository {
       campaignFaction.credits()
     ));
   }
+
+  void removeCampaignFaction(Jdbi jdbi, UUID cfId) {
+    jdbi.useHandle(h ->
+      h.select("select campaign_name, airbase from campaign_faction where id = ?", cfId).mapToMap().findFirst().ifPresent(map -> {
+        var campaignName = map.get("campaign_name");
+        var airbase = map.get("airbase");
+        h.execute("delete from campaign_airfield_warehouse where campaign_name = ? and airbase = ?", campaignName, airbase);
+        h.execute("delete from campaign_faction where id = ?", cfId);
+        h.execute("delete from campaign_faction_units where campaign_faction_id not in (select distinct id from campaign_faction)");
+        h.execute("delete from campaign_faction_flight_log where campaign_faction_id not in (select distinct id from campaign_faction)");
+        h.execute("delete from campaign_airfield_warehouse_item where warehouse_id not in (select distinct id from campaign_airfield_warehouse)");
+      })
+    );
+  }
 }
