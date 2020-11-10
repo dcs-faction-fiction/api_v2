@@ -1,137 +1,137 @@
 game:
   credits:
-    starting: 30
+    starting: 400
     gain:
-      mission: 5
+      mission: 0
   zones:
     sizes:
       min:  50000
-      max: 500000
+      max: 200000
     increase:
       amount: 50000
-      cost: 2
+      cost: 8
     decrease:
       amount: 50000
-      gain: 1
+      gain: 2
     reco-shot:
       edge-size: 10000
       cost: 0.5
   units:
     - code: "AWACS"
-      cost: 3
+      cost: 200
     - code: "EWR_1L13"
-      cost: 3
+      cost: 50
     - code: "TANKER"
-      cost: 1
+      cost: 30
     - code: "ABRAMS"
-      cost: 0.5
+      cost: 10
     - code: "T_80"
-      cost: 0.5
+      cost: 5
     - code: "BRADLEY"
-      cost: 0.5
+      cost: 3.2
     - code: "BMP_3"
-      cost: 0.5
+      cost: 2.4
     - code: "BTR_80"
       cost: 0.5
     - code: "BRDM_2"
-      cost: 0.5
+      cost: 0.2
     - code: "SHILKA"
-      cost: 0.5
-    - code: "SA_9"
-      cost: 0.5
-    - code: "SA_13"
-      cost: 0.5
-    - code: "SA_15"
-      cost: 2
-    - code: "SA_19"
       cost: 1
+    - code: "SA_9"
+      cost: 01.5
+    - code: "SA_13"
+      cost: 5
+    - code: "SA_15"
+      cost: 25
+    - code: "SA_19"
+      cost: 16
     - code: "SA_6"
-      cost: 2
+      cost: 15
     - code: "SA_11"
-      cost: 2
+      cost: 30
     - code: "SA_HAWK"
-      cost: 2
+      cost: 30
     - code: "SA_10"
-      cost: 3
+      cost: 60
     - code: "SA_PATRIOT"
-      cost: 3
+      cost: 60
     - code: "LAV_25"
       cost: 0.5
     - code: "AAV7"
       cost: 0.5
     - code: "M113"
-      cost: 0.5
+      cost: 0.2
     - code: "VULCAN"
-      cost: 0.5
+      cost: 0.7
     - code: "ROLAND"
-      cost: 0.5
+      cost: 12
     - code: "LINEBACKER"
-      cost: 0.5
+      cost: 4.8
     - code: "M818"
-      cost: 0.5
+      cost: 0.3
   warehouseItems:
     - code: "JET_FUEL_TONS"
-      cost: 0.04
+      cost: 0.06
     - code: "AVIATION_GASOLINE_TONS"
       cost: 0.04
     - code: "MW50_TONS"
-      cost: 0.04
+      cost: 0.02
     - code: "DIESEL_TONS"
-      cost: 0.04
+      cost: 0.03
     - code: "F_14_B"
-      cost: 2
+      cost: 21
     - code: "F_15_C"
-      cost: 2
+      cost: 29.9
     - code: "F_16_C"
-      cost: 2
+      cost: 34
     - code: "F_A_18_C"
-      cost: 2
+      cost: 32
     - code: "AV_8B_NA"
-      cost: 2
+      cost: 24
     - code: "A_10C"
-      cost: 2
+      cost: 21
     - code: "A_10C_2"
-      cost: 2
+      cost: 24
     - code: "SU_27"
-      cost: 2
+      cost: 30
     - code: "J_11A"
-      cost: 2
+      cost: 32
     - code: "SU_33"
-      cost: 2
+      cost: 45
     - code: "MIG_29_S"
-      cost: 2
+      cost: 22
     - code: "SU_25_T"
-      cost: 2
+      cost: 11
     - code: "M_2000_C"
-      cost: 2
+      cost: 30.6
     - code: "AJS37"
-      cost: 2
+      cost: 28
     - code: "JF_17"
-      cost: 2
+      cost: 28
     - code: "UH_1H"
-      cost: 2
+      cost: 4.7
     - code: "KA_50"
-      cost: 2
+      cost: 15
     - code: "MI_8MT"
-      cost: 2
+      cost: 9
     - code: "SA342M"
-      cost: 2
-    - code: "AIM_120_B"
-      cost: 0.6
-    - code: "AIM_120_C"
       cost: 0.8
-    - code: "AIM_54_A_MK_47"
-      cost: 1.2
-    - code: "AIM_54_A_MK_60"
-      cost: 1.4
-    - code: "AIM_54_C_MK_47"
-      cost: 1.2
-    - code: "AIM_7_F"
-      cost: 0.2
-    - code: "AIM_7_M"
+    - code: "AIM_120_B"
       cost: 0.3
-    - code: "AIM_7_MH"
+    - code: "AIM_120_C"
       cost: 0.4
+    - code: "AIM_54_A_MK_47"
+      cost: 0.6
+    - code: "AIM_54_A_MK_60"
+      cost: 0.8
+    - code: "AIM_54_C_MK_47"
+      cost: 1
+    - code: "AIM_7_F"
+      cost: 0.1
+    - code: "AIM_7_M"
+      cost: 0.15
+    - code: "AIM_7_MH"
+      cost: 0.2
     - code: "AIM_9_L"
       cost: 0.1
     - code: "AIM_9_M"
@@ -141,25 +141,25 @@ game:
     - code: "AIM_9_X"
       cost: 0.4
     - code: "R_27_ER"
-      cost: 0.4
+      cost: 0.2
     - code: "R_27_ET"
-      cost: 0.8
+      cost: 0.4
     - code: "R_27_R"
       cost: 0.1
     - code: "R_27_T"
-      cost: 0.1
+      cost: 0.2
     - code: "R_73"
-      cost: 0.4
+      cost: 0.35
     - code: "R_60M"
       cost: 0.1
     - code: "R_77"
-      cost: 0.7
+      cost: 0.3
     - code: "MATRA_MAGIC_2"
       cost: 0.1
     - code: "MATRA_S_530_D"
       cost: 0.2
     - code: "AGM_122"
-      cost: 0.6
+      cost: 0.2
     - code: "AGM_154_A"
       cost: 1.2
     - code: "AGM_154_C"
@@ -179,23 +179,23 @@ game:
     - code: "AGM_65_L"
       cost: 0.6
     - code: "AGM_84_D"
-      cost: 1.2
+      cost: 1.0
     - code: "AGM_84_E"
       cost: 1.2
     - code: "AGM_88_C"
       cost: 0.8
     - code: "MK_151_L"
-      cost: 0.15
+      cost: 0.03
     - code: "MK_282_L"
-      cost: 0.15
+      cost: 0.03
     - code: "VIKHR"
-      cost: 0.15
+      cost: 0.08
     - code: "KH_58"
       cost: 0.9
     - code: "KH_25MPU"
       cost: 0.7
     - code: "KH_25ML"
-      cost: 0.6
+      cost: 0.4
     - code: "KH_29L"
       cost: 0.6
     - code: "KH_29T"
@@ -221,27 +221,27 @@ game:
     - code: "AGM_62"
       cost: 0.4
     - code: "MK_81"
-      cost: 0.1
+      cost: 0.01
     - code: "MK_82"
-      cost: 0.15
+      cost: 0.02
     - code: "MK_83"
-      cost: 0.175
+      cost: 0.03
     - code: "MK_84"
-      cost: 0.2
+      cost: 0.04
     - code: "MK_82X"
-      cost: 0.12
+      cost: 0.04
     - code: "MK_82Y"
-      cost: 0.12
+      cost: 0.04
     - code: "S_25"
-      cost: 0.2
+      cost: 0.1
     - code: "ZUNI"
-      cost: 0.1
+      cost: 0.05
     - code: "FAB_250"
-      cost: 0.15
+      cost: 0.02
     - code: "FAB_500"
-      cost: 0.2
+      cost: 0.04
     - code: "S_13"
-      cost: 0.1
+      cost: 0.08
     - code: "M151"
       cost: 0.01
     - code: "S_8"
@@ -253,24 +253,24 @@ game:
     - code: "CBU_87"
       cost: 0.1
     - code: "CBU_97"
-      cost: 0.3
+      cost: 1.2
     - code: "CBU_103"
       cost: 0.1
     - code: "CBU_105"
-      cost: 0.3
+      cost: 1.4
     - code: "CBU_99"
       cost: 0.1
     - code: "MK_20"
       cost: 0.1
     - code: "RB_24_J"
-      cost: 0.5
+      cost: 0.1
     - code: "RB_74"
-      cost: 0.5
+      cost: 0.6
     - code: "RB_75"
-      cost: 0.5
+      cost: 0.6
     - code: "RB_75_T"
-      cost: 0.5
+      cost: 0.6
     - code: "RB_15_F"
-      cost: 0.5
+      cost: 1
     - code: "RB_04_E"
-      cost: 0.5
+      cost: 0.8

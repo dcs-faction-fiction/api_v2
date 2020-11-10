@@ -46,6 +46,6 @@ class CampaignSimulatorIT {
     var result = http.get("/v2/common-api/default-game-options");
 
     BigDecimal credits = new BigDecimal(JsonPath.read(result, "$.credits.starting").toString());
-    assertThat(credits, is(new BigDecimal(30)));
+    assertThat(credits, is(new BigDecimal(400)));
   }
 }

@@ -19,14 +19,14 @@ class GameOptionsLoaderTest {
   void testLoadDefaults() throws IOException {
     var option = loader.loadDefaults();
 
-    assertThat(option.credits().starting(), is(new BigDecimal(30)));
+    assertThat(option.credits().starting(), is(new BigDecimal(400)));
   }
 
   @Test
   void testLoadNotFoundFileReturnsDefaults() throws IOException {
     var option = loader.loadFile("anyfile.yml");
 
-    assertThat(option.credits().starting(), is(new BigDecimal(30)));
+    assertThat(option.credits().starting(), is(new BigDecimal(400)));
   }
 
   @Test

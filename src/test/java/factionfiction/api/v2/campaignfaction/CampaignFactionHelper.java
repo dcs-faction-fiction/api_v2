@@ -37,7 +37,7 @@ public final class CampaignFactionHelper {
       KUTAISI,
       true,
       50_000,
-      new BigDecimal(30)));
+      new BigDecimal(400)));
   }
 
   public static void insertSampleCampaignFaction2(Jdbi jdbi, UUID id, UUID owner) {
@@ -57,7 +57,7 @@ public final class CampaignFactionHelper {
       ANAPA,
       true,
       50_000,
-      new BigDecimal(30)));
+      new BigDecimal(400)));
   }
 
   public static CampaignFaction makeSampleCampaignFaction() {
@@ -67,7 +67,7 @@ public final class CampaignFactionHelper {
       .airbase(KUTAISI)
       .coalition(BLUE)
       .zoneSizeFt(50_000)
-      .credits(new BigDecimal(30))
+      .credits(new BigDecimal(400))
       .build();
   }
 }
