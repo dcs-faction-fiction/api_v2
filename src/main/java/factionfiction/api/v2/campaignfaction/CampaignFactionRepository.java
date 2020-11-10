@@ -194,10 +194,10 @@ public class CampaignFactionRepository {
     ));
   }
 
-  void removeCampaignFaction(Jdbi jdbi, UUID cfId) {
+  void removeCampaignFaction(String campaignName, String factionName) {
+    var cfId = getCampaignFactionId(campaignName, factionName);
     jdbi.useHandle(h ->
       h.select("select campaign_name, airbase from campaign_faction where id = ?", cfId).mapToMap().findFirst().ifPresent(map -> {
-        var campaignName = map.get("campaign_name");
         var airbase = map.get("airbase");
         h.execute("delete from campaign_airfield_warehouse where campaign_name = ? and airbase = ?", campaignName, airbase);
         h.execute("delete from campaign_faction where id = ?", cfId);

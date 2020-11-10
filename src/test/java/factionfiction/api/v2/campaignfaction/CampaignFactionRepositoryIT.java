@@ -297,7 +297,7 @@ class CampaignFactionRepositoryIT {
     var units = unitRepository.getUnitsFromCampaignFaction(cfId);
     assertThat(units.isEmpty(), is(false));
 
-    repository.removeCampaignFaction(jdbi, cfId);
+    repository.removeCampaignFaction("campaign name", "faction name");
 
     assertThrows(NotFoundException.class, () -> {
       repository.getCampaignFaction(cfId);

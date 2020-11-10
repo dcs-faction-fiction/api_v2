@@ -153,6 +153,13 @@ class CampaignFactionServiceTest {
     verify(repository).getRecoShots("campaign", "faction");
   }
 
+  @Test
+  void testPassRemoveFaction() {
+    impl.removeCampaignFaction("campaign", "faction");
+
+    verify(repository).removeCampaignFaction("campaign", "faction");
+  }
+
   void mockFactionSituation() {
     given(repository.getCampaignFactionId(sample.campaignName(), sample.factionName()))
       .willReturn(cfId);

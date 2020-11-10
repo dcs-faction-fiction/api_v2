@@ -114,4 +114,8 @@ public class CampaignFactionServiceImpl {
   void deleteRecoShot(UUID id) {
     repository.deleteRecoShot(id);
   }
+
+  void removeCampaignFaction(String campaign, String faction) {
+   repository.removeCampaignFaction(campaign, faction);
+  }
 }
